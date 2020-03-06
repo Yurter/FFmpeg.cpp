@@ -9,7 +9,7 @@ namespace fpp {
 
     public:
 
-        DecoderContext(const SharedParameters parameters, Dictionary&& dictionary = Dictionary {});
+        DecoderContext(const SharedParameters parameters, const AVStream* test_stream, Dictionary&& dictionary = Dictionary {});
 
         FrameList           decode(const Packet& packet);
         FrameList           flush();

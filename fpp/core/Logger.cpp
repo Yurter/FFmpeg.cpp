@@ -19,7 +19,7 @@ namespace fpp {
         : _log_level(LogLevel::Info) {
         setName("Logger");
 //        av_log_set_callback(log_callback); //TODO later
-        setFFmpegLogLevel(LogLevel::Error);
+//        setFFmpegLogLevel(LogLevel::Info);
         print(this->name(), CODE_POS, LogLevel::Info, "Logger opened");
         openFile(log_dir);
     }
@@ -261,8 +261,8 @@ namespace fpp {
     }
 
     void Logger::print(const std::string& caller_name, const std::string& code_position, const LogLevel log_level, const std::string& message) {
-//        const std::string formated_message = formatMessage(caller_name, code_position, log_level, message);
-//        try_throw(print(log_level, formated_message));
+        const std::string formated_message = formatMessage(caller_name, code_position, log_level, message);
+        print(log_level, formated_message);
     }
 
 } // namespace fpp

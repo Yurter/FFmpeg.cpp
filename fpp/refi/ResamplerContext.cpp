@@ -10,7 +10,7 @@ namespace fpp {
         init();
     }
 
-    FrameList ResamplerContext::resample(Frame source_frame) {
+    FrameList ResamplerContext::resample(const Frame source_frame) {
         if (::swr_convert_frame(raw(), nullptr, source_frame.ptr()) != 0) {
             throw FFmpegException { "swr_convert_frame failed" };
         }
@@ -25,7 +25,14 @@ namespace fpp {
             if (ret < 0) {
                 throw FFmpegException { "swr_convert_frame failed", ret };
             }
-            output_frame.setPts(source_frame.pts()); //TODO проверить необходимость ручной установки 24.01
+//            std::cout << ">> " << ::swr_next_pts(raw(), source_frame.pts()) << "\n";
+//            std::cout << ">> " << params.in->timeBase() << " " << params.out->timeBase() << "\n";
+            //https://github.com/FFmpeg/FFmpeg/blob/a0ac49e38ee1d1011c394d7be67d0f08b2281526/libavfilter/af_aresample.c#L209
+//            output_frame.setPts(::swr_next_pts(raw(), source_frame.pts()) / 44328);
+//            output_frame.setPts(::swr_next_pts(raw(), source_frame.pts()) / 44100);
+            output_frame.setPts(::swr_next_pts(raw(), source_frame.pts()) / 44100);
+            output_frame.setPts(output_frame.pts() * 1.01124227093873);
+//            output_frame.setPts(source_frame.pts()); //TODO проверить необходимость ручной установки 24.01
             resampled_frames.push_back(output_frame);
         }
         return resampled_frames;
@@ -60,15 +67,17 @@ namespace fpp {
         }
 
         log_info("Inited "
-            << "from "
+            << "from ["
                 << "ch_layout " << in_param->channelLayout()
-                << ", sample_rate " << in_param->sampleFormat()
+                << ", smp_rate " << in_param->sampleRate()
                 << ", " << in_param->sampleFormat()
+                << ", nb_smp " << in_param->frameSize()
                 << "] "
-            << "to "
+            << "to ["
                  << "ch_layout " << out_param->channelLayout()
-                 << ", sample_rate " << out_param->sampleFormat()
+                 << ", smp_rate " << out_param->sampleRate()
                  << ", " << out_param->sampleFormat()
+                 << ", nb_smp " << out_param->frameSize()
                  << "] "
         );
     }
@@ -87,7 +96,7 @@ namespace fpp {
         frame.raw().sample_rate    = int(out_param->sampleRate());
         /* Allocate the samples of the created frame. This call will make
          * sure that the audio frame can hold as many samples as specified. */
-        if (const auto ret { ::av_frame_get_buffer(frame.ptr(), 0) }; ret < 0) {
+        if (const auto ret { ::av_frame_get_buffer(frame.ptr(), 32) }; ret < 0) {
             throw FFmpegException { "av_frame_get_buffer failed", ret };
         }
         return frame;

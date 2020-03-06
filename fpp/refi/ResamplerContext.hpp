@@ -15,7 +15,7 @@ namespace fpp {
         ResamplerContext(IOParams parameters);
         virtual ~ResamplerContext() override = default;
 
-        FrameList           resample(Frame source_frame);
+        FrameList           resample(const Frame source_frame);
 
         const IOParams      params;
 

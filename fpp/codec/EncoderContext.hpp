@@ -9,7 +9,7 @@ namespace fpp {
 
     public:
 
-        EncoderContext(const SharedParameters parameters, AVRational source_time_base, Dictionary&& dictionary = Dictionary {});
+        EncoderContext(const SharedParameters parameters, AVRational source_time_base, const AVStream* test_stream, Dictionary&& dictionary = Dictionary {});
 
         PacketList          encode(const Frame& frame);
         PacketList          flush();

@@ -29,8 +29,9 @@ namespace fpp {
 
     public: // TODO сделать конструкторы приватными
 
-        Stream(const AVStream* avstream, SharedParameters parameters);      //TODO сделать приватным 23.01 (используется в OutputContext)
+        Stream(SharedParameters parameters, const AVStream* avstream);
         Stream(const AVStream* avstream);   // Создание реального потока
+        Stream(const AVStream* avstream, SharedParameters parameters);      //TODO сделать приватным 23.01 (используется в OutputContext)
         Stream(SharedParameters params);    // Создание виртуального потока //TODO не используется (см 1й конструктор) 24.01
         Stream(const Stream& other) = delete;
         virtual ~Stream() override = default;
@@ -53,7 +54,7 @@ namespace fpp {
         int64_t             endTimePoint()      const;
         int64_t             packetIndex()       const;
 
-        AVCodecParameters*  codecParameters();
+        AVCodecParameters*  codecParams();
 
     public:
 
@@ -82,18 +83,18 @@ namespace fpp {
     };
 
     inline SharedStream make_input_stream(const AVStream* avstream) {
-        return std::make_shared<Stream>(avstream); // TODO делать utils::avmt_to_mt(avstream->codecpar->codec_type)) тут 12.02
+        return std::make_shared<Stream>(avstream);
     }
 
-    inline SharedStream make_output_stream(const AVStream* avstream, SharedParameters params) {
-        return std::make_shared<Stream>(avstream, params);
+    inline SharedStream make_output_stream(const AVStream* avstream, const SharedParameters params) {
+        return std::make_shared<Stream>(params, avstream);
     }
 
-    inline SharedStream make_virtual_input_stream(SharedParameters params) {
+    inline SharedStream make_virtual_input_stream(const SharedParameters params) {
         return std::make_shared<Stream>(nullptr, params);
     }
 
-    inline SharedStream make_virtual_output_stream(SharedParameters params) {
+    inline SharedStream make_virtual_output_stream(const SharedParameters params) {
         return std::make_shared<Stream>(nullptr, params);
     }
 

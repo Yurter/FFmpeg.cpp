@@ -29,6 +29,9 @@ namespace fpp {
         void                setDecoder(AVCodecID codec_id);
         void                setEncoder(AVCodecID codec_id);
 
+        bool                isDecoder() const;
+        bool                isEncoder() const;
+
         void                setBitrate(int64_t bitrate);
         void                setDuration(int64_t duration);
         void                setStreamIndex(uid_t stream_index);

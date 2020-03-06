@@ -47,6 +47,8 @@ namespace fpp {
 
         static const char*  guess_format_short_name(const std::string_view media_resurs_locator);
 
+        static void         params_to_avcodecpar(const SharedParameters params, AVCodecParameters* codecpar);
+
         /* FFmpeg's error codes explanation */
         static std::string  option_set_error_to_string(int ret);
         static std::string  send_packet_error_to_string(int ret);
@@ -54,13 +56,15 @@ namespace fpp {
         static std::string  send_frame_error_to_string(int ret);
         static std::string  receive_packet_error_to_string(int ret);
 
+        static SharedParameters make_youtube_video_params();
+        static SharedParameters make_youtube_audio_params();
+
         /* ---- R E F A C T O R I N G ---- */
 
         static MediaType    avmt_to_mt(AVMediaType avmedia_type);
 
         static SharedParameters createParams(MediaType type);
 
-        static void         parameters_to_avcodecpar(const SharedParameters params, AVCodecParameters* codecpar);
 
     };
 

@@ -3,11 +3,16 @@
 #include <fpp/core/Logger.hpp>
 #include <fpp/core/FFmpegException.hpp>
 
+extern "C" {
+    #include <libavformat/avformat.h>
+}
+
 namespace fpp {
 
-    CodecContext::CodecContext(const SharedParameters parameters)
+    CodecContext::CodecContext(const SharedParameters parameters, const AVStream* test_stream)
         : params { parameters }
-        , _opened { false } {
+        , _opened { false }
+        , _test_stream { test_stream } {
         setName("CodecContext");
     }
 
@@ -34,6 +39,12 @@ namespace fpp {
     void CodecContext::open(Dictionary&& dictionary) {
         if (opened()) {
             throw std::runtime_error { "Codec already opened" };
+        }
+        int ret = avcodec_parameters_from_context(_test_stream->codecpar, raw());
+        if (ret < 0)
+        {
+            fprintf(stderr, "Could not initialize stream codec parameters!\n");
+            return;
         }
         log_debug("Opening");
         if (const auto ret { ::avcodec_open2(raw(), codec(), dictionary.ptrPtr()) }; ret != 0) {
@@ -89,7 +100,7 @@ namespace fpp {
         _opened = value;
     }
 
-    void CodecContext::initContextParams() {
+    void CodecContext::initContextParams() { //TODO
         raw()->codec_id = params->codecId();
         raw()->bit_rate = params->bitrate();
 //        codec->time_base = param->timeBase(); // TODO см :318 12/02
@@ -104,6 +115,14 @@ namespace fpp {
             raw()->framerate    = video_parameters->frameRate();
             raw()->gop_size     = int(video_parameters->gopSize());
     //        codec->sample_aspect_ratio    = video_parameters->sampl; //TODO
+
+            raw()->codec_tag = 0;
+            raw()->codec_type = AVMEDIA_TYPE_VIDEO;
+            raw()->gop_size = 12;
+            raw()->framerate = { 30, 0 };
+            raw()->time_base = { 1, 1000 };
+//            raw()->bit_rate = 500000;
+            raw()->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
             return;
         }
 
@@ -113,6 +132,11 @@ namespace fpp {
             raw()->channel_layout   = audio_parameters->channelLayout();
             raw()->channels         = int(audio_parameters->channels());
             raw()->sample_rate      = int(audio_parameters->sampleRate());
+//            raw()->profile = FF_PROFILE_MPEG2_AAC_LOW;
+//            raw()->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
+//            raw()->codec_tag = 0;
+            raw()->bit_rate = 50000;
+            raw()->codec_type = AVMEDIA_TYPE_AUDIO;
             return;
         }
 

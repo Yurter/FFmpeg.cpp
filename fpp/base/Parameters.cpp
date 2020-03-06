@@ -30,6 +30,14 @@ namespace fpp {
         setCodec(::avcodec_find_encoder(codec_id));
     }
 
+    bool Parameters::isDecoder() const {
+        return ::av_codec_is_decoder(codec()) != 0;
+    }
+
+    bool Parameters::isEncoder() const {
+        return ::av_codec_is_encoder(codec()) != 0;
+    }
+
     void Parameters::setCodec(AVCodec* codec) {
         if (not_inited_ptr(codec)) {
             throw std::runtime_error {

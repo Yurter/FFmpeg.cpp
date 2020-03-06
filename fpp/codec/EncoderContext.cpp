@@ -7,10 +7,15 @@
 
 namespace fpp {
 
-    EncoderContext::EncoderContext(const SharedParameters parameters, AVRational source_time_base, Dictionary&& dictionary)
-        : CodecContext(parameters)
+    EncoderContext::EncoderContext(const SharedParameters parameters, AVRational source_time_base, const AVStream* test_stream, Dictionary&& dictionary)
+        : CodecContext(parameters, test_stream)
         , _source_time_base(source_time_base) {
         setName("EncCtx");
+        if (!parameters->isEncoder()) {
+            throw std::runtime_error {
+                "Encoder cannot be initialized with decoder parameters"
+            };
+        }
         init(std::move(dictionary));
     }
 
@@ -52,6 +57,7 @@ namespace fpp {
         int ret { 0 };
         while (0 == ret) {
             Packet output_packet { params->type() };
+//            av_init_packet(output_packet.ptr());
             const auto ret { ::avcodec_receive_packet(raw(), &output_packet.raw()) };
             if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
                 break;

@@ -286,56 +286,77 @@ namespace fpp {
 
     std::string utils::send_frame_error_to_string(int ret) {
         if (AVERROR(EAGAIN) == ret) {
-            return "avcodec_receive_frame failed: input is not accepted in \
-                    the current state - user must read output \
-                    with avcodec_receive_packet()";
+            return "avcodec_receive_frame failed: input is not accepted in "
+                    "the current state - user must read output "
+                    "with avcodec_receive_packet()";
         }
         if (AVERROR_EOF == ret) {
-            return "avcodec_receive_frame failed: the encoder has been flushed, \
-                    and no new frames can be sent to it";
+            return "avcodec_receive_frame failed: the encoder has been flushed, "
+                    "and no new frames can be sent to it";
         }
         if (AVERROR(EINVAL) == ret) {
-            return "avcodec_receive_frame failed: codec not opened, \
-                    refcounted_frames not set, it is a decoder, or requires flush";
+            return "avcodec_receive_frame failed: codec not opened, "
+                    "refcounted_frames not set, it is a decoder, or requires flush";
         }
         if (AVERROR(ENOMEM) == ret) {
-            return "avcodec_receive_frame failed: failed to add packet \
-                    to internal queue, or similar other errors: \
-                    legitimate decoding errors";
+            return "avcodec_receive_frame failed: failed to add packet "
+                    "to internal queue, or similar other errors: "
+                    "legitimate decoding errors";
         }
         return "avcodec_send_frame failed: unknown code: " + std::to_string(ret);
     }
 
     std::string utils::receive_packet_error_to_string(int ret) {
         if (AVERROR(EAGAIN) == ret) {
-            return "avcodec_receive_frame failed: output is not available \
-                    in the current state - user must try to send input";
+            return "avcodec_receive_frame failed: output is not available "
+                    "in the current state - user must try to send input";
         }
         if (AVERROR_EOF == ret) {
-            return "avcodec_receive_frame failed: the encoder has been \
-                    fully flushed, and there will be no more output packets";
+            return "avcodec_receive_frame failed: the encoder has been "
+                    "fully flushed, and there will be no more output packets";
         }
         if (AVERROR(EAGAIN) == ret) {
-            return "avcodec_receive_frame failed: codec not opened, \
-                    or it is an encoder other errors: \
-                    legitimate decoding errors";
+            return "avcodec_receive_frame failed: codec not opened, "
+                    "or it is an encoder other errors: "
+                    "lgitimate decoding errors";
         }
         return "avcodec_receive_packet failed: unknown code: " + std::to_string(ret);
+    }
+
+    SharedParameters utils::make_youtube_video_params() {
+        const auto params { fpp::VideoParameters::make_shared() };
+        params->setEncoder(AVCodecID::AV_CODEC_ID_H264);
+        params->setPixelFormat(AVPixelFormat::AV_PIX_FMT_YUV420P);
+        params->setTimeBase(DEFAULT_TIME_BASE);
+        params->setGopSize(12);
+        return params;
+    }
+
+    SharedParameters utils::make_youtube_audio_params() {
+        const auto params { fpp::AudioParameters::make_shared() };
+        params->setEncoder(AVCodecID::AV_CODEC_ID_AAC);
+        params->setSampleFormat(AV_SAMPLE_FMT_FLTP);
+        params->setTimeBase(DEFAULT_TIME_BASE);
+        params->setSampleRate(44'100);
+        params->setBitrate(128 * 1024);
+        params->setChannelLayout(AV_CH_LAYOUT_STEREO);
+        params->setChannels(2);
+        return params;
     }
 
     SharedParameters utils::createParams(MediaType type) {
         switch (type) {
         case MediaType::Video:
-            return std::make_shared<VideoParameters>();
+            return VideoParameters::make_shared();
         case MediaType::Audio:
-            return std::make_shared<AudioParameters>();
+            return AudioParameters::make_shared();
         default:
             throw std::invalid_argument("createParams failed");
         }
     }
 
     //TODO
-    void utils::parameters_to_avcodecpar(const SharedParameters params, AVCodecParameters* codecpar) {
+    void utils::params_to_avcodecpar(const SharedParameters params, AVCodecParameters* codecpar) {
         codecpar->codec_id = params->codecId();
         codecpar->bit_rate = params->bitrate();
 

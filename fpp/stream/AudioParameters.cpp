@@ -8,7 +8,6 @@ extern "C" {
 
 #define DEFAULT_SAMPLE_FORMAT   AV_SAMPLE_FMT_NONE
 #define DEFAULT_CHANEL_LAYOUT   0
-#define DEFAULT_SAMPLE_RATE     44'100
 #define not_inited_smp_fmt(x)   ((x) == DEFAULT_SAMPLE_FORMAT)
 #define not_inited_ch_layout(x) ((x) == DEFAULT_CHANEL_LAYOUT)
 
@@ -98,7 +97,7 @@ namespace fpp {
 
     void AudioParameters::completeFrom(const SharedParameters other) {
         Parameters::completeFrom(other);
-        const auto other_audio = std::static_pointer_cast<AudioParameters>(other);
+        const auto other_audio { std::static_pointer_cast<AudioParameters>(other) };
         if (not_inited_int(sampleRate()))           { setSampleRate(other_audio->sampleRate());         }
         if (not_inited_smp_fmt(sampleFormat()))     { setSampleFormat(other_audio->sampleFormat());     }
         if (not_inited_ch_layout(channelLayout()))  { setChannelLayout(other_audio->channelLayout());   }
@@ -109,15 +108,19 @@ namespace fpp {
         Parameters::parseStream(avstream);
         setSampleRate(avstream->codecpar->sample_rate);
         setSampleFormat(AVSampleFormat(avstream->codecpar->format));
-        setChannelLayout(avstream->codecpar->channel_layout);
         setChannels(avstream->codecpar->channels);
+        setChannelLayout(
+            avstream->codecpar->channel_layout == 0
+                ? uint64_t(::av_get_default_channel_layout(int(channels())))
+                : avstream->codecpar->channel_layout
+        );
         setFrameSize(avstream->codecpar->frame_size);
     }
 
     bool AudioParameters::betterThen(const SharedParameters& other) {
-        const auto other_audio = std::static_pointer_cast<AudioParameters>(other);
-        const auto this_sound_quality = sampleRate() * channels();
-        const auto other_sound_quality = other_audio->sampleRate() * other_audio->channels();
+        const auto other_audio { std::static_pointer_cast<AudioParameters>(other) };
+        const auto this_sound_quality { sampleRate() * channels() };
+        const auto other_sound_quality { other_audio->sampleRate() * other_audio->channels() };
         return this_sound_quality > other_sound_quality;
     }
 

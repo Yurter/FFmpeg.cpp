@@ -67,6 +67,8 @@ namespace fpp {
 
         [[nodiscard]] virtual StreamVector parseFormatContext() = 0;
 
+        void                addStream(SharedStream stream);
+
     private:
 
         void                setOpened(bool opened);

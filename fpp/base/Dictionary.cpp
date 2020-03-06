@@ -25,7 +25,7 @@ namespace fpp {
 
     void Dictionary::setOption(const std::string_view value, const std::string& key) {
         if (const auto ret {
-                ::av_dict_set(ptrPtr(), value.data(), key.c_str(), 0)
+                ::av_dict_set(ptrPtr(), value.data(), key.c_str(), 0) //TODO BUG!! прядок аргументов value key
             }; ret < 0) {
             throw FFmpegException {
                 std::string("Setting option - ")

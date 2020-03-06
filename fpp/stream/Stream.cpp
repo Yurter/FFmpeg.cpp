@@ -8,12 +8,14 @@ extern "C" {
 
 namespace fpp {
 
+    //base init
     Stream::Stream(const AVStream* avstream, SharedParameters parameters)
         : FFmpegObject(avstream)
         , MediaData(parameters->type())
         , params { parameters }
         , _used { false }
-        , _stamp_type { StampType::Rescale }
+//        , _stamp_type { StampType::Rescale }
+        , _stamp_type { StampType::Copy }
         , _prev_dts { 0 }
         , _prev_pts { 0 }
         , _packet_index { 0 }
@@ -25,12 +27,20 @@ namespace fpp {
         , _start_time_point { FROM_START }
         , _end_time_point { TO_END } {
         setName(utils::to_string(type()) + " stream");
-        parameters->setStreamIndex(avstream->index);
     }
 
+    //input stream
     Stream::Stream(const AVStream* avstream)
-        : Stream(avstream, utils::createParams(utils::avmt_to_mt(avstream->codecpar->codec_type))) { // TODO выводить тайп, а параметры создавать с методом type() в первом конструкторе
+        : Stream(avstream, utils::createParams(utils::avmt_to_mt(avstream->codecpar->codec_type))) {
         params->parseStream(avstream);
+        params->setStreamIndex(avstream->index);
+    }
+
+    //output stream
+    Stream::Stream(SharedParameters parameters, const AVStream* avstream)
+        : Stream(avstream, parameters) {
+        params->setStreamIndex(avstream->index);
+        utils::params_to_avcodecpar(params, codecParams());
     }
 
     Stream::Stream(SharedParameters params)
@@ -41,7 +51,7 @@ namespace fpp {
 //        return_if(inited(), Code::OK);
         if (inited_ptr(raw())) {
             /* Инициализация полей параметров кодека значениями из параметров потока */
-            utils::parameters_to_avcodecpar(params, codecParameters());
+            utils::params_to_avcodecpar(params, codecParams());
         }
     }
 
@@ -61,7 +71,7 @@ namespace fpp {
                 _chronometer.reset_timepoint();
             }
 
-            const AVRational chronometer_timebase = DEFAULT_TIME_BASE;
+            const auto chronometer_timebase { DEFAULT_TIME_BASE };
             _packet_duration = ::av_rescale_q(_chronometer.elapsed_milliseconds(), chronometer_timebase, params->timeBase());
 
             _chronometer.reset_timepoint();
@@ -233,11 +243,15 @@ namespace fpp {
         return _packet_index;
     }
 
-    AVCodecParameters* Stream::codecParameters() {
+    AVCodecParameters* Stream::codecParams() {
         if (not_inited_ptr(raw())) {
             throw std::runtime_error { "stream is nullptr" }; // TODO перенести выброс в метод raw() 04.02
         }
         return raw()->codecpar;
     }
+
+//    SharedStream make_input_stream(const AVStream* avstream) {
+//        return std::make_shared<Stream>(avstream);
+//    }
 
 } // namespace fpp

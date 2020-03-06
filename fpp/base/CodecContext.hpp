@@ -11,7 +11,7 @@ namespace fpp {
 
     public:
 
-        CodecContext(const SharedParameters parameters);
+        CodecContext(const SharedParameters parameters, const AVStream* test_stream);
         virtual ~CodecContext() override;
 
         std::string         toString() const override final;
@@ -39,6 +39,7 @@ namespace fpp {
     private:
 
         bool                _opened;
+        const AVStream* _test_stream;
 
     };
 
