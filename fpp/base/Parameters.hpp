@@ -54,6 +54,10 @@ namespace fpp {
         virtual void        initStream(AVStream* avstream) const;
         virtual bool        betterThen(const SharedParameters& other);
 
+        static SharedParameters make_shared() {
+            return std::make_shared<Parameters>();
+        }
+
     private:
 
         void                setCodec(AVCodec* codec);
