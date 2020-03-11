@@ -40,7 +40,9 @@ namespace fpp {
         if (_stream->params->isDecoder()) {
             initContext();
         }
-        if (const auto ret { ::avcodec_open2(raw(), codec(), dictionary.ptrPtr()) }; ret != 0) {
+        if (const auto ret {
+                ::avcodec_open2(raw(), codec(), dictionary.ptrPtr())
+            }; ret != 0) {
             const auto codec_type {
                 _stream->params->isDecoder() ? "decoder" : "encoder"
             };
