@@ -134,7 +134,16 @@ namespace fpp {
     }
 
     SharedStream FormatContext::stream(int64_t index) {
-       return _streams.at(size_t(index));
+        return _streams.at(size_t(index));
+    }
+
+    SharedStream FormatContext::stream(MediaType stream_type) {
+        for (const auto& stream : _streams) {
+            if (stream->params->typeIs(stream_type)) {
+                return stream;
+            }
+        }
+        return nullptr;
     }
 
 } // namespace fpp

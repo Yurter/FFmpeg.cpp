@@ -27,6 +27,7 @@ namespace fpp {
         bool                closed() const;
 
         SharedStream        stream(int64_t index);
+        SharedStream        stream(MediaType stream_type);
         int64_t             streamAmount() const;
         void                setStreams(StreamVector stream_list);
 
