@@ -10,7 +10,7 @@ extern "C" {
 namespace fpp {
 
     OutputFormatContext::OutputFormatContext(const std::string_view mrl)
-        : FormatContext { mrl }
+        : FormatContext(mrl)
         , _output_format { nullptr } {
         setName("OutFmtCtx");
         createContext();
@@ -23,17 +23,16 @@ namespace fpp {
     void OutputFormatContext::write(Packet packet, WriteMode write_mode) {
         processPacket(packet);
         if (write_mode == WriteMode::Instant) {
-            std::cout << packet << "\n";
-            if (packet.isAudio()) {
-//                packet.setDuration(180);
-//                std::cout << "[2] "<< packet.toString() << "\n";
-            }
-            if (const auto ret { ::av_write_frame(raw(), packet.ptr()) }; ret < 0) {
+            if (const auto ret {
+                    ::av_write_frame(raw(), packet.ptr())
+                }; ret < 0) {
                 throw FFmpegException { "av_write_frame failed", ret };
             }
         }
         else if (write_mode == WriteMode::Interleaved) {
-            if (const auto ret { ::av_interleaved_write_frame(raw(), packet.ptr()) }; ret < 0) {
+            if (const auto ret {
+                    ::av_interleaved_write_frame(raw(), packet.ptr())
+                }; ret < 0) {
                 throw FFmpegException { "av_interleaved_write_frame failed", ret };
             }
         }
@@ -41,12 +40,14 @@ namespace fpp {
 
     void OutputFormatContext::flush() {
         if (const auto ret { ::av_write_frame(raw(), nullptr) }; ret != 1) {
-            throw FFmpegException { "av_write_frame failed", ret };
+            throw FFmpegException { "OutputFormatContext flush failed", ret };
         }
     }
 
     void OutputFormatContext::createContext() {
-        const auto format_short_name { utils::guess_format_short_name(mediaResourceLocator()) };
+        const auto format_short_name {
+            utils::guess_format_short_name(mediaResourceLocator())
+        };
         AVFormatContext* fmt_ctx { nullptr };
         if (const auto ret {
                 ::avformat_alloc_output_context2(
@@ -80,10 +81,9 @@ namespace fpp {
                 };
             }
         }
-//        if (::avformat_write_header(raw(), nullptr) < 0) {
-//            throw FFmpegException { "avformat_write_header failed" };
-//        }
-//        ::av_dump_format(raw(), 0, mediaResourceLocator().c_str(), 1);
+        if (::avformat_write_header(raw(), nullptr) < 0) {
+            throw FFmpegException { "avformat_write_header failed" };
+        }
     }
 
     void OutputFormatContext::closeContext() {
@@ -111,7 +111,11 @@ namespace fpp {
 
     Code OutputFormatContext::guessOutputFromat() {
         const auto out_fmt {
-            ::av_guess_format(nullptr, mediaResourceLocator().c_str(), nullptr)
+            ::av_guess_format(
+                nullptr                             /* short_name */
+                , mediaResourceLocator().c_str()    /* filename   */
+                , nullptr                           /* mime_type  */
+            )
         };
         setOutputFormat(out_fmt);
         return Code::OK;

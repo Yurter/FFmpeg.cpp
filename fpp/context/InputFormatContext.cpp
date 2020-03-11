@@ -10,7 +10,7 @@ extern "C" {
 namespace fpp {
 
     InputFormatContext::InputFormatContext(const std::string_view mrl)
-        : FormatContext { mrl }
+        : FormatContext(mrl)
         , _input_format { nullptr } {
         setName("InpFmtCtx");
         createContext();
@@ -35,7 +35,9 @@ namespace fpp {
         case SeekPrecision::Precisely:
             throw std::runtime_error { "NOT_IMPLEMENTED" };
         }
-        if (const auto ret { ::av_seek_frame(raw(), int(stream_index), timestamp, flags) }; ret < 0) {
+        if (const auto ret {
+                ::av_seek_frame(raw(), int(stream_index), timestamp, flags)
+            }; ret < 0) {
             throw FFmpegException {
                 "Failed to seek timestamp "
                     + utils::time_to_string(timestamp, DEFAULT_TIME_BASE)
@@ -52,7 +54,11 @@ namespace fpp {
             if (ret == AVERROR_EOF) {
                 return Packet { MediaType::EndOF };
             }
-            throw FFmpegException { "Cannot read source: \'" + mediaResourceLocator() + "\'", ret };
+            throw FFmpegException {
+                "Cannot read source: \'"
+                    + mediaResourceLocator() + "\'"
+                , ret
+            };
         }
         processPacket(packet);
         return packet;
