@@ -27,8 +27,10 @@ rtsp://admin:admin@192.168.10.3:554 (1080p)
 int main() {
 
     try {
-
+        #pragma warning( push )
+        #pragma warning( disable : 4974)
         ::av_register_all();
+        #pragma warning( pop )
         ::avformat_network_init();
         ::avdevice_register_all();
 //        ::av_log_set_level(AV_LOG_DEBUG);
@@ -60,9 +62,9 @@ int main() {
         ::av_dump_format(youtube.raw(), 0, youtube.mediaResourceLocator().c_str(), 1);
         std::cout << "Output context opened\n";
 
-        fpp::DecoderContext video_decoder { camera.stream(0)->params, camera.stream(0).get()->raw() };
+        fpp::DecoderContext video_decoder { camera.stream(0) };
 #ifdef USE_AUDIO
-        fpp::DecoderContext audio_decoder { camera.stream(1)->params, camera.stream(1).get()->raw() };
+        fpp::DecoderContext audio_decoder { camera.stream(1) };
 #endif
         std::cout << "Decoders inited\n";
 
@@ -81,7 +83,7 @@ int main() {
         options.setOption("crf",            "30"        );
         options.setOption("tune",           "zerolatency");
         options.setOption("profile",        "main");
-        fpp::EncoderContext video_encoder { youtube.stream(0)->params, camera.stream(0)->params->timeBase(), youtube.stream(0)->raw(), std::move(options) };
+        fpp::EncoderContext video_encoder { youtube.stream(0), std::move(options) };
 
         auto out_stream { youtube.stream(0)->raw() };
         out_stream->codecpar->extradata_size = video_encoder.raw()->extradata_size;
@@ -93,7 +95,7 @@ int main() {
 #ifdef USE_AUDIO
         fpp::Dictionary audio_options;
         audio_options.setOption("preset",   "low" );
-        fpp::EncoderContext audio_encoder { youtube.stream(1)->params, camera.stream(1)->params->timeBase(), camera.stream(1).get()->raw(), std::move(audio_options) };
+        fpp::EncoderContext audio_encoder { youtube.stream(1), std::move(audio_options) };
         auto out_stream_audio { youtube.stream(1)->raw() };
         youtube.stream(0)->setStampType(fpp::StampType::Realtime);
         out_stream_audio->codecpar->extradata_size = audio_encoder.raw()->extradata_size;

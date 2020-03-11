@@ -9,10 +9,10 @@ extern "C" {
 
 namespace fpp {
 
-    CodecContext::CodecContext(const SharedParameters parameters, const AVStream* test_stream)
-        : params { parameters }
-        , _opened { false }
-        , _test_stream { test_stream } {
+    CodecContext::CodecContext(const SharedStream stream)
+        : params { stream->params }
+        , _stream { stream }
+        , _opened { false } {
         setName("CodecContext");
     }
 
@@ -29,10 +29,6 @@ namespace fpp {
             }
         });
         setName(name() + " " + codec()->name);
-        initContextParams();
-        if (true) { // TODO костыль
-            raw()->time_base = params->timeBase();
-        }
         open(std::move(dictionary));
     }
 
@@ -40,23 +36,22 @@ namespace fpp {
         if (opened()) {
             throw std::runtime_error { "Codec already opened" };
         }
-        int ret = avcodec_parameters_from_context(_test_stream->codecpar, raw());
-        if (ret < 0)
-        {
-            fprintf(stderr, "Could not initialize stream codec parameters!\n");
-            return;
-        }
         log_debug("Opening");
+        if (_stream->params->isDecoder()) {
+            initContext();
+        }
         if (const auto ret { ::avcodec_open2(raw(), codec(), dictionary.ptrPtr()) }; ret != 0) {
             const auto codec_type {
-                ::av_codec_is_decoder(codec()) ? "decoder" : "encoder"
+                _stream->params->isDecoder() ? "decoder" : "encoder"
             };
             throw FFmpegException {
                 "Cannot open " + std::string { codec()->name } + ", " + codec_type
                 , ret
             };
         }
-        onOpen();
+        if (_stream->params->isEncoder()) {
+            initStreamCodecpar();
+        }
         setOpened(true);
     }
 
@@ -100,50 +95,26 @@ namespace fpp {
         _opened = value;
     }
 
-    void CodecContext::initContextParams() { //TODO
-        raw()->codec_id = params->codecId();
-        raw()->bit_rate = params->bitrate();
-//        codec->time_base = param->timeBase(); // TODO см :318 12/02
-//        codec_context->time_base = { 1, 16000/*тут нужен таймбейс входного потока, либо рескейлить в энкодере*/ };
-
-        if (params->isVideo()) {
-            const auto video_parameters { std::static_pointer_cast<const VideoParameters>(params) };
-            raw()->pix_fmt      = video_parameters->pixelFormat();
-            raw()->width        = int(video_parameters->width());
-            raw()->height       = int(video_parameters->height());
-//            codec->time_base    = param->timeBase(); // TODO почему закомментировано ? см CodecContex.cpp:28 12.02
-            raw()->framerate    = video_parameters->frameRate();
-            raw()->gop_size     = int(video_parameters->gopSize());
-    //        codec->sample_aspect_ratio    = video_parameters->sampl; //TODO
-
-            raw()->codec_tag = 0;
-            raw()->codec_type = AVMEDIA_TYPE_VIDEO;
-            raw()->gop_size = 12;
-            raw()->framerate = { 30, 0 };
-            raw()->time_base = { 1, 1000 };
-//            raw()->bit_rate = 500000;
-            raw()->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
-            return;
+    void CodecContext::initContext() {
+        if (const auto ret {
+            ::avcodec_parameters_to_context(raw(), _stream->raw()->codecpar)
+        }; ret < 0) {
+            throw FFmpegException {
+                "Could not initialize stream codec parameters!"
+                , ret
+            };
         }
+    }
 
-        if (params->isAudio()) {
-            const auto audio_parameters { std::static_pointer_cast<const AudioParameters>(params) };
-            raw()->sample_fmt       = audio_parameters->sampleFormat();
-            raw()->channel_layout   = audio_parameters->channelLayout();
-            raw()->channels         = int(audio_parameters->channels());
-            raw()->sample_rate      = int(audio_parameters->sampleRate());
-//            raw()->profile = FF_PROFILE_MPEG2_AAC_LOW;
-//            raw()->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
-//            raw()->codec_tag = 0;
-            raw()->bit_rate = 50000;
-            raw()->codec_type = AVMEDIA_TYPE_AUDIO;
-            return;
+    void CodecContext::initStreamCodecpar() {
+        if (const auto ret {
+            ::avcodec_parameters_from_context(_stream->raw()->codecpar, raw())
+        }; ret < 0) {
+            throw FFmpegException {
+                "Could not initialize stream codec parameters!"
+                , ret
+            };
         }
-
-        throw std::invalid_argument {
-            "Failed to init codec's params with "
-                + utils::to_string(params->type()) + " params"
-        };
     }
 
 } // namespace fpp

@@ -9,21 +9,16 @@ namespace fpp {
 
     public:
 
-        EncoderContext(const SharedParameters parameters, AVRational source_time_base, const AVStream* test_stream, Dictionary&& dictionary = Dictionary {});
+        EncoderContext(const SharedStream stream, Dictionary&& dictionary = Dictionary {});
 
         PacketList          encode(const Frame& frame);
         PacketList          flush();
-        virtual void        onOpen()    override;
 
     private:
 
         void                sendFrame(const Frame& frame);
         void                sendFlushFrame();
         PacketList          receivePackets();
-
-    private:
-
-        AVRational          _source_time_base;
 
     };
 
