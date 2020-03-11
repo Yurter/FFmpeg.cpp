@@ -16,6 +16,7 @@ namespace fpp {
         virtual ~OutputFormatContext() override;
 
         SharedStream        createStream(SharedParameters params);
+        SharedStream        copyStream(const SharedStream other);
 
         void                write(Packet packet, WriteMode write_mode = WriteMode::Instant);
         void                flush();

@@ -20,6 +20,40 @@ rtsp://admin:Admin2019@192.168.10.12:554
 rtsp://admin:admin@192.168.10.3:554 (1080p)
 */
 
+void simpleCopyFile() {
+    /* create source */
+    fpp::InputFormatContext camera { "rtsp://admin:admin@192.168.10.3:554" };
+
+    /* create sink */
+    fpp::OutputFormatContext youtube { "rtsp_copy.flv" };
+
+    /* open source */
+    camera.open();
+
+    /* copy source's streams to sink */
+    for (const auto& input_stream : camera.streams()) {
+        youtube.copyStream(input_stream);
+    }
+
+    /* open sink */
+    youtube.open();
+
+    youtube.stream(fpp::MediaType::Video)->setEndTimePoint(1 * 60 * 1000); // 1 min
+
+    fpp::Packet input_packet { fpp::MediaType::Unknown };
+    const auto eof_pred {
+        [&input_packet,&camera](){
+            input_packet = camera.read();
+            return input_packet.isEOF();
+        }
+    };
+
+    while (!eof_pred()) {
+        youtube.write(input_packet);
+    }
+
+}
+
 void startYoutubeStream() {
 
     /* create source */

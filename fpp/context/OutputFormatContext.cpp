@@ -109,6 +109,29 @@ namespace fpp {
         return fppstream;
     }
 
+    SharedStream OutputFormatContext::copyStream(const SharedStream other) {
+        const auto input_params { other->params };
+        const auto output_params {
+            input_params->isVideo()
+                ? fpp::SharedParameters(fpp::VideoParameters::make_shared())
+                : fpp::SharedParameters(fpp::AudioParameters::make_shared())
+        };
+        output_params->completeFrom(input_params);
+        const auto created_stream { createStream(output_params) };
+        if (const auto ret {
+            ::avcodec_parameters_copy(
+                created_stream->raw()->codecpar /* dst */
+                , other->raw()->codecpar        /* src */
+            )
+        }; ret < 0) {
+            throw FFmpegException {
+                "Could not copy stream codec parameters!"
+                , ret
+            };
+        }
+        return created_stream;
+    }
+
     Code OutputFormatContext::guessOutputFromat() {
         const auto out_fmt {
             ::av_guess_format(
