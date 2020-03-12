@@ -8,7 +8,8 @@ extern "C" {
 namespace fpp {
 
     Frame::Frame(MediaType type)
-        : MediaData(type) {
+        : MediaData(type)
+        , _time_base { DEFAULT_RATIONAL } {
         setName("Frame");
     }
 
@@ -17,9 +18,9 @@ namespace fpp {
         ref(other);
     }
 
-    Frame::Frame(const AVFrame& frame, MediaType type)
+    Frame::Frame(const AVFrame& frame, AVRational time_base, MediaType type)
         : Frame(type) {
-        ref(frame);
+        ref(frame, time_base);
     }
 
     Frame::~Frame() {
@@ -39,6 +40,14 @@ namespace fpp {
 
     void Frame::setPts(int64_t pts) {
         raw().pts = pts;
+    }
+
+    void Frame::setTimeBase(AVRational time_base) {
+        _time_base = time_base;
+    }
+
+    AVRational Frame::timeBase() const {
+        return _time_base;
     }
 
     bool Frame::keyFrame() const {
@@ -104,11 +113,17 @@ namespace fpp {
     }
 
     void Frame::ref(const Frame& other) {
-        ::av_frame_ref(ptr(), other.ptr());
+        if (::av_frame_ref(ptr(), other.ptr()) != 0) {
+            throw FFmpegException { "av_packet_ref failed" };
+        }
+        setTimeBase(other.timeBase());
     }
 
-    void Frame::ref(const AVFrame& other) {
-        ::av_frame_ref(ptr(), &other);
+    void Frame::ref(const AVFrame& other, AVRational time_base) {
+        if (::av_frame_ref(ptr(), &other) != 0) {
+            throw FFmpegException { "av_packet_ref failed" };
+        }
+        setTimeBase(time_base);
     }
 
     void Frame::unref() {
