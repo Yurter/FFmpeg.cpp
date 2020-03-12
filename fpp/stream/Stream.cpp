@@ -9,7 +9,7 @@ extern "C" {
 namespace fpp {
 
     //base init
-    Stream::Stream(const AVStream* avstream, SharedParameters parameters)
+    Stream::Stream(AVStream* avstream, SharedParameters parameters)
         : FFmpegObject(avstream)
         , MediaData(parameters->type())
         , params { parameters }
@@ -30,14 +30,14 @@ namespace fpp {
     }
 
     //input stream
-    Stream::Stream(const AVStream* avstream)
+    Stream::Stream(AVStream* avstream)
         : Stream(avstream, utils::createParams(utils::avmt_to_mt(avstream->codecpar->codec_type))) {
         params->parseStream(avstream);
         params->setStreamIndex(avstream->index);
     }
 
     //output stream
-    Stream::Stream(SharedParameters parameters, const AVStream* avstream)
+    Stream::Stream(SharedParameters parameters, AVStream* avstream)
         : Stream(avstream, parameters) {
         params->setStreamIndex(avstream->index);
         utils::params_to_avcodecpar(params, codecParams());

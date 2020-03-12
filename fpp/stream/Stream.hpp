@@ -25,13 +25,13 @@ namespace fpp {
     using StreamVector = std::vector<SharedStream>;
 
                             // TODO заменить на шаред оббъект без деструктора 13.02
-    class Stream : public FFmpegObject<const AVStream*>, public MediaData {
+    class Stream : public FFmpegObject</*const*/ AVStream*>, public MediaData {
 
     public: // TODO сделать конструкторы приватными
 
-        Stream(SharedParameters parameters, const AVStream* avstream);
-        Stream(const AVStream* avstream);   // Создание реального потока
-        Stream(const AVStream* avstream, SharedParameters parameters);      //TODO сделать приватным 23.01 (используется в OutputContext)
+        Stream(SharedParameters parameters, AVStream* avstream);
+        Stream(AVStream* avstream);   // Создание реального потока
+        Stream(AVStream* avstream, SharedParameters parameters);      //TODO сделать приватным 23.01 (используется в OutputContext)
         Stream(SharedParameters params);    // Создание виртуального потока //TODO не используется (см 1й конструктор) 24.01
         Stream(const Stream& other) = delete;
         virtual ~Stream() override = default;
@@ -82,11 +82,11 @@ namespace fpp {
 
     };
 
-    inline SharedStream make_input_stream(const AVStream* avstream) {
+    inline SharedStream make_input_stream(AVStream* avstream) {
         return std::make_shared<Stream>(avstream);
     }
 
-    inline SharedStream make_output_stream(const AVStream* avstream, const SharedParameters params) {
+    inline SharedStream make_output_stream(AVStream* avstream, const SharedParameters params) {
         return std::make_shared<Stream>(params, avstream);
     }
 
