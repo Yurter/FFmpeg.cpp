@@ -7,6 +7,7 @@ namespace fpp {
 
     ResamplerContext::ResamplerContext(IOParams parameters)
         : params { parameters } {
+        setName("Resampler");
         init();
     }
 
