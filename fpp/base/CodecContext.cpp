@@ -37,9 +37,7 @@ namespace fpp {
             throw std::runtime_error { "Codec already opened" };
         }
         log_debug("Opening");
-        if (_stream->params->isDecoder()) {
-            initContext();
-        }
+        initContext();
         if (const auto ret {
                 ::avcodec_open2(raw(), codec(), dictionary.ptrPtr())
             }; ret != 0) {
@@ -106,6 +104,7 @@ namespace fpp {
                 , ret
             };
         }
+        raw()->time_base = params->timeBase();
     }
 
     void CodecContext::initStreamCodecpar() {
