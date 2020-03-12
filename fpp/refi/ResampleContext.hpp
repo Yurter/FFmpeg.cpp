@@ -8,12 +8,12 @@ extern "C" {
 
 namespace fpp {
 
-    class ResamplerContext : public SharedFFmpegObject<SwrContext> {
+    class ResampleContext : public SharedFFmpegObject<SwrContext> {
 
     public:
 
-        ResamplerContext(IOParams parameters);
-        virtual ~ResamplerContext() override = default;
+        ResampleContext(IOParams parameters);
+        virtual ~ResampleContext() override = default;
 
         FrameList           resample(const Frame source_frame);
 

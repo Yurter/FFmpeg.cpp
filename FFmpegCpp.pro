@@ -12,6 +12,7 @@ LIBS += -lpostproc -lswresample -lswscale
 INCLUDEPATH += include
 
 SOURCES += \
+    fpp/refi/ResampleContext.cpp \
     main.cpp \
     fpp/base/CodecContext.cpp \
     fpp/base/Dictionary.cpp \
@@ -30,7 +31,6 @@ SOURCES += \
     fpp/core/Utils.cpp \
     fpp/refi/AudioFilterContext.cpp \
     fpp/refi/FilterContext.cpp \
-    fpp/refi/ResamplerContext.cpp \
     fpp/refi/RescalerContext.cpp \
     fpp/refi/VideoFilterContext.cpp \
     fpp/stream/AudioParameters.cpp \
@@ -65,7 +65,7 @@ HEADERS += \
     fpp/core/wrap/SharedFFmpegObject.hpp \
     fpp/refi/AudioFilterContext.hpp \
     fpp/refi/FilterContext.hpp \
-    fpp/refi/ResamplerContext.hpp \
+    fpp/refi/ResampleContext.hpp \
     fpp/refi/RescalerContext.hpp \
     fpp/refi/VideoFilterContext.hpp \
     fpp/stream/AudioParameters.hpp \

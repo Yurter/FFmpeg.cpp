@@ -3,7 +3,7 @@
 #include <fpp/context/OutputFormatContext.hpp>
 #include <fpp/codec/DecoderContext.hpp>
 #include <fpp/codec/EncoderContext.hpp>
-#include <fpp/refi/ResamplerContext.hpp>
+#include <fpp/refi/ResampleContext.hpp>
 #include <fpp/core/Utils.hpp>
 
 extern "C" {
@@ -21,6 +21,7 @@ rtsp://admin:admin@192.168.10.3:554 (1080p)
 */
 
 void simpleCopyFile() {
+
     /* create source */
     fpp::InputFormatContext camera { "rtsp://admin:admin@192.168.10.3:554" };
 
@@ -38,17 +39,19 @@ void simpleCopyFile() {
     /* open sink */
     youtube.open();
 
-    youtube.stream(fpp::MediaType::Video)->setEndTimePoint(1 * 60 * 1000); // 1 min
+    /* set timeout */
+    camera.stream(fpp::MediaType::Video)->setEndTimePoint(1 * 60 * 1000); // 1 min
 
     fpp::Packet input_packet { fpp::MediaType::Unknown };
-    const auto eof_pred {
-        [&input_packet,&camera](){
+    const auto read_packet {
+        [&input_packet,&camera]() {
             input_packet = camera.read();
-            return input_packet.isEOF();
+            return !input_packet.isEOF();
         }
     };
 
-    while (!eof_pred()) {
+    /* read and write packets */
+    while (read_packet()) {
         youtube.write(input_packet);
     }
 
@@ -61,24 +64,18 @@ void startYoutubeStream() {
 
     /* create sink */
     const std::string stream_key { "apaj-8d8z-0ksj-6qxe" };
-    fpp::OutputFormatContext youtube {
-        "rtmp://a.rtmp.youtube.com/live2/"
-        + stream_key
-    };
+//    fpp::OutputFormatContext youtube {
+//        "rtmp://a.rtmp.youtube.com/live2/"
+//        + stream_key
+//    };
+    fpp::OutputFormatContext youtube { "youtube.flv" };
 
     /* open source */
     camera.open();
 
     /* copy source's streams to sink */
     for (const auto& input_stream : camera.streams()) {
-        const auto input_params { input_stream->params };
-        const auto output_params {
-            input_params->isVideo()
-                ? fpp::utils::make_youtube_video_params()
-                : fpp::utils::make_youtube_audio_params()
-        };
-        output_params->completeFrom(input_params);
-        youtube.createStream(output_params);
+        youtube.copyStream(input_stream);
     }
 
     /* create decoders */
@@ -86,7 +83,7 @@ void startYoutubeStream() {
     fpp::DecoderContext audio_decoder { camera.stream(fpp::MediaType::Audio) };
 
     /* create resampler */
-    fpp::ResamplerContext resampler {
+    fpp::ResampleContext resample {
         { camera.stream(fpp::MediaType::Audio)->params
         , youtube.stream(fpp::MediaType::Audio)->params }
     };
@@ -116,10 +113,19 @@ void startYoutubeStream() {
             , youtube.stream(fpp::MediaType::Video)->params })
     };
 
-    youtube.stream(fpp::MediaType::Video)->setEndTimePoint(10 * 60 * 1000); // 10 min
+    /* set timeout */
+    camera.stream(fpp::MediaType::Video)->setEndTimePoint(1 * 60 * 1000); // 1 min
 
     fpp::Packet input_packet { fpp::MediaType::Unknown };
-    while ([&](){ input_packet = camera.read(); return !input_packet.isEOF(); }()) {
+    const auto read_packet {
+        [&input_packet,&camera]() {
+            input_packet = camera.read();
+            return !input_packet.isEOF();
+        }
+    };
+
+    /* read and write packets */
+    while (read_packet()) {
         if (input_packet.isVideo()) {
             if (transcode_video) {
                 const auto video_frames { video_decoder.decode(input_packet) };
@@ -135,11 +141,12 @@ void startYoutubeStream() {
             }
         }
         else if (input_packet.isAudio()) {
+            continue;
             input_packet.setDts(AV_NOPTS_VALUE);
             input_packet.setPts(AV_NOPTS_VALUE);
             const auto audio_frames { audio_decoder.decode(input_packet) };
             for (const auto& a_frame : audio_frames) {
-                const auto resampled_frames { resampler.resample(a_frame) };
+                const auto resampled_frames { resample.resample(a_frame) };
                 for (auto& ra_frame : resampled_frames) {
                     auto audio_packets { audio_encoder.encode(ra_frame) };
                     for (auto& a_packet : audio_packets) {
@@ -167,6 +174,7 @@ int main() {
         ::avdevice_register_all();
 
         startYoutubeStream();
+//        simpleCopyFile();
 
     } catch (const std::exception& e) {
         std::cout << "Exception: " << e.what() << "\n";
