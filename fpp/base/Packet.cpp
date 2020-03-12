@@ -101,27 +101,17 @@ namespace fpp {
     }
 
     void Packet::ref(const Packet& other) {
-        setPts(other.pts());
-        setDts(other.dts());
-        setDuration(other.duration());
-        setTimeBase(other.timeBase());
-        setPos(other.pos());
-        setStreamIndex(other.streamIndex());
         if (::av_packet_ref(ptr(), other.ptr()) != 0) {
             throw FFmpegException { "av_packet_ref failed" };
         }
+        setTimeBase(other.timeBase());
     }
 
     void Packet::ref(const AVPacket& other, AVRational time_base) {
-        setPts(other.pts);
-        setDts(other.dts);
-        setDuration(other.duration);
-        setTimeBase(time_base);
-        setPos(other.pos);
-        setStreamIndex(other.stream_index);
         if (::av_packet_ref(ptr(), &other) != 0) {
             throw FFmpegException { "av_packet_ref failed" };
         }
+        setTimeBase(time_base);
     }
 
     void Packet::unref() {
