@@ -116,6 +116,7 @@ namespace fpp {
                 ? fpp::SharedParameters(fpp::VideoParameters::make_shared())
                 : fpp::SharedParameters(fpp::AudioParameters::make_shared())
         };
+        output_params->setTimeBase(DEFAULT_TIME_BASE); // TODO timebase hardcoded 12.03
         output_params->completeFrom(input_params);
         const auto created_stream { createStream(output_params) };
         if (const auto ret {
