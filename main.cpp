@@ -75,18 +75,27 @@ void startYoutubeStream() {
 
     /* copy source's streams to sink */
     for (const auto& input_stream : camera.streams()) {
-        youtube.copyStream(input_stream);
+        if (input_stream->isVideo()) {
+            youtube.copyStream(
+                input_stream, fpp::utils::make_youtube_video_params()
+            );
+        }
+//        if (input_stream->isAudio()) {
+//            youtube.copyStream(
+//                input_stream, fpp::utils::make_youtube_audio_params()
+//            );
+//        }
     }
 
     /* create decoders */
     fpp::DecoderContext video_decoder { camera.stream(fpp::MediaType::Video) };
-    fpp::DecoderContext audio_decoder { camera.stream(fpp::MediaType::Audio) };
+//    fpp::DecoderContext audio_decoder { camera.stream(fpp::MediaType::Audio) };
 
     /* create resampler */
-    fpp::ResampleContext resample {
-        { camera.stream(fpp::MediaType::Audio)->params
-        , youtube.stream(fpp::MediaType::Audio)->params }
-    };
+//    fpp::ResampleContext resample {
+//        { camera.stream(fpp::MediaType::Audio)->params
+//        , youtube.stream(fpp::MediaType::Audio)->params }
+//    };
 
     /* create encoder's options */
     fpp::Dictionary video_options;
@@ -102,7 +111,9 @@ void startYoutubeStream() {
 
     /* create encoders */
     fpp::EncoderContext video_encoder { youtube.stream(fpp::MediaType::Video), std::move(video_options) };
-    fpp::EncoderContext audio_encoder { youtube.stream(fpp::MediaType::Audio), std::move(audio_options) };
+//    fpp::EncoderContext audio_encoder { youtube.stream(fpp::MediaType::Audio), std::move(audio_options) };
+    std::cout << video_encoder << std::endl;
+//    std::cout << audio_encoder << std::endl;
 
     /* open sink */
     youtube.open();
@@ -140,24 +151,24 @@ void startYoutubeStream() {
                 youtube.write(input_packet);
             }
         }
-        else if (input_packet.isAudio()) {
-            continue;
-            input_packet.setDts(AV_NOPTS_VALUE);
-            input_packet.setPts(AV_NOPTS_VALUE);
-            const auto audio_frames { audio_decoder.decode(input_packet) };
-            for (const auto& a_frame : audio_frames) {
-                const auto resampled_frames { resample.resample(a_frame) };
-                for (auto& ra_frame : resampled_frames) {
-                    auto audio_packets { audio_encoder.encode(ra_frame) };
-                    for (auto& a_packet : audio_packets) {
-                        youtube.write(a_packet);
-                    }
-                }
-            }
-        }
-        else {
-            throw std::runtime_error { "Unknown packet! "};
-        }
+//        else if (input_packet.isAudio()) {
+////            continue;
+//            input_packet.setDts(AV_NOPTS_VALUE);
+//            input_packet.setPts(AV_NOPTS_VALUE);
+//            const auto audio_frames { audio_decoder.decode(input_packet) };
+//            for (const auto& a_frame : audio_frames) {
+//                const auto resampled_frames { resample.resample(a_frame) };
+//                for (auto& ra_frame : resampled_frames) {
+//                    auto audio_packets { audio_encoder.encode(ra_frame) };
+//                    for (auto& a_packet : audio_packets) {
+//                        youtube.write(a_packet);
+//                    }
+//                }
+//            }
+//        }
+//        else {
+//            throw std::runtime_error { "Unknown packet! "};
+//        }
     }
 
 }

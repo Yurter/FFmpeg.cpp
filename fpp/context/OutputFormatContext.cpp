@@ -22,6 +22,7 @@ namespace fpp {
 
     void OutputFormatContext::write(Packet packet, WriteMode write_mode) {
         processPacket(packet);
+        std::cout << packet << std::endl;
         if (write_mode == WriteMode::Instant) {
             if (const auto ret {
                     ::av_write_frame(raw(), packet.ptr())
@@ -109,26 +110,27 @@ namespace fpp {
         return fppstream;
     }
 
-    SharedStream OutputFormatContext::copyStream(const SharedStream other) {
+    SharedStream OutputFormatContext::copyStream(const SharedStream other, SharedParameters output_params) {
         const auto input_params { other->params };
-        const auto output_params {
-            input_params->isVideo()
-                ? fpp::SharedParameters(fpp::VideoParameters::make_shared())
-                : fpp::SharedParameters(fpp::AudioParameters::make_shared())
-        };
+        const auto full_stream_copy { !output_params };
+        if (full_stream_copy) {
+            output_params = utils::make_params(input_params->type());
+        }
         output_params->setTimeBase(DEFAULT_TIME_BASE); // TODO timebase hardcoded 12.03
         output_params->completeFrom(input_params);
         const auto created_stream { createStream(output_params) };
-        if (const auto ret {
-            ::avcodec_parameters_copy(
-                created_stream->raw()->codecpar /* dst */
-                , other->raw()->codecpar        /* src */
-            )
-        }; ret < 0) {
-            throw FFmpegException {
-                "Could not copy stream codec parameters!"
-                , ret
-            };
+        if (full_stream_copy) {
+            if (const auto ret {
+                ::avcodec_parameters_copy(
+                    created_stream->raw()->codecpar /* dst */
+                    , other->raw()->codecpar        /* src */
+                )
+            }; ret < 0) {
+                throw FFmpegException {
+                    "Could not copy stream codec parameters!"
+                    , ret
+                };
+            }
         }
         return created_stream;
     }
