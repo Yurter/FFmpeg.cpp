@@ -13,8 +13,10 @@ namespace fpp {
 
     //https://github.com/FFmpeg/FFmpeg/blob/a0ac49e38ee1d1011c394d7be67d0f08b2281526/libavfilter/af_aresample.c#L209
     FrameList ResampleContext::resample(const Frame source_frame) {
-        if (::swr_convert_frame(raw(), nullptr, source_frame.ptr()) != 0) {
-            throw FFmpegException { "swr_convert_frame failed" };
+        if (const auto ret {
+                ::swr_convert_frame(raw(), nullptr, source_frame.ptr())
+            }; ret != 0) {
+            throw FFmpegException { "swr_convert_frame failed", ret };
         }
         const auto in_param {
             std::static_pointer_cast<const AudioParameters>(params.in)
