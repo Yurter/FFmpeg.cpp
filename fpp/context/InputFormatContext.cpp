@@ -101,7 +101,6 @@ namespace fpp {
     StreamVector InputFormatContext::parseFormatContext() {
         StreamVector result;
         for (unsigned i { 0 }; i < raw()->nb_streams; ++i) {
-            auto qwe = raw()->streams[i];
             result.push_back(make_input_stream(raw()->streams[i]));
         }
         return result;
