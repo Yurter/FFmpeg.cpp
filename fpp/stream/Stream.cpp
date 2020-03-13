@@ -40,6 +40,7 @@ namespace fpp {
         : Stream(avstream, parameters) {
         params->setStreamIndex(avstream->index);
         avstream->time_base = params->timeBase();
+        utils::params_to_avcodecpar(params, raw()->codecpar);
     }
 
     Stream::Stream(SharedParameters params)
@@ -247,6 +248,38 @@ namespace fpp {
             throw std::runtime_error { "stream is nullptr" }; // TODO перенести выброс в метод raw() 04.02
         }
         return raw()->codecpar;
+    }
+
+    void Stream::initCodecpar() {
+        auto codecpar { raw()->codecpar };
+        codecpar->codec_id = params->codecId();
+        codecpar->bit_rate = params->bitrate();
+
+        switch (params->type()) {
+        case MediaType::Video: {
+            const auto video_parameters {
+                std::static_pointer_cast<VideoParameters>(params)
+            };
+            codecpar->codec_type        = AVMediaType::AVMEDIA_TYPE_VIDEO;
+            codecpar->width             = int(video_parameters->width());
+            codecpar->height            = int(video_parameters->height());
+    //        codec->sample_aspect_ratio    = video_parameters->sampl; //TODO
+            codecpar->format            = int(video_parameters->pixelFormat());
+            break;
+        }
+        case MediaType::Audio: {
+            const auto audio_parameters {
+                std::static_pointer_cast<AudioParameters>(params)
+            };
+            codecpar->codec_type        = AVMediaType::AVMEDIA_TYPE_AUDIO;
+            codecpar->channel_layout    = audio_parameters->channelLayout();
+            codecpar->channels          = int(audio_parameters->channels());
+            codecpar->sample_rate       = int(audio_parameters->sampleRate());
+            break;
+        }
+        default:
+            throw std::invalid_argument { "Stream::initCodecpar failed" };
+        }
     }
 
 //    SharedStream make_input_stream(const AVStream* avstream) {

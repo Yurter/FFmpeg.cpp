@@ -56,11 +56,15 @@ namespace fpp {
 
         AVCodecParameters*  codecParams();
 
+    private:
+
+        void                initCodecpar();
+
     public:
 
         SharedParameters    params;
 
-    protected:
+    private:
 
         bool                _used;
         StampType           _stamp_type;
