@@ -17,13 +17,15 @@ namespace fpp {
         static uid_t        gen_stream_uid(uid_t context_uid, uid_t stream_index);
         static uid_t        get_context_uid(uid_t stream_uid);
 
+        static std::string  to_string(AVMediaType type);
+        static std::string  to_string(AVCodecID codec_id);
+        static std::string  to_string(AVRational rational);
+        static std::string  to_string(AVSampleFormat value);
+        static std::string  to_string(AVPixelFormat pxl_fmt);
+        static std::string  to_string(Code code);
+        static std::string  to_string(bool value);
         static std::string  to_string(MediaType type);
         static std::string  pts_to_string(int64_t pts);
-        static std::string  to_string(bool value);
-        static std::string  to_string(AVPixelFormat pxl_fmt);
-        static std::string  to_string(AVSampleFormat value);
-        static std::string  to_string(Code code);
-        static std::string  to_string(AVRational rational);
         static std::string  time_to_string(int64_t time_stamp, AVRational time_base);
 
         static void         sleep_for(int64_t milliseconds);
@@ -46,8 +48,6 @@ namespace fpp {
         static bool         compatible_with_sample_format(const AVCodec* codec, AVSampleFormat sample_format);
 
         static const char*  guess_format_short_name(const std::string_view media_resurs_locator);
-
-        static void         params_to_avcodecpar(const SharedParameters params, AVCodecParameters* codecpar);
 
         /* FFmpeg's error codes explanation */
         static std::string  option_set_error_to_string(int ret);
@@ -87,7 +87,7 @@ namespace fpp {
     }
 
     inline std::ostream& operator<<(std::ostream& os, const AVCodecID codec_id) {
-        os << ::avcodec_get_name(codec_id);
+        os << utils::to_string(codec_id);
         return os;
     }
 

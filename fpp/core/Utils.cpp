@@ -66,6 +66,25 @@ namespace fpp {
         return "Invalid";
     }
 
+    std::string utils::to_string(AVMediaType type) {
+        switch (type) {
+        case AVMediaType::AVMEDIA_TYPE_UNKNOWN:
+            return "Unknown";
+        case AVMediaType::AVMEDIA_TYPE_VIDEO:
+            return "Video";
+        case AVMediaType::AVMEDIA_TYPE_AUDIO:
+            return "Audio";
+        case AVMediaType::AVMEDIA_TYPE_DATA:
+            return "Data";
+        case AVMediaType::AVMEDIA_TYPE_SUBTITLE:
+            return "Subtitle";
+        case AVMediaType::AVMEDIA_TYPE_ATTACHMENT:
+            return "Attachment";
+        default:
+            return "Invalid";
+        }
+    }
+
     std::string utils::pts_to_string(int64_t pts) {
         return pts == AV_NOPTS_VALUE ? "NOPTS" : std::to_string(pts);
     }
@@ -88,6 +107,10 @@ namespace fpp {
             return "NONE";
         }
         return std::string(ret);
+    }
+
+    std::string utils::to_string(AVCodecID codec_id) {
+        return ::avcodec_get_name(codec_id);
     }
 
     void utils::sleep_for(int64_t milliseconds) {
@@ -354,34 +377,6 @@ namespace fpp {
             throw std::invalid_argument {
                 "make_params failed: invalid media type"
             };
-        }
-    }
-
-    //TODO
-    void utils::params_to_avcodecpar(const SharedParameters params, AVCodecParameters* codecpar) {
-        codecpar->codec_id = params->codecId();
-        codecpar->bit_rate = params->bitrate();
-
-        switch (params->type()) {
-        case MediaType::Video: {
-            codecpar->codec_type = AVMediaType::AVMEDIA_TYPE_VIDEO;
-            auto video_parameters = dynamic_cast<VideoParameters*>(params.get());
-            codecpar->width                  = int(video_parameters->width());
-            codecpar->height                 = int(video_parameters->height());
-    //        codec->sample_aspect_ratio    = video_parameters->sampl; //TODO
-            codecpar->format                = int(video_parameters->pixelFormat());
-            break;
-        }
-        case MediaType::Audio: {
-            codecpar->codec_type = AVMediaType::AVMEDIA_TYPE_AUDIO;
-            auto audio_parameters = dynamic_cast<AudioParameters*>(params.get());
-            codecpar->channel_layout   = audio_parameters->channelLayout();
-            codecpar->channels         = int(audio_parameters->channels());
-            codecpar->sample_rate      = int(audio_parameters->sampleRate());
-            break;
-        }
-        case MediaType::Unknown:
-            break;
         }
     }
 
