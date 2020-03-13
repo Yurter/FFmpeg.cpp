@@ -31,16 +31,15 @@ namespace fpp {
 
     //input stream
     Stream::Stream(AVStream* avstream)
-        : Stream(avstream, utils::createParams(utils::avmt_to_mt(avstream->codecpar->codec_type))) {
+        : Stream(avstream, utils::make_params(avstream->codecpar->codec_type)) {
         params->parseStream(avstream);
-        params->setStreamIndex(avstream->index);
     }
 
     //output stream
     Stream::Stream(SharedParameters parameters, AVStream* avstream)
         : Stream(avstream, parameters) {
         params->setStreamIndex(avstream->index);
-        utils::params_to_avcodecpar(params, codecParams());
+        avstream->time_base = params->timeBase();
     }
 
     Stream::Stream(SharedParameters params)
