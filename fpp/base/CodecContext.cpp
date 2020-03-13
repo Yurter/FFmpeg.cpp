@@ -69,6 +69,7 @@ namespace fpp {
     std::string CodecContext::toString() const { // TODO лог не подоходит для аудио 13.02
         const auto delimeter { ", " };
         return "Codec name: "   + std::string(raw()->codec->name)      + delimeter
+            + (_stream->params->isDecoder() ? "decoder" : "encoder")   + delimeter
             + "codec id: "      + utils::to_string(raw()->codec->id)   + delimeter
             + "codec type: "    + utils::to_string(raw()->codec_type)  + delimeter
             + "width: "         + std::to_string(raw()->width)         + delimeter

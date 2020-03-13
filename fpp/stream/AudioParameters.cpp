@@ -109,11 +109,12 @@ namespace fpp {
         setSampleRate(avstream->codecpar->sample_rate);
         setSampleFormat(AVSampleFormat(avstream->codecpar->format));
         setChannels(avstream->codecpar->channels);
-        setChannelLayout(
-            avstream->codecpar->channel_layout == 0
-                ? uint64_t(::av_get_default_channel_layout(int(channels())))
-                : avstream->codecpar->channel_layout
-        );
+//        setChannelLayout(
+//            avstream->codecpar->channel_layout == 0
+//                ? uint64_t(::av_get_default_channel_layout(int(channels())))
+//                : avstream->codecpar->channel_layout
+//        );
+        setChannelLayout(avstream->codecpar->channel_layout);
         setFrameSize(avstream->codecpar->frame_size);
     }
 
