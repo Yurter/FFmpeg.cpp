@@ -181,19 +181,6 @@ namespace fpp {
         return false;
     }
 
-    MediaType utils::avmt_to_mt(AVMediaType avmedia_type) {
-        switch (avmedia_type) {
-        case AVMediaType::AVMEDIA_TYPE_UNKNOWN:
-            return MediaType::Unknown;
-        case AVMediaType::AVMEDIA_TYPE_VIDEO:
-            return MediaType::Video;
-        case AVMediaType::AVMEDIA_TYPE_AUDIO:
-            return MediaType::Audio;
-        default:
-            throw FFmpegException("TODO avmt_to_mt");
-        }
-    }
-
     uid_t utils::gen_uid() {
         static std::atomic<uid_t> object_uid_handle = 0;
         return object_uid_handle++;
@@ -344,14 +331,29 @@ namespace fpp {
         return params;
     }
 
-    SharedParameters utils::createParams(MediaType type) {
+    SharedParameters utils::make_params(MediaType type) {
         switch (type) {
         case MediaType::Video:
             return VideoParameters::make_shared();
         case MediaType::Audio:
             return AudioParameters::make_shared();
         default:
-            throw std::invalid_argument("createParams failed");
+            throw std::invalid_argument {
+                "make_params failed: invalid media type"
+            };
+        }
+    }
+
+    SharedParameters utils::make_params(AVMediaType type) {
+        switch (type) {
+        case AVMediaType::AVMEDIA_TYPE_VIDEO:
+            return VideoParameters::make_shared();
+        case AVMediaType::AVMEDIA_TYPE_AUDIO:
+            return AudioParameters::make_shared();
+        default:
+            throw std::invalid_argument {
+                "make_params failed: invalid media type"
+            };
         }
     }
 
@@ -479,7 +481,7 @@ namespace fpp {
     }
 
     bool utils::compare_float(float a, float b) {
-        const float epsilon { 0.0001f };
+        const auto epsilon { 0.0001f };
         return ::fabs(a - b) < epsilon;
     }
 

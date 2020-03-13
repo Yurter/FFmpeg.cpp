@@ -56,15 +56,10 @@ namespace fpp {
         static std::string  send_frame_error_to_string(int ret);
         static std::string  receive_packet_error_to_string(int ret);
 
+        static SharedParameters make_params(MediaType type);
+        static SharedParameters make_params(AVMediaType type);
         static SharedParameters make_youtube_video_params();
         static SharedParameters make_youtube_audio_params();
-
-        /* ---- R E F A C T O R I N G ---- */
-
-        static MediaType    avmt_to_mt(AVMediaType avmedia_type);
-
-        static SharedParameters createParams(MediaType type);
-
 
     };
 
