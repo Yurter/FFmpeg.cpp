@@ -106,6 +106,7 @@ namespace fpp {
             };
         }
         raw()->time_base = params->timeBase();
+        raw()->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
     }
 
     void CodecContext::initStreamCodecpar() {
