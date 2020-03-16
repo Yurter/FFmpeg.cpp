@@ -138,6 +138,16 @@ namespace fpp {
         return std::to_string(hh) + ':' + std::to_string(mm) + ':' + std::to_string(ss) + '.' + std::to_string(ms);
     }
 
+    std::string utils::channels_layout_to_string(int nb_channels, uint64_t channel_layout) {
+        if (channel_layout == 0) {
+            return "Unknown or unspecified";
+        }
+        const auto buf_size { 16 };
+        char buf[buf_size];
+        ::av_get_channel_layout_string(buf, buf_size, nb_channels, channel_layout);
+        return std::string { buf };
+    }
+
     bool utils::exit_code(Code code) {
         if (error_code(code))                   { return true; }
         if (code == Code::EXIT)                 { return true; }
@@ -331,6 +341,16 @@ namespace fpp {
                     "lgitimate decoding errors";
         }
         return "avcodec_receive_packet failed: unknown code: " + std::to_string(ret);
+    }
+
+    std::string utils::swr_convert_frame_error_to_string(int ret) {
+        if (ret & AVERROR_INPUT_CHANGED) {
+            return "Input changed";
+        }
+        if (ret & AVERROR_OUTPUT_CHANGED) {
+            return "Output changed";
+        }
+        return std::to_string(ret);
     }
 
     SharedParameters utils::make_youtube_video_params() {
