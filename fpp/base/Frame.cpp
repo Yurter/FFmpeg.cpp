@@ -56,7 +56,7 @@ namespace fpp {
 
     size_t Frame::size() const {
         if (isVideo()) {
-            return uint64_t(
+            return size_t(
                 ::av_image_get_buffer_size(
                     AVPixelFormat(raw().format)
                     , raw().width
@@ -78,7 +78,7 @@ namespace fpp {
                     , 32                            /* align */
                 )
             };
-            return uint64_t(bufer_size);
+            return size_t(bufer_size);
         }
         return 0;
     }
