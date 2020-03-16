@@ -14,7 +14,6 @@ namespace fpp {
         , MediaData(parameters->type())
         , params { parameters }
         , _used { false }
-//        , _stamp_type { StampType::Rescale }
         , _stamp_type { StampType::Copy }
         , _prev_dts { 0 }
         , _prev_pts { 0 }
@@ -40,20 +39,20 @@ namespace fpp {
         : Stream(avstream, parameters) {
         params->setStreamIndex(avstream->index);
         avstream->time_base = params->timeBase();
-        utils::params_to_avcodecpar(params, raw()->codecpar);
+        initCodecpar();
     }
 
     Stream::Stream(SharedParameters params)
         : Stream(nullptr, params) {
     }
 
-    void Stream::init() { //TODO продумать инициализацию ффмпег потока из параметров по типу completeFrom метода 17.01
-//        return_if(inited(), Code::OK);
-        if (inited_ptr(raw())) {
-            /* Инициализация полей параметров кодека значениями из параметров потока */
-            utils::params_to_avcodecpar(params, codecParams());
-        }
-    }
+//    void Stream::init() { //TODO продумать инициализацию ффмпег потока из параметров по типу completeFrom метода 17.01
+////        return_if(inited(), Code::OK);
+//        if (inited_ptr(raw())) {
+//            /* Инициализация полей параметров кодека значениями из параметров потока */
+//            utils::params_to_avcodecpar(params, codecParams());
+//        }
+//    }
 
     std::string Stream::toString() const {
         return "[" + std::to_string(params->streamIndex()) + "] "
@@ -278,7 +277,9 @@ namespace fpp {
             break;
         }
         default:
-            throw std::invalid_argument { "Stream::initCodecpar failed" };
+            throw std::invalid_argument {
+                "Stream::initCodecpar failed becose of bad param's type"
+            };
         }
     }
 

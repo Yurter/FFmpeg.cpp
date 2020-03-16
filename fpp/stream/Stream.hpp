@@ -36,7 +36,7 @@ namespace fpp {
         Stream(const Stream& other) = delete;
         virtual ~Stream() override = default;
 
-        void                init();
+//        void                init();
         virtual std::string toString() const override final;
 
         void                stampPacket(Packet& packet);

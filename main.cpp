@@ -125,7 +125,7 @@ void startYoutubeStream() {
     };
 
     /* set timeout */
-    camera.stream(fpp::MediaType::Video)->setEndTimePoint(1 * 60 * 1000); // 1 min
+    camera.stream(fpp::MediaType::Video)->setEndTimePoint(1 * 30 * 1000); // 10 min
 
     fpp::Packet input_packet { fpp::MediaType::Unknown };
     const auto read_packet {
