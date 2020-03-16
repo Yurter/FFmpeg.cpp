@@ -274,6 +274,7 @@ namespace fpp {
             codecpar->channel_layout    = audio_parameters->channelLayout();
             codecpar->channels          = int(audio_parameters->channels());
             codecpar->sample_rate       = int(audio_parameters->sampleRate());
+            codecpar->format            = int(audio_parameters->sampleFormat());
             break;
         }
         default:
