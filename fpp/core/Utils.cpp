@@ -138,7 +138,7 @@ namespace fpp {
         return std::to_string(hh) + ':' + std::to_string(mm) + ':' + std::to_string(ss) + '.' + std::to_string(ms);
     }
 
-    std::string utils::channels_layout_to_string(int nb_channels, uint64_t channel_layout) {
+    std::string utils::channel_layout_to_string(int nb_channels, uint64_t channel_layout) {
         if (channel_layout == 0) {
             return "Unknown or unspecified";
         }
