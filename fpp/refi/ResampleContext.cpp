@@ -11,12 +11,16 @@ namespace fpp {
         init();
     }
 
-    //https://github.com/FFmpeg/FFmpeg/blob/a0ac49e38ee1d1011c394d7be67d0f08b2281526/libavfilter/af_aresample.c#L209
+    // https://github.com/FFmpeg/FFmpeg/blob/a0ac49e38ee1d1011c394d7be67d0f08b2281526/libavfilter/af_aresample.c#L209
     FrameList ResampleContext::resample(const Frame source_frame) {
         if (const auto ret {
                 ::swr_convert_frame(raw(), nullptr, source_frame.ptr())
             }; ret != 0) {
-            throw FFmpegException { "swr_convert_frame failed", ret };
+            throw FFmpegException {
+                "swr_convert_frame failed: "
+                    + utils::swr_convert_frame_error_to_string(ret)
+                , ret
+            };
         }
         const auto in_param {
             std::static_pointer_cast<const AudioParameters>(params.in)
@@ -45,7 +49,11 @@ namespace fpp {
                 /* не ошибка */
                 break;
             if (ret < 0) {
-                throw FFmpegException { "swr_convert_frame failed", ret };
+                throw FFmpegException {
+                    "swr_convert_frame failed: "
+                        + utils::swr_convert_frame_error_to_string(ret)
+                    , ret
+                };
             }
             resampled_frames.push_back(output_frame);
         }
@@ -64,10 +72,10 @@ namespace fpp {
         reset(std::shared_ptr<SwrContext> {
             ::swr_alloc_set_opts(
                 nullptr   /* existing Swr context   */
-                , ::av_get_default_channel_layout(int(out_param->channels())) //TODO юзать метод setChannelLayout() 24.01
+                , out_param->channelLayout()
                 , out_param->sampleFormat()
                 , int(out_param->sampleRate())
-                , ::av_get_default_channel_layout(int(in_param->channels()))  //TODO юзать метод setChannelLayout() 24.01
+                , in_param->channelLayout()
                 , in_param->sampleFormat()
                 , int(in_param->sampleRate())
                 , 0       /* logging level offset   */
@@ -82,13 +90,13 @@ namespace fpp {
 
         log_info("Inited "
             << "from ["
-                << "ch_layout " << in_param->channelLayout()
+                << "ch_layout " << utils::channel_layout_to_string(in_param->frameSize(), in_param->channelLayout())
                 << ", smp_rate " << in_param->sampleRate()
                 << ", " << in_param->sampleFormat()
                 << ", nb_smp " << in_param->frameSize()
                 << "] "
             << "to ["
-                 << "ch_layout " << out_param->channelLayout()
+                 << "ch_layout " << utils::channel_layout_to_string(out_param->frameSize(), out_param->channelLayout())
                  << ", smp_rate " << out_param->sampleRate()
                  << ", " << out_param->sampleFormat()
                  << ", nb_smp " << out_param->frameSize()

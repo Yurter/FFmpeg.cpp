@@ -45,19 +45,19 @@ namespace fpp {
 
     FrameList DecoderContext::receiveFrames() {
         FrameList decoded_frames;
-        int ret { 0 };
+        auto ret { 0 };
         while (ret == 0) {
             Frame output_frame { params->type() };
-            ret = ::avcodec_receive_frame(raw(), &output_frame.raw());
+            ret = ::avcodec_receive_frame(raw(), output_frame.ptr());
             if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF)
                 /* Не ошибка */
                 break;
             if (ret < 0) {
-                throw FFmpegException { utils::receive_frame_error_to_string(ret), ret };
+                throw FFmpegException {
+                    utils::receive_frame_error_to_string(ret), ret
+                };
             }
-//            if (output_frame.isVideo()) {
-//                output_frame.raw().pict_type = AV_PICTURE_TYPE_NONE;
-//            }
+            log_error("==> output_frame: " << output_frame);
             decoded_frames.push_back(output_frame);
         }
         return decoded_frames;

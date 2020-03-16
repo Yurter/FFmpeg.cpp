@@ -102,6 +102,10 @@ namespace fpp {
         return _time_base;
     }
 
+    std::string Parameters::codecType() const {
+        return isDecoder() ? "decoder" : "encoder";
+    }
+
     void Parameters::increaseDuration(const int64_t value) {
         _duration += value;
     }

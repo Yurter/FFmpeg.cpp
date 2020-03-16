@@ -44,6 +44,7 @@ namespace fpp {
         int64_t             duration()      const;
         uid_t               streamIndex()   const;
         AVRational          timeBase()      const;
+        std::string         codecType()     const;
 
         void                increaseDuration(const int64_t value);
 

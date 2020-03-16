@@ -142,7 +142,7 @@ namespace fpp {
         if (channel_layout == 0) {
             return "Unknown or unspecified";
         }
-        const auto buf_size { 16 };
+        const auto buf_size { 32 };
         char buf[buf_size];
         ::av_get_channel_layout_string(buf, buf_size, nb_channels, channel_layout);
         return std::string { buf };

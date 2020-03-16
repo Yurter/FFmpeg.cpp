@@ -101,7 +101,7 @@ namespace fpp {
                     + (keyFrame() ? "[I]" : "[_]") + ", "
                     + "pts " + utils::pts_to_string(raw().pts) + ", "
                     + "samples " + std::to_string(raw().nb_samples) + ", "
-                    + "channel_layout " + std::to_string(raw().channel_layout) + ", "
+                    + "channel_layout " + utils::channel_layout_to_string(raw().nb_samples, raw().channel_layout) + ", "
                     + "sample_rate " + std::to_string(raw().sample_rate);
             return str;
         }

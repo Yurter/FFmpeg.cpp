@@ -29,12 +29,6 @@ namespace fpp {
         return receivePackets();
     }
 
-//    void EncoderContext::onOpen() { //TODO 11.03
-//        if (params->typeIs(MediaType::Audio)) {
-//            static_cast<AudioParameters * const>(params.get())->setFrameSize(raw()->frame_size); //TODO не надежно: нет гарантий, что кодек откроется раньше, чем рескейлер начнет работу
-//        }
-//    }
-
     void EncoderContext::sendFrame(const Frame& frame) {
         if (const auto ret {
                 ::avcodec_send_frame(raw(), &frame.raw())
@@ -56,13 +50,16 @@ namespace fpp {
         auto ret { 0 };
         while (0 == ret) {
             Packet output_packet { params->type() };
-//            av_init_packet(output_packet.ptr());
-            const auto ret { ::avcodec_receive_packet(raw(), &output_packet.raw()) };
+            const auto ret {
+                ::avcodec_receive_packet(raw(), &output_packet.raw())
+            };
             if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
                 break;
             }
             if (ret < 0) {
-                throw FFmpegException { utils::receive_packet_error_to_string(ret), ret };
+                throw FFmpegException {
+                    utils::receive_packet_error_to_string(ret), ret
+                };
             }
             output_packet.setType(params->type());
             throw std::runtime_error { "TODO _source_time_base 11.03" };

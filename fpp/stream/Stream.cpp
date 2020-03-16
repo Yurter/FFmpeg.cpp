@@ -46,14 +46,6 @@ namespace fpp {
         : Stream(nullptr, params) {
     }
 
-//    void Stream::init() { //TODO продумать инициализацию ффмпег потока из параметров по типу completeFrom метода 17.01
-////        return_if(inited(), Code::OK);
-//        if (inited_ptr(raw())) {
-//            /* Инициализация полей параметров кодека значениями из параметров потока */
-//            utils::params_to_avcodecpar(params, codecParams());
-//        }
-//    }
-
     std::string Stream::toString() const {
         return "[" + std::to_string(params->streamIndex()) + "] "
                 + utils::to_string(type()) + " stream: "
