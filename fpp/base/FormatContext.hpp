@@ -64,7 +64,7 @@ namespace fpp {
 
         virtual void        createContext() = 0;
         virtual void        openContext()   = 0;
-        virtual void        closeContext()  = 0;
+        virtual void        beforeCloseContext();
 
         [[nodiscard]] virtual StreamVector parseFormatContext() = 0;
 
@@ -76,6 +76,7 @@ namespace fpp {
         void                setInteruptCallback(InterruptedProcess process);
         void                resetInteruptCallback();
         static int          interrupt_callback(void* opaque);
+        void                closeContext();
 
     private:
 

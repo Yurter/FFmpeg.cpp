@@ -64,12 +64,10 @@ namespace fpp {
         return packet;
     }
 
-    void fpp::InputFormatContext::createContext() {
+    void InputFormatContext::createContext() {
         reset(std::shared_ptr<AVFormatContext> {
             ::avformat_alloc_context()
-            , [](auto* ctx) {
-//                ::avformat_free_context(ctx); //TODO closeContext делает указатель висящим 02.03
-            }
+            , [](auto* ctx) { ::avformat_free_context(ctx); }
         });
     }
 
@@ -91,11 +89,6 @@ namespace fpp {
             throw FFmpegException { "Failed to retrieve input stream information", ret };
         }
         setStreams(parseFormatContext());
-    }
-
-    void InputFormatContext::closeContext() {
-        auto fmt_ctx { raw() };
-        avformat_close_input(&fmt_ctx);
     }
 
     StreamVector InputFormatContext::parseFormatContext() {

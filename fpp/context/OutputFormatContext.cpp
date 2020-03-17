@@ -22,7 +22,6 @@ namespace fpp {
 
     void OutputFormatContext::write(Packet packet, WriteMode write_mode) {
         processPacket(packet);
-//        std::cout << packet << std::endl;
         if (write_mode == WriteMode::Instant) {
             if (const auto ret {
                     ::av_write_frame(raw(), packet.ptr())
@@ -70,7 +69,7 @@ namespace fpp {
     void OutputFormatContext::openContext() {
         if (!(raw()->flags & AVFMT_NOFILE)) {
             if (const auto ret {
-                    ::avio_open( // TODO: avio_open2 03.03
+                    ::avio_open( // TODO: avio_open2 [interrupt callback] 03.03
                         &raw()->pb                          /* AVIOContext  */
                         , mediaResourceLocator().c_str()    /* url          */
                         , AVIO_FLAG_WRITE                   /* flags        */
@@ -82,24 +81,11 @@ namespace fpp {
                 };
             }
         }
-        if (::avformat_write_header(raw(), nullptr) < 0) {
-            throw FFmpegException { "avformat_write_header failed" };
-        }
+        writeHeader();
     }
 
-    void OutputFormatContext::closeContext() {
-        if (const auto ret { ::av_write_trailer(raw()) }; ret < 0) {
-            throw FFmpegException {
-                "Failed to write stream trailer to " + mediaResourceLocator()
-                , ret
-            };
-        }
-        if (const auto ret { ::avio_close(raw()->pb) }; ret < 0) {
-            throw FFmpegException {
-                "Failed to close " + mediaResourceLocator()
-                , ret
-            };
-        }
+    void OutputFormatContext::beforeCloseContext() {
+        writeTrailer();
     }
 
     SharedStream OutputFormatContext::createStream(SharedParameters params) {
@@ -149,6 +135,22 @@ namespace fpp {
 
     StreamVector OutputFormatContext::parseFormatContext() {
         throw std::logic_error { "OutputFormatContext::parseFormatContext()" };
+    }
+
+    void OutputFormatContext::writeHeader() {
+        ::avformat_write_header(
+            raw()
+            , nullptr /* options */
+        );
+    }
+
+    void OutputFormatContext::writeTrailer() {
+        if (const auto ret { ::av_write_trailer(raw()) }; ret < 0) {
+            throw FFmpegException {
+                "Failed to write stream trailer to " + mediaResourceLocator()
+                , ret
+            };
+        }
     }
 
     AVOutputFormat* OutputFormatContext::outputFormat() {

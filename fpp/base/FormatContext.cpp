@@ -43,6 +43,10 @@ namespace fpp {
         return context_info;
     }
 
+    void FormatContext::beforeCloseContext() {
+        //
+    }
+
     void FormatContext::setOpened(bool opened) {
         _opened = opened;
     }
@@ -96,6 +100,16 @@ namespace fpp {
             throw std::runtime_error { "InterruptedProcess::Writing is not implemeted" };
         }
         throw std::invalid_argument { "Bad InterruptedProcess arg" };
+    }
+
+    void FormatContext::closeContext() {
+        beforeCloseContext();
+        if (const auto ret { ::avio_close(raw()->pb) }; ret < 0) {
+            throw FFmpegException {
+                "Failed to close " + mediaResourceLocator()
+                , ret
+            };
+        }
     }
 
     std::string FormatContext::mediaResourceLocator() const {

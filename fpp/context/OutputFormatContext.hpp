@@ -26,12 +26,14 @@ namespace fpp {
 
     private:
 
-        virtual void        createContext() override;
-        virtual void        openContext()   override;
-        virtual void        closeContext()  override;
+        virtual void        createContext()         override;
+        virtual void        openContext()           override;
+        virtual void        beforeCloseContext()    override;
 
         Code                guessOutputFromat();
         [[nodiscard]] virtual StreamVector parseFormatContext() override;
+        void                writeHeader();
+        void                writeTrailer();
 
     private:
 
