@@ -66,6 +66,25 @@ namespace fpp {
         return "Invalid";
     }
 
+    std::string utils::to_string(AVMediaType type) {
+        switch (type) {
+        case AVMediaType::AVMEDIA_TYPE_UNKNOWN:
+            return "Unknown";
+        case AVMediaType::AVMEDIA_TYPE_VIDEO:
+            return "Video";
+        case AVMediaType::AVMEDIA_TYPE_AUDIO:
+            return "Audio";
+        case AVMediaType::AVMEDIA_TYPE_DATA:
+            return "Data";
+        case AVMediaType::AVMEDIA_TYPE_SUBTITLE:
+            return "Subtitle";
+        case AVMediaType::AVMEDIA_TYPE_ATTACHMENT:
+            return "Attachment";
+        default:
+            return "Invalid";
+        }
+    }
+
     std::string utils::pts_to_string(int64_t pts) {
         return pts == AV_NOPTS_VALUE ? "NOPTS" : std::to_string(pts);
     }
@@ -88,6 +107,10 @@ namespace fpp {
             return "NONE";
         }
         return std::string(ret);
+    }
+
+    std::string utils::to_string(AVCodecID codec_id) {
+        return ::avcodec_get_name(codec_id);
     }
 
     void utils::sleep_for(int64_t milliseconds) {
@@ -113,6 +136,16 @@ namespace fpp {
         const int64_t mm = ((time_ms / 1000) % 3600) / 60;
         const int64_t hh = (time_ms / 1000) / 3600;
         return std::to_string(hh) + ':' + std::to_string(mm) + ':' + std::to_string(ss) + '.' + std::to_string(ms);
+    }
+
+    std::string utils::channel_layout_to_string(int nb_channels, uint64_t channel_layout) {
+        if (channel_layout == 0) {
+            return "Unknown or unspecified";
+        }
+        const auto buf_size { 32 };
+        char buf[buf_size];
+        ::av_get_channel_layout_string(buf, buf_size, nb_channels, channel_layout);
+        return std::string { buf };
     }
 
     bool utils::exit_code(Code code) {
@@ -179,19 +212,6 @@ namespace fpp {
             smp_fmt++;
         }
         return false;
-    }
-
-    MediaType utils::avmt_to_mt(AVMediaType avmedia_type) {
-        switch (avmedia_type) {
-        case AVMediaType::AVMEDIA_TYPE_UNKNOWN:
-            return MediaType::Unknown;
-        case AVMediaType::AVMEDIA_TYPE_VIDEO:
-            return MediaType::Video;
-        case AVMediaType::AVMEDIA_TYPE_AUDIO:
-            return MediaType::Audio;
-        default:
-            throw FFmpegException("TODO avmt_to_mt");
-        }
     }
 
     uid_t utils::gen_uid() {
@@ -286,79 +306,97 @@ namespace fpp {
 
     std::string utils::send_frame_error_to_string(int ret) {
         if (AVERROR(EAGAIN) == ret) {
-            return "avcodec_receive_frame failed: input is not accepted in \
-                    the current state - user must read output \
-                    with avcodec_receive_packet()";
+            return "avcodec_receive_frame failed: input is not accepted in "
+                    "the current state - user must read output "
+                    "with avcodec_receive_packet()";
         }
         if (AVERROR_EOF == ret) {
-            return "avcodec_receive_frame failed: the encoder has been flushed, \
-                    and no new frames can be sent to it";
+            return "avcodec_receive_frame failed: the encoder has been flushed, "
+                    "and no new frames can be sent to it";
         }
         if (AVERROR(EINVAL) == ret) {
-            return "avcodec_receive_frame failed: codec not opened, \
-                    refcounted_frames not set, it is a decoder, or requires flush";
+            return "avcodec_receive_frame failed: codec not opened, "
+                    "refcounted_frames not set, it is a decoder, or requires flush";
         }
         if (AVERROR(ENOMEM) == ret) {
-            return "avcodec_receive_frame failed: failed to add packet \
-                    to internal queue, or similar other errors: \
-                    legitimate decoding errors";
+            return "avcodec_receive_frame failed: failed to add packet "
+                    "to internal queue, or similar other errors: "
+                    "legitimate decoding errors";
         }
         return "avcodec_send_frame failed: unknown code: " + std::to_string(ret);
     }
 
     std::string utils::receive_packet_error_to_string(int ret) {
         if (AVERROR(EAGAIN) == ret) {
-            return "avcodec_receive_frame failed: output is not available \
-                    in the current state - user must try to send input";
+            return "avcodec_receive_frame failed: output is not available "
+                    "in the current state - user must try to send input";
         }
         if (AVERROR_EOF == ret) {
-            return "avcodec_receive_frame failed: the encoder has been \
-                    fully flushed, and there will be no more output packets";
+            return "avcodec_receive_frame failed: the encoder has been "
+                    "fully flushed, and there will be no more output packets";
         }
         if (AVERROR(EAGAIN) == ret) {
-            return "avcodec_receive_frame failed: codec not opened, \
-                    or it is an encoder other errors: \
-                    legitimate decoding errors";
+            return "avcodec_receive_frame failed: codec not opened, "
+                    "or it is an encoder other errors: "
+                    "lgitimate decoding errors";
         }
         return "avcodec_receive_packet failed: unknown code: " + std::to_string(ret);
     }
 
-    SharedParameters utils::createParams(MediaType type) {
+    std::string utils::swr_convert_frame_error_to_string(int ret) {
+        if (ret & AVERROR_INPUT_CHANGED) {
+            return "Input changed";
+        }
+        if (ret & AVERROR_OUTPUT_CHANGED) {
+            return "Output changed";
+        }
+        return std::to_string(ret);
+    }
+
+    SharedParameters utils::make_youtube_video_params() {
+        const auto params { fpp::VideoParameters::make_shared() };
+        params->setEncoder(AVCodecID::AV_CODEC_ID_H264);
+        params->setPixelFormat(AVPixelFormat::AV_PIX_FMT_YUV420P);
+        params->setTimeBase(DEFAULT_TIME_BASE);
+        params->setGopSize(12);
+        return params;
+    }
+
+    SharedParameters utils::make_youtube_audio_params() {
+        const auto params { fpp::AudioParameters::make_shared() };
+        params->setEncoder(AVCodecID::AV_CODEC_ID_AAC);
+        params->setSampleFormat(AV_SAMPLE_FMT_FLTP);
+        params->setTimeBase(DEFAULT_TIME_BASE);
+        params->setSampleRate(44'100);
+        params->setBitrate(128 * 1024);
+        params->setChannelLayout(AV_CH_LAYOUT_STEREO);
+        params->setChannels(2);
+        return params;
+    }
+
+    SharedParameters utils::make_params(MediaType type) {
         switch (type) {
         case MediaType::Video:
-            return std::make_shared<VideoParameters>();
+            return VideoParameters::make_shared();
         case MediaType::Audio:
-            return std::make_shared<AudioParameters>();
+            return AudioParameters::make_shared();
         default:
-            throw std::invalid_argument("createParams failed");
+            throw std::invalid_argument {
+                "make_params failed: invalid media type"
+            };
         }
     }
 
-    //TODO
-    void utils::parameters_to_avcodecpar(const SharedParameters params, AVCodecParameters* codecpar) {
-        codecpar->codec_id = params->codecId();
-        codecpar->bit_rate = params->bitrate();
-
-        switch (params->type()) {
-        case MediaType::Video: {
-            codecpar->codec_type = AVMediaType::AVMEDIA_TYPE_VIDEO;
-            auto video_parameters = dynamic_cast<VideoParameters*>(params.get());
-            codecpar->width                  = int(video_parameters->width());
-            codecpar->height                 = int(video_parameters->height());
-    //        codec->sample_aspect_ratio    = video_parameters->sampl; //TODO
-            codecpar->format                = int(video_parameters->pixelFormat());
-            break;
-        }
-        case MediaType::Audio: {
-            codecpar->codec_type = AVMediaType::AVMEDIA_TYPE_AUDIO;
-            auto audio_parameters = dynamic_cast<AudioParameters*>(params.get());
-            codecpar->channel_layout   = audio_parameters->channelLayout();
-            codecpar->channels         = int(audio_parameters->channels());
-            codecpar->sample_rate      = int(audio_parameters->sampleRate());
-            break;
-        }
-        case MediaType::Unknown:
-            break;
+    SharedParameters utils::make_params(AVMediaType type) {
+        switch (type) {
+        case AVMediaType::AVMEDIA_TYPE_VIDEO:
+            return VideoParameters::make_shared();
+        case AVMediaType::AVMEDIA_TYPE_AUDIO:
+            return AudioParameters::make_shared();
+        default:
+            throw std::invalid_argument {
+                "make_params failed: invalid media type"
+            };
         }
     }
 
@@ -458,7 +496,7 @@ namespace fpp {
     }
 
     bool utils::compare_float(float a, float b) {
-        const float epsilon { 0.0001f };
+        const auto epsilon { 0.0001f };
         return ::fabs(a - b) < epsilon;
     }
 

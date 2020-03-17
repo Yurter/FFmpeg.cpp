@@ -43,6 +43,10 @@ namespace fpp {
         return context_info;
     }
 
+    void FormatContext::beforeCloseContext() {
+        //
+    }
+
     void FormatContext::setOpened(bool opened) {
         _opened = opened;
     }
@@ -51,9 +55,9 @@ namespace fpp {
         if (opened()) {
             throw std::runtime_error { "Context already opened" };
         }
-        if (streamAmount() == 0) {
-            throw std::logic_error { "Can't open context without streams" };
-        }
+//        if (streamAmount() == 0) { потоков у инпута нет до открытия
+//            throw std::logic_error { "Can't open context without streams" };
+//        }
         setInteruptCallback(InterruptedProcess::Opening);
         openContext();
         resetInteruptCallback();
@@ -98,6 +102,16 @@ namespace fpp {
         throw std::invalid_argument { "Bad InterruptedProcess arg" };
     }
 
+    void FormatContext::closeContext() {
+        beforeCloseContext();
+        if (const auto ret { ::avio_close(raw()->pb) }; ret < 0) {
+            throw FFmpegException {
+                "Failed to close " + mediaResourceLocator()
+                , ret
+            };
+        }
+    }
+
     std::string FormatContext::mediaResourceLocator() const {
         return _media_resource_locator;
     }
@@ -107,14 +121,18 @@ namespace fpp {
     }
 
     void FormatContext::processPacket(Packet& packet) {
-        const auto data_stream { stream(packet.streamIndex()) };
-        data_stream->stampPacket(packet);
+        const auto packet_stream { stream(packet.streamIndex()) };
+        packet_stream->stampPacket(packet);
         const auto packet_type {
-            data_stream->timeIsOver()
+            packet_stream->timeIsOver()
             ? MediaType::EndOF
-            : data_stream->params->type()
+            : packet_stream->params->type()
         };
         packet.setType(packet_type);
+    }
+
+    void FormatContext::addStream(SharedStream stream) {
+        _streams.push_back(stream);
     }
 
     int64_t FormatContext::streamAmount() const {
@@ -130,7 +148,16 @@ namespace fpp {
     }
 
     SharedStream FormatContext::stream(int64_t index) {
-       return _streams.at(size_t(index));
+        return _streams.at(size_t(index));
+    }
+
+    SharedStream FormatContext::stream(MediaType stream_type) {
+        for (const auto& stream : _streams) {
+            if (stream->params->typeIs(stream_type)) {
+                return stream;
+            }
+        }
+        return nullptr;
     }
 
 } // namespace fpp

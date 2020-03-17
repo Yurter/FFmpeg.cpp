@@ -3,10 +3,15 @@
 #include <fpp/core/Logger.hpp>
 #include <fpp/core/FFmpegException.hpp>
 
+extern "C" {
+    #include <libavformat/avformat.h>
+}
+
 namespace fpp {
 
-    CodecContext::CodecContext(const SharedParameters parameters)
-        : params { parameters }
+    CodecContext::CodecContext(const SharedStream stream)
+        : params { stream->params }
+        , _stream { stream }
         , _opened { false } {
         setName("CodecContext");
     }
@@ -24,10 +29,6 @@ namespace fpp {
             }
         });
         setName(name() + " " + codec()->name);
-        initContextParams();
-        if (true) { // TODO костыль
-            raw()->time_base = params->timeBase();
-        }
         open(std::move(dictionary));
     }
 
@@ -36,16 +37,24 @@ namespace fpp {
             throw std::runtime_error { "Codec already opened" };
         }
         log_debug("Opening");
-        if (const auto ret { ::avcodec_open2(raw(), codec(), dictionary.ptrPtr()) }; ret != 0) {
-            const auto codec_type {
-                ::av_codec_is_decoder(codec()) ? "decoder" : "encoder"
-            };
+        initContext();
+        if (const auto ret {
+                ::avcodec_open2(raw(), codec(), dictionary.ptrPtr())
+            }; ret != 0) {
             throw FFmpegException {
-                "Cannot open " + std::string { codec()->name } + ", " + codec_type
+                "Cannot open "
+                    + utils::to_string(raw()->codec_type) + " "
+                    + _stream->params->codecType() + " "
+                    + codec()->name
                 , ret
             };
         }
-        onOpen();
+        if (_stream->params->isEncoder()) {
+            initStreamCodecpar();
+        }
+        if (params->isAudio()) { // TODO 16.03
+            std::static_pointer_cast<AudioParameters>(params)->setFrameSize(raw()->frame_size);
+        }
         setOpened(true);
     }
 
@@ -60,17 +69,32 @@ namespace fpp {
         setOpened(false);
     }
 
-    std::string CodecContext::toString() const { // TODO лог не подоходит для аудио 13.02
+    std::string CodecContext::toString() const {
         const auto delimeter { ", " };
-        return "Codec name: "   + std::string(raw()->codec->name)      + delimeter
-            + "codec id: "      + utils::to_string(raw()->codec->id)   + delimeter
-            + "codec type: "    + utils::to_string(raw()->codec_type)  + delimeter
-            + "width: "         + std::to_string(raw()->width)         + delimeter
-            + "height: "        + std::to_string(raw()->height)        + delimeter
-            + "coded_width: "   + std::to_string(raw()->coded_width)   + delimeter
-            + "coded_height: "  + std::to_string(raw()->coded_height)  + delimeter
-            + "time_base: "     + utils::to_string(raw()->time_base)   + delimeter
-            + "pix_fmt: "       + utils::to_string(raw()->pix_fmt);
+        if (params->isVideo()) {
+            return utils::to_string(raw()->codec_type) + " "
+                + _stream->params->codecType() + " " + codec()->name        + delimeter
+                + "width: "         + std::to_string(raw()->width)          + delimeter
+                + "height: "        + std::to_string(raw()->height)         + delimeter
+                + "coded_width: "   + std::to_string(raw()->coded_width)    + delimeter
+                + "coded_height: "  + std::to_string(raw()->coded_height)   + delimeter
+                + "time_base: "     + utils::to_string(raw()->time_base)    + delimeter
+                + "pix_fmt: "       + utils::to_string(raw()->pix_fmt);
+        }
+        if (params->isAudio()) {
+            return utils::to_string(raw()->codec_type) + " "
+                + _stream->params->codecType() + " " + codec()->name        + delimeter
+                + "sample_rate "   + std::to_string(raw()->sample_rate)     + delimeter
+                + "sample_fmt "    + utils::to_string(raw()->sample_fmt)    + delimeter
+                + "ch_layout "     + utils::channel_layout_to_string(
+                                        raw()->channels
+                                        , raw()->channel_layout)            + delimeter
+                + "channels "      + std::to_string(raw()->channels)        + delimeter
+                + "frame_size "    + std::to_string(raw()->frame_size);
+        }
+        throw std::runtime_error {
+            "Invalid codec type"
+        };
     }
 
     const AVCodec* CodecContext::codec() const {
@@ -89,37 +113,28 @@ namespace fpp {
         _opened = value;
     }
 
-    void CodecContext::initContextParams() {
-        raw()->codec_id = params->codecId();
-        raw()->bit_rate = params->bitrate();
-//        codec->time_base = param->timeBase(); // TODO см :318 12/02
-//        codec_context->time_base = { 1, 16000/*тут нужен таймбейс входного потока, либо рескейлить в энкодере*/ };
-
-        if (params->isVideo()) {
-            const auto video_parameters { std::static_pointer_cast<const VideoParameters>(params) };
-            raw()->pix_fmt      = video_parameters->pixelFormat();
-            raw()->width        = int(video_parameters->width());
-            raw()->height       = int(video_parameters->height());
-//            codec->time_base    = param->timeBase(); // TODO почему закомментировано ? см CodecContex.cpp:28 12.02
-            raw()->framerate    = video_parameters->frameRate();
-            raw()->gop_size     = int(video_parameters->gopSize());
-    //        codec->sample_aspect_ratio    = video_parameters->sampl; //TODO
-            return;
+    void CodecContext::initContext() {
+        if (const auto ret {
+            ::avcodec_parameters_to_context(raw(), _stream->raw()->codecpar)
+        }; ret < 0) {
+            throw FFmpegException {
+                "Could not initialize stream codec parameters!"
+                , ret
+            };
         }
+        raw()->time_base = params->timeBase();
+        raw()->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
+    }
 
-        if (params->isAudio()) {
-            const auto audio_parameters { std::static_pointer_cast<const AudioParameters>(params) };
-            raw()->sample_fmt       = audio_parameters->sampleFormat();
-            raw()->channel_layout   = audio_parameters->channelLayout();
-            raw()->channels         = int(audio_parameters->channels());
-            raw()->sample_rate      = int(audio_parameters->sampleRate());
-            return;
+    void CodecContext::initStreamCodecpar() {
+        if (const auto ret {
+            ::avcodec_parameters_from_context(_stream->raw()->codecpar, raw())
+        }; ret < 0) {
+            throw FFmpegException {
+                "Could not initialize stream codec parameters!"
+                , ret
+            };
         }
-
-        throw std::invalid_argument {
-            "Failed to init codec's params with "
-                + utils::to_string(params->type()) + " params"
-        };
     }
 
 } // namespace fpp

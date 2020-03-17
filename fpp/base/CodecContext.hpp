@@ -1,17 +1,17 @@
 #pragma once
 #include <fpp/core/wrap/SharedFFmpegObject.hpp>
-#include <fpp/base/Parameters.hpp>
 #include <fpp/base/Dictionary.hpp>
+#include <fpp/stream/Stream.hpp>
 
 struct AVCodecContext;
 
 namespace fpp {
 
-    class CodecContext : public SharedFFmpegObject<AVCodecContext> {
+    class CodecContext : public SharedFFmpegObject<AVCodecContext> { // TODO унаследовать от MediaType ? 16.03
 
     public:
 
-        CodecContext(const SharedParameters parameters);
+        CodecContext(const SharedStream stream);
         virtual ~CodecContext() override;
 
         std::string         toString() const override final;
@@ -20,9 +20,8 @@ namespace fpp {
         bool                closed() const;
 
         const AVCodec*      codec() const;
-        virtual void        onOpen() { } //TODO убрать 24.01
 
-        const SharedParameters  params;
+        const SharedParameters params;
 
     protected:
 
@@ -34,10 +33,12 @@ namespace fpp {
         void                close();
         void                setOpened(bool value);
 
-        void                initContextParams();
+        void                initContext();
+        void                initStreamCodecpar();
 
     private:
 
+        const SharedStream  _stream;
         bool                _opened;
 
     };

@@ -35,7 +35,6 @@ namespace fpp {
 
         virtual void        createContext() override;
         virtual void        openContext()   override;
-        virtual void        closeContext()  override;
 
         [[nodiscard]] virtual StreamVector parseFormatContext() override;
 

@@ -5,9 +5,14 @@
 
 namespace fpp {
 
-    DecoderContext::DecoderContext(const SharedParameters parameters, Dictionary&& dictionary)
-        : CodecContext(parameters) {
+    DecoderContext::DecoderContext(const SharedStream stream, Dictionary&& dictionary)
+        : CodecContext(stream) {
         setName("DecCtx");
+        if (!stream->params->isDecoder()) {
+            throw std::runtime_error {
+                "Decoder cannot be initialized with encoder parameters"
+            };
+        }
         init(std::move(dictionary));
     }
 
@@ -40,16 +45,19 @@ namespace fpp {
 
     FrameList DecoderContext::receiveFrames() {
         FrameList decoded_frames;
-        int ret { 0 };
+        auto ret { 0 };
         while (ret == 0) {
             Frame output_frame { params->type() };
-            ret = ::avcodec_receive_frame(raw(), &output_frame.raw());
+            ret = ::avcodec_receive_frame(raw(), output_frame.ptr());
             if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF)
                 /* Не ошибка */
                 break;
             if (ret < 0) {
-                throw FFmpegException { utils::receive_frame_error_to_string(ret), ret };
+                throw FFmpegException {
+                    utils::receive_frame_error_to_string(ret), ret
+                };
             }
+            output_frame.setTimeBase(params->timeBase());
             decoded_frames.push_back(output_frame);
         }
         return decoded_frames;

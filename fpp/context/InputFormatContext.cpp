@@ -10,7 +10,7 @@ extern "C" {
 namespace fpp {
 
     InputFormatContext::InputFormatContext(const std::string_view mrl)
-        : FormatContext { mrl }
+        : FormatContext(mrl)
         , _input_format { nullptr } {
         setName("InpFmtCtx");
         createContext();
@@ -35,7 +35,9 @@ namespace fpp {
         case SeekPrecision::Precisely:
             throw std::runtime_error { "NOT_IMPLEMENTED" };
         }
-        if (const auto ret { ::av_seek_frame(raw(), int(stream_index), timestamp, flags) }; ret < 0) {
+        if (const auto ret {
+                ::av_seek_frame(raw(), int(stream_index), timestamp, flags)
+            }; ret < 0) {
             throw FFmpegException {
                 "Failed to seek timestamp "
                     + utils::time_to_string(timestamp, DEFAULT_TIME_BASE)
@@ -52,18 +54,20 @@ namespace fpp {
             if (ret == AVERROR_EOF) {
                 return Packet { MediaType::EndOF };
             }
-            throw FFmpegException { "Cannot read source: \'" + mediaResourceLocator() + "\'", ret };
+            throw FFmpegException {
+                "Cannot read source: \'"
+                    + mediaResourceLocator() + "\'"
+                , ret
+            };
         }
         processPacket(packet);
         return packet;
     }
 
-    void fpp::InputFormatContext::createContext() {
+    void InputFormatContext::createContext() {
         reset(std::shared_ptr<AVFormatContext> {
             ::avformat_alloc_context()
-            , [](auto* ctx) {
-                ::avformat_free_context(ctx);
-            }
+            , [](auto* ctx) { ::avformat_free_context(ctx); }
         });
     }
 
@@ -85,11 +89,6 @@ namespace fpp {
             throw FFmpegException { "Failed to retrieve input stream information", ret };
         }
         setStreams(parseFormatContext());
-    }
-
-    void InputFormatContext::closeContext() {
-        auto fmt_ctx { raw() };
-        avformat_close_input(&fmt_ctx);
     }
 
     StreamVector InputFormatContext::parseFormatContext() {

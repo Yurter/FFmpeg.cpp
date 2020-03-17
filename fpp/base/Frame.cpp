@@ -8,7 +8,8 @@ extern "C" {
 namespace fpp {
 
     Frame::Frame(MediaType type)
-        : MediaData(type) {
+        : MediaData(type)
+        , _time_base { DEFAULT_RATIONAL } {
         setName("Frame");
     }
 
@@ -17,9 +18,9 @@ namespace fpp {
         ref(other);
     }
 
-    Frame::Frame(const AVFrame& frame, MediaType type)
+    Frame::Frame(const AVFrame& frame, AVRational time_base, MediaType type)
         : Frame(type) {
-        ref(frame);
+        ref(frame, time_base);
     }
 
     Frame::~Frame() {
@@ -41,13 +42,25 @@ namespace fpp {
         raw().pts = pts;
     }
 
+    void Frame::setTimeBase(AVRational time_base) {
+        _time_base = time_base;
+    }
+
+    AVRational Frame::timeBase() const {
+        return _time_base;
+    }
+
     bool Frame::keyFrame() const {
         return raw().key_frame == 1;
     }
 
+    int Frame::nbSamples() const {
+        return raw().nb_samples;
+    }
+
     size_t Frame::size() const {
         if (isVideo()) {
-            return uint64_t(
+            return size_t(
                 ::av_image_get_buffer_size(
                     AVPixelFormat(raw().format)
                     , raw().width
@@ -69,7 +82,7 @@ namespace fpp {
                     , 32                            /* align */
                 )
             };
-            return uint64_t(bufer_size);
+            return size_t(bufer_size);
         }
         return 0;
     }
@@ -92,7 +105,7 @@ namespace fpp {
                     + (keyFrame() ? "[I]" : "[_]") + ", "
                     + "pts " + utils::pts_to_string(raw().pts) + ", "
                     + "samples " + std::to_string(raw().nb_samples) + ", "
-                    + "channel_layout " + std::to_string(raw().channel_layout) + ", "
+                    + "channel_layout " + utils::channel_layout_to_string(raw().channels, raw().channel_layout) + ", "
                     + "sample_rate " + std::to_string(raw().sample_rate);
             return str;
         }
@@ -104,11 +117,17 @@ namespace fpp {
     }
 
     void Frame::ref(const Frame& other) {
-        ::av_frame_ref(ptr(), other.ptr());
+        if (::av_frame_ref(ptr(), other.ptr()) != 0) {
+            throw FFmpegException { "av_packet_ref failed" };
+        }
+        setTimeBase(other.timeBase());
     }
 
-    void Frame::ref(const AVFrame& other) {
-        ::av_frame_ref(ptr(), &other);
+    void Frame::ref(const AVFrame& other, AVRational time_base) {
+        if (::av_frame_ref(ptr(), &other) != 0) {
+            throw FFmpegException { "av_packet_ref failed" };
+        }
+        setTimeBase(time_base);
     }
 
     void Frame::unref() {

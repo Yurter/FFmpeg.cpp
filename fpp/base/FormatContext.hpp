@@ -27,6 +27,7 @@ namespace fpp {
         bool                closed() const;
 
         SharedStream        stream(int64_t index);
+        SharedStream        stream(MediaType stream_type);
         int64_t             streamAmount() const;
         void                setStreams(StreamVector stream_list);
 
@@ -63,9 +64,11 @@ namespace fpp {
 
         virtual void        createContext() = 0;
         virtual void        openContext()   = 0;
-        virtual void        closeContext()  = 0;
+        virtual void        beforeCloseContext();
 
         [[nodiscard]] virtual StreamVector parseFormatContext() = 0;
+
+        void                addStream(SharedStream stream);
 
     private:
 
@@ -73,6 +76,7 @@ namespace fpp {
         void                setInteruptCallback(InterruptedProcess process);
         void                resetInteruptCallback();
         static int          interrupt_callback(void* opaque);
+        void                closeContext();
 
     private:
 

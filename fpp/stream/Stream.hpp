@@ -10,13 +10,12 @@
 
 namespace fpp {
 
-    /* ? */ //TODO заменить вируальным мтоедодом штампа 03.02
+    /* ? */ // TODO заменить вируальным мтоедодом штампа 03.02
+            // TODO SharedInputStream and SharedOutputStream 17.03
     enum class StampType : uint8_t {
-        /* Штампы сорса */
+        /* Source */
         Copy,
-        Realtime,
-        Offset,
-        /* Штампы синка */
+        /* Sink   */
         Rescale,
     };
 
@@ -25,17 +24,17 @@ namespace fpp {
     using StreamVector = std::vector<SharedStream>;
 
                             // TODO заменить на шаред оббъект без деструктора 13.02
-    class Stream : public FFmpegObject<const AVStream*>, public MediaData {
+    class Stream : public FFmpegObject</*const*/ AVStream*>, public MediaData {
 
     public: // TODO сделать конструкторы приватными
 
-        Stream(const AVStream* avstream, SharedParameters parameters);      //TODO сделать приватным 23.01 (используется в OutputContext)
-        Stream(const AVStream* avstream);   // Создание реального потока
+        Stream(SharedParameters parameters, AVStream* avstream);
+        Stream(AVStream* avstream);   // Создание реального потока
+        Stream(AVStream* avstream, SharedParameters parameters);      //TODO сделать приватным 23.01 (используется в OutputContext)
         Stream(SharedParameters params);    // Создание виртуального потока //TODO не используется (см 1й конструктор) 24.01
         Stream(const Stream& other) = delete;
         virtual ~Stream() override = default;
 
-        void                init();
         virtual std::string toString() const override final;
 
         void                stampPacket(Packet& packet);
@@ -53,13 +52,17 @@ namespace fpp {
         int64_t             endTimePoint()      const;
         int64_t             packetIndex()       const;
 
-        AVCodecParameters*  codecParameters();
+        AVCodecParameters*  codecParams();
+
+    private:
+
+        void                initCodecpar();
 
     public:
 
         SharedParameters    params;
 
-    protected:
+    private:
 
         bool                _used;
         StampType           _stamp_type;
@@ -81,19 +84,19 @@ namespace fpp {
 
     };
 
-    inline SharedStream make_input_stream(const AVStream* avstream) {
-        return std::make_shared<Stream>(avstream); // TODO делать utils::avmt_to_mt(avstream->codecpar->codec_type)) тут 12.02
+    inline SharedStream make_input_stream(AVStream* avstream) {
+        return std::make_shared<Stream>(avstream);
     }
 
-    inline SharedStream make_output_stream(const AVStream* avstream, SharedParameters params) {
-        return std::make_shared<Stream>(avstream, params);
+    inline SharedStream make_output_stream(AVStream* avstream, const SharedParameters params) {
+        return std::make_shared<Stream>(params, avstream);
     }
 
-    inline SharedStream make_virtual_input_stream(SharedParameters params) {
+    inline SharedStream make_virtual_input_stream(const SharedParameters params) {
         return std::make_shared<Stream>(nullptr, params);
     }
 
-    inline SharedStream make_virtual_output_stream(SharedParameters params) {
+    inline SharedStream make_virtual_output_stream(const SharedParameters params) {
         return std::make_shared<Stream>(nullptr, params);
     }
 

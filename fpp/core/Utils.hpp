@@ -17,14 +17,17 @@ namespace fpp {
         static uid_t        gen_stream_uid(uid_t context_uid, uid_t stream_index);
         static uid_t        get_context_uid(uid_t stream_uid);
 
+        static std::string  to_string(AVMediaType type);
+        static std::string  to_string(AVCodecID codec_id);
+        static std::string  to_string(AVRational rational);
+        static std::string  to_string(AVSampleFormat value);
+        static std::string  to_string(AVPixelFormat pxl_fmt);
+        static std::string  to_string(Code code);
+        static std::string  to_string(bool value);
         static std::string  to_string(MediaType type);
         static std::string  pts_to_string(int64_t pts);
-        static std::string  to_string(bool value);
-        static std::string  to_string(AVPixelFormat pxl_fmt);
-        static std::string  to_string(AVSampleFormat value);
-        static std::string  to_string(Code code);
-        static std::string  to_string(AVRational rational);
         static std::string  time_to_string(int64_t time_stamp, AVRational time_base);
+        static std::string  channel_layout_to_string(int nb_channels, uint64_t channel_layout);
 
         static void         sleep_for(int64_t milliseconds);
         static void         sleep_for_ms(int64_t milliseconds);
@@ -53,14 +56,12 @@ namespace fpp {
         static std::string  receive_frame_error_to_string(int ret);
         static std::string  send_frame_error_to_string(int ret);
         static std::string  receive_packet_error_to_string(int ret);
+        static std::string  swr_convert_frame_error_to_string(int ret);
 
-        /* ---- R E F A C T O R I N G ---- */
-
-        static MediaType    avmt_to_mt(AVMediaType avmedia_type);
-
-        static SharedParameters createParams(MediaType type);
-
-        static void         parameters_to_avcodecpar(const SharedParameters params, AVCodecParameters* codecpar);
+        static SharedParameters make_params(MediaType type);
+        static SharedParameters make_params(AVMediaType type);
+        static SharedParameters make_youtube_video_params();
+        static SharedParameters make_youtube_audio_params();
 
     };
 
@@ -88,7 +89,7 @@ namespace fpp {
     }
 
     inline std::ostream& operator<<(std::ostream& os, const AVCodecID codec_id) {
-        os << ::avcodec_get_name(codec_id);
+        os << utils::to_string(codec_id);
         return os;
     }
 

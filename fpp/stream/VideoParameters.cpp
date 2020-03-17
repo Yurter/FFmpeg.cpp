@@ -100,7 +100,7 @@ namespace fpp {
 
     void VideoParameters::completeFrom(const SharedParameters other) {
         Parameters::completeFrom(other);
-        const auto other_video_parames = std::static_pointer_cast<VideoParameters>(other);
+        const auto other_video_parames { std::static_pointer_cast<VideoParameters>(other) };
         if (not_inited_int(width()))            { setWidth(other_video_parames->width());               }
         if (not_inited_int(height()))           { setHeight(other_video_parames->height());             }
         if (not_inited_q(aspectRatio()))        { setAspectRatio(other_video_parames->aspectRatio());   }
@@ -129,9 +129,9 @@ namespace fpp {
     }
 
     bool VideoParameters::betterThen(const SharedParameters& other) {
-        const auto other_video = std::static_pointer_cast<VideoParameters>(other);
-        const auto this_picture_size = width() * height();
-        const auto other_picture_size = other_video->width() * other_video->height();
+        const auto other_video { std::static_pointer_cast<VideoParameters>(other) };
+        const auto this_picture_size { width() * height() };
+        const auto other_picture_size { other_video->width() * other_video->height() };
         return this_picture_size > other_picture_size;
     }
 

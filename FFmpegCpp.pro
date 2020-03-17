@@ -4,14 +4,17 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 #FFmpeg
-INCLUDEPATH += ../00_ffmpeg/ffmpeg-4.1.3-win64-dev/include
-LIBS += -L../../00_ffmpeg/ffmpeg-4.1.3-win64-dev/lib
+#INCLUDEPATH += ../00_ffmpeg/ffmpeg-4.1.3-win64-dev/include
+#LIBS += -L../../00_ffmpeg/ffmpeg-4.1.3-win64-dev/lib
+INCLUDEPATH += D:\dev\00_ffmpeg\ffmpeg-4.1.3-win64-dev\include
+LIBS += -LD:\dev\00_ffmpeg\ffmpeg-4.1.3-win64-dev\lib
 LIBS += -lavcodec -lavdevice -lavfilter -lavformat -lavutil
 LIBS += -lpostproc -lswresample -lswscale
 
 INCLUDEPATH += include
 
 SOURCES += \
+    fpp/refi/ResampleContext.cpp \
     main.cpp \
     fpp/base/CodecContext.cpp \
     fpp/base/Dictionary.cpp \
@@ -30,8 +33,7 @@ SOURCES += \
     fpp/core/Utils.cpp \
     fpp/refi/AudioFilterContext.cpp \
     fpp/refi/FilterContext.cpp \
-    fpp/refi/ResamplerContext.cpp \
-    fpp/refi/RescalerContext.cpp \
+    fpp/refi/RescaleContext.cpp \
     fpp/refi/VideoFilterContext.cpp \
     fpp/stream/AudioParameters.cpp \
     fpp/stream/Stream.cpp \
@@ -65,8 +67,8 @@ HEADERS += \
     fpp/core/wrap/SharedFFmpegObject.hpp \
     fpp/refi/AudioFilterContext.hpp \
     fpp/refi/FilterContext.hpp \
-    fpp/refi/ResamplerContext.hpp \
-    fpp/refi/RescalerContext.hpp \
+    fpp/refi/ResampleContext.hpp \
+    fpp/refi/RescaleContext.hpp \
     fpp/refi/VideoFilterContext.hpp \
     fpp/stream/AudioParameters.hpp \
     fpp/stream/Stream.hpp \

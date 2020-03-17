@@ -8,14 +8,14 @@ extern "C" {
 
 namespace fpp {
 
-    class RescalerContext : public SharedFFmpegObject<SwsContext> {
+    class RescaleContext : public SharedFFmpegObject<SwsContext> {
 
     public:
 
-        RescalerContext(IOParams parameters);
-        virtual ~RescalerContext() override = default;
+        RescaleContext(IOParams parameters);
+        virtual ~RescaleContext() override = default;
 
-        Frame               scale(Frame source_frame);
+        Frame               scale(const Frame source_frame);
 
         const IOParams      params;
 

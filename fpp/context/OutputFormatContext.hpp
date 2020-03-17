@@ -16,18 +16,24 @@ namespace fpp {
         virtual ~OutputFormatContext() override;
 
         SharedStream        createStream(SharedParameters params);
+        SharedStream        copyStream(
+                                const SharedStream other
+                                , SharedParameters output_params = SharedParameters {}
+                            );
 
         void                write(Packet packet, WriteMode write_mode = WriteMode::Instant);
         void                flush();
 
     private:
 
-        virtual void        createContext() override;
-        virtual void        openContext()   override;
-        virtual void        closeContext()  override;
+        virtual void        createContext()         override;
+        virtual void        openContext()           override;
+        virtual void        beforeCloseContext()    override;
 
         Code                guessOutputFromat();
         [[nodiscard]] virtual StreamVector parseFormatContext() override;
+        void                writeHeader();
+        void                writeTrailer();
 
     private:
 

@@ -7,28 +7,26 @@
 
 namespace fpp {
 
-    EncoderContext::EncoderContext(const SharedParameters parameters, AVRational source_time_base, Dictionary&& dictionary)
-        : CodecContext(parameters)
-        , _source_time_base(source_time_base) {
+    EncoderContext::EncoderContext(const SharedStream stream, Dictionary&& dictionary)
+        : CodecContext(stream) {
         setName("EncCtx");
+        if (!stream->params->isEncoder()) {
+            throw std::runtime_error {
+                "Encoder cannot be initialized with decoder parameters"
+            };
+        }
         init(std::move(dictionary));
     }
 
     PacketList EncoderContext::encode(const Frame& frame) {
         sendFrame(frame);
-        return receivePackets();
+        return receivePackets(frame.timeBase());
     }
 
     PacketList EncoderContext::flush() {
         log_debug("Flushing");
         sendFlushFrame();
-        return receivePackets();
-    }
-
-    void EncoderContext::onOpen() {
-        if (params->typeIs(MediaType::Audio)) {
-            static_cast<AudioParameters * const>(params.get())->setFrameSize(raw()->frame_size); //TODO не надежно: нет гарантий, что кодек откроется раньше, чем рескейлер начнет работу
-        }
+        return receivePackets({ DEFAULT_TIME_BASE });
     }
 
     void EncoderContext::sendFrame(const Frame& frame) {
@@ -47,21 +45,24 @@ namespace fpp {
         }
     }
 
-    PacketList EncoderContext::receivePackets() {
+    PacketList EncoderContext::receivePackets(AVRational time_base) {
         PacketList encoded_packets;
-        int ret { 0 };
+        auto ret { 0 };
         while (0 == ret) {
             Packet output_packet { params->type() };
-            const auto ret { ::avcodec_receive_packet(raw(), &output_packet.raw()) };
+            const auto ret {
+                ::avcodec_receive_packet(raw(), &output_packet.raw())
+            };
             if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
                 break;
             }
             if (ret < 0) {
-                throw FFmpegException { utils::receive_packet_error_to_string(ret), ret };
+                throw FFmpegException {
+                    utils::receive_packet_error_to_string(ret), ret
+                };
             }
-            output_packet.setType(params->type());
-            output_packet.setTimeBase(_source_time_base);
             output_packet.setStreamIndex(params->streamIndex());
+            output_packet.setTimeBase(time_base);
             output_packet.setDts(output_packet.pts()); //TODO костыль, разобраться, почему смещение во времени (0, -45)
             encoded_packets.push_back(output_packet);
         }
