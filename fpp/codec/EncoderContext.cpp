@@ -61,6 +61,7 @@ namespace fpp {
                     utils::receive_packet_error_to_string(ret), ret
                 };
             }
+            output_packet.setStreamIndex(params->streamIndex());
             output_packet.setTimeBase(time_base);
             output_packet.setDts(output_packet.pts()); //TODO костыль, разобраться, почему смещение во времени (0, -45)
             encoded_packets.push_back(output_packet);
