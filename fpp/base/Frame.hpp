@@ -26,6 +26,7 @@ namespace fpp {
 
         AVRational          timeBase()  const;
         bool                keyFrame()  const;
+        int                 nbSamples() const;
 
         size_t              size()      const;
         virtual std::string toString()  const override;

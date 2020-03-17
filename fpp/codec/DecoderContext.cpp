@@ -57,7 +57,7 @@ namespace fpp {
                     utils::receive_frame_error_to_string(ret), ret
                 };
             }
-            log_error("==> output_frame: " << output_frame);
+            output_frame.setTimeBase(params->timeBase());
             decoded_frames.push_back(output_frame);
         }
         return decoded_frames;

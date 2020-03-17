@@ -39,8 +39,14 @@ namespace fpp {
                         , in_param->timeBase().den
                     )
                 };
-                const auto out_pts { ::swr_next_pts(raw(), in_pts) };
-                output_frame.setPts(ROUNDED_DIV(out_pts, in_param->sampleRate()));
+//                const auto out_pts { ::swr_next_pts(raw(), INT64_MIN) };
+//                const auto out_pts { ::swr_next_pts(raw(), in_pts) };
+                static auto samples_count { 0 };
+                const auto out_pts { ::av_rescale_q(samples_count, AVRational {1, 44'100}, AVRational { 1, 16000 }) };
+//                output_frame.setPts(ROUNDED_DIV(out_pts, in_param->sampleRate()));
+                output_frame.setPts(out_pts);
+                samples_count += output_frame.nbSamples();
+                log_error(out_pts << " " << output_frame.pts());
             } else {
                 output_frame.setPts(AV_NOPTS_VALUE);
             }
@@ -55,6 +61,7 @@ namespace fpp {
                     , ret
                 };
             }
+            output_frame.setTimeBase(source_frame.timeBase());
             resampled_frames.push_back(output_frame);
         }
         return resampled_frames;
@@ -90,13 +97,13 @@ namespace fpp {
 
         log_info("Inited "
             << "from ["
-                << "ch_layout " << utils::channel_layout_to_string(in_param->frameSize(), in_param->channelLayout())
+                << "ch_layout " << utils::channel_layout_to_string(in_param->channels(), in_param->channelLayout())
                 << ", smp_rate " << in_param->sampleRate()
                 << ", " << in_param->sampleFormat()
                 << ", nb_smp " << in_param->frameSize()
                 << "] "
             << "to ["
-                 << "ch_layout " << utils::channel_layout_to_string(out_param->frameSize(), out_param->channelLayout())
+                 << "ch_layout " << utils::channel_layout_to_string(out_param->channels(), out_param->channelLayout())
                  << ", smp_rate " << out_param->sampleRate()
                  << ", " << out_param->sampleFormat()
                  << ", nb_smp " << out_param->frameSize()

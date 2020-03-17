@@ -18,7 +18,7 @@ namespace fpp {
 
         void                sendFrame(const Frame& frame);
         void                sendFlushFrame();
-        PacketList          receivePackets();
+        PacketList          receivePackets(AVRational time_base);
 
     };
 

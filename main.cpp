@@ -152,14 +152,19 @@ void startYoutubeStream() {
 //            }
         }
         else if (input_packet.isAudio()) {
-            input_packet.setDts(AV_NOPTS_VALUE);
-            input_packet.setPts(AV_NOPTS_VALUE);
+//            input_packet.setDts(AV_NOPTS_VALUE);
+//            input_packet.setPts(AV_NOPTS_VALUE);
             const auto audio_frames { audio_decoder.decode(input_packet) };
             for (const auto& a_frame : audio_frames) {
                 const auto resampled_frames { resample.resample(a_frame) };
                 for (auto& ra_frame : resampled_frames) {
                     auto audio_packets { audio_encoder.encode(ra_frame) };
                     for (auto& a_packet : audio_packets) {
+                        if (a_packet.typeIs(fpp::MediaType::Unknown)) {
+                            throw std::runtime_error {
+                                "Unknown packet type!"
+                            };
+                        }
                         youtube.write(a_packet);
                     }
                 }

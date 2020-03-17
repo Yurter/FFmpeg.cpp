@@ -57,94 +57,20 @@ namespace fpp {
         case StampType::Copy:
             _packet_duration = packet.pts() - _prev_pts;
             break;
-        case StampType::Realtime: {
-            if (_packet_index == 0) { //TODO костыль сброса таймера на получении первого пакета, перенести в открытие?
-                _chronometer.reset_timepoint();
-            }
-
-            const auto chronometer_timebase { DEFAULT_TIME_BASE };
-            _packet_duration = ::av_rescale_q(_chronometer.elapsed_milliseconds(), chronometer_timebase, params->timeBase());
-
-            _chronometer.reset_timepoint();
-
-            if (_packet_duration < 16) { //TODO костыль: ффмпег отдает первый кадров 10 мгновенно
-                const int64_t duration_ms = int64_t(1000 / ::av_q2d(static_cast<VideoParameters*>(params.get())->frameRate()));
-                _packet_duration = ::av_rescale_q(duration_ms, DEFAULT_TIME_BASE, params->timeBase());
-            }
-
-            if (_packet_index == 0) { //TODO костыль
-                packet.setDts(0);
-                packet.setPts(0);
-                break;
-            }
-
-            _packet_dts_delta = _packet_duration;
-            _packet_pts_delta = _packet_duration;
-
-            packet.setDts(_prev_dts + _packet_dts_delta);
-            packet.setPts(_prev_pts + _packet_pts_delta);
-            break;
-        }
         case StampType::Rescale: {
-            auto debug_value_00 = packet.pts();
-            if (packet.isVideo() && (packet.dts() == AV_NOPTS_VALUE)) {
-                packet.setDts(0);
-                packet.setPts(0);
-            }
-            /* Рескеил в таймбейс потока без изменений */
+
+            std::cout << "1>> " << packet << std::endl;
+            /* Пересчет временных штампов */
             packet.setDts(::av_rescale_q(packet.dts(), packet.timeBase(), params->timeBase()));
             packet.setPts(::av_rescale_q(packet.pts(), packet.timeBase(), params->timeBase()));
-            auto debug_value_01 = packet.pts();
-
-            if (packetIndex() == 0) {
-                _pts_offset = -packet.pts();
-                _dts_offset = -packet.dts();
-//                log_error("OFFSET: " << _pts_offset);
-            }
-
-            auto debug_value = packet.pts();
-
-            /* Пересчет с учетом смещения */
-            auto new_pts = packet.pts() + _pts_offset;
-            auto new_dts = packet.dts() + _dts_offset;
-
-            /* Проверка на начало новой последовательности пакетов */
-            if (new_pts < _prev_pts) {
-                auto offset = params->duration();
-                _pts_offset = offset;
-                _dts_offset = offset;
-                new_pts = packet.pts() + _pts_offset;
-                new_dts = packet.dts() + _dts_offset;
-                log_error("new_pts < _prev_pts: " << new_pts << " " << offset);
-                log_error("source pts: " << debug_value << ", " << debug_value_00 << " -> " << debug_value_01);
-            }
 
             /* Расчет длительности пакета */
-            _packet_duration = new_pts - _prev_pts;
+            _packet_duration = packet.pts() - _prev_pts;
 
-            _packet_dts_delta = _packet_duration;
-            _packet_pts_delta = _packet_duration;
-
-
-            /* Установка новых значений */
-            packet.setDts(new_dts);
-            packet.setPts(new_pts);
             break;
         }
-        case StampType::Offset: {
-            if (packetIndex() == 0) {
-                _pts_offset = -packet.pts();
-                _dts_offset = -packet.dts();
-            }
-            auto new_pts = packet.pts() + _pts_offset;
-            auto new_dts = packet.dts() + _dts_offset;
-            _packet_duration = new_pts - _prev_pts;
-            _packet_dts_delta = _packet_duration;
-            _packet_pts_delta = _packet_duration;
-            packet.setDts(new_dts);
-            packet.setPts(new_pts);
-            break;
-        }
+        default:
+            throw std::logic_error { "stampPacket" };
         }
 
         packet.setPos(-1);
@@ -154,6 +80,8 @@ namespace fpp {
         _prev_dts = packet.dts();
         _prev_pts = packet.pts();
         _packet_index++;
+        if (_stamp_type == StampType::Rescale)
+        std::cout << "2>> " << packet << std::endl;
     }
 
     bool Stream::timeIsOver() const {

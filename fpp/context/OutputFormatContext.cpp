@@ -22,7 +22,7 @@ namespace fpp {
 
     void OutputFormatContext::write(Packet packet, WriteMode write_mode) {
         processPacket(packet);
-        std::cout << packet << std::endl;
+//        std::cout << packet << std::endl;
         if (write_mode == WriteMode::Instant) {
             if (const auto ret {
                     ::av_write_frame(raw(), packet.ptr())

@@ -20,13 +20,13 @@ namespace fpp {
 
     PacketList EncoderContext::encode(const Frame& frame) {
         sendFrame(frame);
-        return receivePackets();
+        return receivePackets(frame.timeBase());
     }
 
     PacketList EncoderContext::flush() {
         log_debug("Flushing");
         sendFlushFrame();
-        return receivePackets();
+        return receivePackets({ DEFAULT_TIME_BASE });
     }
 
     void EncoderContext::sendFrame(const Frame& frame) {
@@ -45,7 +45,7 @@ namespace fpp {
         }
     }
 
-    PacketList EncoderContext::receivePackets() {
+    PacketList EncoderContext::receivePackets(AVRational time_base) {
         PacketList encoded_packets;
         auto ret { 0 };
         while (0 == ret) {
@@ -61,10 +61,7 @@ namespace fpp {
                     utils::receive_packet_error_to_string(ret), ret
                 };
             }
-            output_packet.setType(params->type());
-            throw std::runtime_error { "TODO _source_time_base 11.03" };
-//            output_packet.setTimeBase(_source_time_base);
-            output_packet.setStreamIndex(params->streamIndex());
+            output_packet.setTimeBase(time_base);
             output_packet.setDts(output_packet.pts()); //TODO костыль, разобраться, почему смещение во времени (0, -45)
             encoded_packets.push_back(output_packet);
         }
