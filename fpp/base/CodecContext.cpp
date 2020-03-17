@@ -41,11 +41,11 @@ namespace fpp {
         if (const auto ret {
                 ::avcodec_open2(raw(), codec(), dictionary.ptrPtr())
             }; ret != 0) {
-            const auto codec_type {
-                _stream->params->isDecoder() ? "decoder" : "encoder"
-            };
             throw FFmpegException {
-                "Cannot open " + std::string { codec()->name } + ", " + codec_type
+                "Cannot open "
+                    + utils::to_string(raw()->codec_type) + " "
+                    + _stream->params->codecType() + " "
+                    + codec()->name
                 , ret
             };
         }
@@ -73,7 +73,7 @@ namespace fpp {
         const auto delimeter { ", " };
         if (params->isVideo()) {
             return utils::to_string(raw()->codec_type) + " "
-                + _stream->params->codecType() + " " + raw()->codec->name   + delimeter
+                + _stream->params->codecType() + " " + codec()->name        + delimeter
                 + "width: "         + std::to_string(raw()->width)          + delimeter
                 + "height: "        + std::to_string(raw()->height)         + delimeter
                 + "coded_width: "   + std::to_string(raw()->coded_width)    + delimeter
@@ -83,7 +83,7 @@ namespace fpp {
         }
         if (params->isAudio()) {
             return utils::to_string(raw()->codec_type) + " "
-                + _stream->params->codecType() + " " + raw()->codec->name   + delimeter
+                + _stream->params->codecType() + " " + codec()->name        + delimeter
                 + "sample_rate "   + std::to_string(raw()->sample_rate)     + delimeter
                 + "sample_fmt "    + utils::to_string(raw()->sample_fmt)    + delimeter
                 + "ch_layout "     + utils::channel_layout_to_string(
