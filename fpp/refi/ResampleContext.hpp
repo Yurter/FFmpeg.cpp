@@ -23,11 +23,14 @@ namespace fpp {
 
         void                init();
         Frame               createFrame() const;
-        void                stampFrame(const Frame& source_frame, Frame& output_frame);
+        void                sendFrame(const Frame source_frame);
+        FrameList           receiveFrames();
+        void                stampFrame(Frame& output_frame);
 
     private:
 
         int64_t             _samples_count;
+        int64_t             _source_pts;
 
     };
 

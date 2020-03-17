@@ -7,60 +7,17 @@ namespace fpp {
 
     ResampleContext::ResampleContext(IOParams parameters)
         : params { parameters }
-        , _samples_count { 0 } {
+        , _samples_count { 0 }
+        , _source_pts { 0 } {
         setName("Resampler");
         init();
     }
 
-    // https://github.com/FFmpeg/FFmpeg/blob/a0ac49e38ee1d1011c394d7be67d0f08b2281526/libavfilter/af_aresample.c#L209
     FrameList ResampleContext::resample(const Frame source_frame) {
-        if (const auto ret {
-                ::swr_convert_frame(
-                    raw()                   /* swr    */
-                    , nullptr               /* output */
-                    , source_frame.ptr()    /* input  */
-                )
-            }; ret != 0) {
-            throw FFmpegException {
-                "swr_convert_frame failed: "
-                    + utils::swr_convert_frame_error_to_string(ret)
-                , ret
-            };
-        }
-        const auto in_param {
-            std::static_pointer_cast<const AudioParameters>(params.in)
-        };
-        const auto out_param {
-            std::static_pointer_cast<const AudioParameters>(params.out)
-        };
-        FrameList resampled_frames;
-        while (::swr_get_out_samples(raw(), 0) >= out_param->frameSize()) { // TODO сравнить AVERROR(EAGAIN) и swr_get_out_samples,
-            Frame output_frame { createFrame() };
-            stampFrame(source_frame, output_frame);
-            const auto ret {
-                ::swr_convert_frame(
-                    raw()                   /* swr    */
-                    , output_frame.ptr()    /* output */
-                    , nullptr               /* input  */
-                )
-            };
-            if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF)
-                /* не ошибка */
-                break;
-            if (ret < 0) {
-                throw FFmpegException {
-                    "swr_convert_frame failed: "
-                        + utils::swr_convert_frame_error_to_string(ret)
-                    , ret
-                };
-            }
-            output_frame.setTimeBase(source_frame.timeBase());
-            resampled_frames.push_back(output_frame);
-        }
-        return resampled_frames;
+        sendFrame(source_frame);
+        return receiveFrames();
     }
 
-    // TODO https://stackoverflow.com/questions/12831761/how-to-resize-a-picture-using-ffmpegs-sws-scale
     void ResampleContext::init() {
         const auto in_param {
             std::static_pointer_cast<const AudioParameters>(params.in)
@@ -72,10 +29,10 @@ namespace fpp {
         reset(std::shared_ptr<SwrContext> {
             ::swr_alloc_set_opts(
                 nullptr   /* existing Swr context   */
-                , out_param->channelLayout()
+                , int64_t(out_param->channelLayout())
                 , out_param->sampleFormat()
                 , int(out_param->sampleRate())
-                , in_param->channelLayout()
+                , int64_t(in_param->channelLayout())
                 , in_param->sampleFormat()
                 , int(in_param->sampleRate())
                 , 0       /* logging level offset   */
@@ -91,7 +48,7 @@ namespace fpp {
         log_info("Inited "
             << "from ["
                 << "ch_layout " <<  utils::channel_layout_to_string(
-                                        in_param->channels()
+                                        int(in_param->channels())
                                         , in_param->channelLayout()
                                     )
                 << ", smp_rate " << in_param->sampleRate()
@@ -100,7 +57,7 @@ namespace fpp {
                 << "] "
             << "to ["
                  << "ch_layout " << utils::channel_layout_to_string(
-                                        out_param->channels()
+                                        int(out_param->channels())
                                         , out_param->channelLayout()
                                     )
                  << ", smp_rate " << out_param->sampleRate()
@@ -132,8 +89,53 @@ namespace fpp {
         return frame;
     }
 
-    void ResampleContext::stampFrame(const Frame &source_frame, Frame &output_frame) {
-        if (source_frame.pts() != AV_NOPTS_VALUE) {
+    void ResampleContext::sendFrame(const Frame source_frame) {
+        if (const auto ret {
+                ::swr_convert_frame(
+                    raw()                   /* swr    */
+                    , nullptr               /* output */
+                    , source_frame.ptr()    /* input  */
+                )
+            }; ret != 0) {
+            throw FFmpegException {
+                "swr_convert_frame failed: "
+                    + utils::swr_convert_frame_error_to_string(ret)
+                , ret
+            };
+        }
+        _source_pts = source_frame.pts();
+    }
+
+    FrameList ResampleContext::receiveFrames() {
+        const auto out_param {
+            std::static_pointer_cast<const AudioParameters>(params.out)
+        };
+
+        FrameList resampled_frames;
+        while (::swr_get_out_samples(raw(), 0) >= out_param->frameSize()) {
+            Frame output_frame { createFrame() };
+            if (const auto ret {
+                ::swr_convert_frame(
+                    raw()                   /* swr    */
+                    , output_frame.ptr()    /* output */
+                    , nullptr               /* input  */
+                )
+            }; ret < 0) {
+                throw FFmpegException {
+                    "swr_convert_frame failed: "
+                        + utils::swr_convert_frame_error_to_string(ret)
+                    , ret
+                };
+            }
+            stampFrame(output_frame);
+            output_frame.setTimeBase(params.in->timeBase());
+            resampled_frames.push_back(output_frame);
+        }
+        return resampled_frames;
+    }
+
+    void ResampleContext::stampFrame(Frame &output_frame) {
+        if (_source_pts != AV_NOPTS_VALUE) {
             const auto in_param {
                 std::static_pointer_cast<const AudioParameters>(params.in)
             };
@@ -144,7 +146,7 @@ namespace fpp {
             const auto out_pts {
                 ::av_rescale_q(
                     _samples_count
-                    , ::av_make_q(1, out_param->sampleRate())
+                    , ::av_make_q(1, int(out_param->sampleRate()))
                     , in_param->timeBase()
                 )
             };
