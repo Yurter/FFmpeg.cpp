@@ -63,6 +63,24 @@ namespace fpp {
                 packet.setDts(::av_rescale_q(packet.dts(), packet.timeBase(), params->timeBase()));
                 packet.setPts(::av_rescale_q(packet.pts(), packet.timeBase(), params->timeBase()));
 
+                /* Контроль за монотонностью временных штампов */
+                if (packet.dts() <= _prev_dts) {
+                    log_warning("Application provided invalid, "
+                                "non monotonically increasing dts to muxer "
+                                "in stream " << packet.streamIndex() << ": "
+                                << _prev_dts << " >= " << packet.dts()
+                    );
+                    packet.setDts(_prev_dts + 1);
+                }
+                if (packet.pts() <= _prev_pts) {
+                    log_warning("Application provided invalid, "
+                                "non monotonically increasing pts to muxer "
+                                "in stream " << packet.streamIndex() << ": "
+                                << _prev_pts << " >= " << packet.pts()
+                    );
+                    packet.setPts(_prev_pts + 1);
+                }
+
                 /* Расчет длительности пакета */
                 _packet_duration = packet.pts() - _prev_pts;
 
@@ -74,9 +92,9 @@ namespace fpp {
         packet.setDuration(_packet_duration);
         packet.setTimeBase(params->timeBase());
         params->increaseDuration(packet.duration());
-        _prev_dts = packet.dts();   // TODO check raw()->cur_dts 17.03
+        _prev_dts = packet.dts();
         _prev_pts = packet.pts();
-        _packet_index++;            // TODO check raw()->nb_frames 17.03
+        _packet_index++;
     }
 
     bool Stream::timeIsOver() const {
