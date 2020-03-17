@@ -15,6 +15,8 @@ INCLUDEPATH += include
 
 SOURCES += \
     fpp/refi/ResampleContext.cpp \
+    fpp/stream/InputStream.cpp \
+    fpp/stream/OutputStream.cpp \
     main.cpp \
     fpp/base/CodecContext.cpp \
     fpp/base/Dictionary.cpp \
@@ -71,5 +73,7 @@ HEADERS += \
     fpp/refi/RescaleContext.hpp \
     fpp/refi/VideoFilterContext.hpp \
     fpp/stream/AudioParameters.hpp \
+    fpp/stream/InputStream.h \
+    fpp/stream/OutputStream.h \
     fpp/stream/Stream.hpp \
     fpp/stream/VideoParameters.hpp
