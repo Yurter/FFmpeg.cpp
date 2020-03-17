@@ -1,6 +1,5 @@
-#include "InputStream.h"
+#include "InputStream.hpp"
 
-InputStream::InputStream()
-{
+namespace fpp {
 
-}
+} // namespace fpp

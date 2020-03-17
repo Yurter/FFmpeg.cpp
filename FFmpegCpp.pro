@@ -73,7 +73,7 @@ HEADERS += \
     fpp/refi/RescaleContext.hpp \
     fpp/refi/VideoFilterContext.hpp \
     fpp/stream/AudioParameters.hpp \
-    fpp/stream/InputStream.h \
-    fpp/stream/OutputStream.h \
+    fpp/stream/InputStream.hpp \
+    fpp/stream/OutputStream.hpp \
     fpp/stream/Stream.hpp \
     fpp/stream/VideoParameters.hpp

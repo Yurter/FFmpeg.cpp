@@ -1,6 +1,5 @@
-#include "OutputStream.h"
+#include "OutputStream.hpp"
 
-OutputStream::OutputStream()
-{
+namespace fpp {
 
-}
+} // namespace fpp
