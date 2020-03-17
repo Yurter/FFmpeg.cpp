@@ -61,7 +61,6 @@ namespace fpp {
             };
         }
         processPacket(packet);
-        log_warning("read " << packet);
         return packet;
     }
 

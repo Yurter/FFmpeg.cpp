@@ -59,7 +59,6 @@ namespace fpp {
             break;
         case StampType::Rescale: {
 
-            std::cout << "1>> " << packet << std::endl;
             /* Пересчет временных штампов */
             packet.setDts(::av_rescale_q(packet.dts(), packet.timeBase(), params->timeBase()));
             packet.setPts(::av_rescale_q(packet.pts(), packet.timeBase(), params->timeBase()));
@@ -80,8 +79,6 @@ namespace fpp {
         _prev_dts = packet.dts();
         _prev_pts = packet.pts();
         _packet_index++;
-        if (_stamp_type == StampType::Rescale)
-        std::cout << "2>> " << packet << std::endl;
     }
 
     bool Stream::timeIsOver() const {
