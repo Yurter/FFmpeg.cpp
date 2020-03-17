@@ -52,33 +52,31 @@ namespace fpp {
                 + (used() ? params->toString() : "not used");
     }
 
-    void Stream::stampPacket(Packet& packet) { // TODO refactoring 14.01
+    void Stream::stampPacket(Packet& packet) {
         switch (_stamp_type) {
-        case StampType::Copy:
-            _packet_duration = packet.pts() - _prev_pts;
-            break;
-        case StampType::Rescale: {
+            case StampType::Copy:
+                _packet_duration = packet.pts() - _prev_pts;
+                break;
+            case StampType::Rescale: {
 
-            /* Пересчет временных штампов */
-            packet.setDts(::av_rescale_q(packet.dts(), packet.timeBase(), params->timeBase()));
-            packet.setPts(::av_rescale_q(packet.pts(), packet.timeBase(), params->timeBase()));
+                /* Пересчет временных штампов */
+                packet.setDts(::av_rescale_q(packet.dts(), packet.timeBase(), params->timeBase()));
+                packet.setPts(::av_rescale_q(packet.pts(), packet.timeBase(), params->timeBase()));
 
-            /* Расчет длительности пакета */
-            _packet_duration = packet.pts() - _prev_pts;
+                /* Расчет длительности пакета */
+                _packet_duration = packet.pts() - _prev_pts;
 
-            break;
-        }
-        default:
-            throw std::logic_error { "stampPacket" };
+                break;
+            }
         }
 
         packet.setPos(-1);
         packet.setDuration(_packet_duration);
         packet.setTimeBase(params->timeBase());
         params->increaseDuration(packet.duration());
-        _prev_dts = packet.dts();
+        _prev_dts = packet.dts();   // TODO check raw()->cur_dts 17.03
         _prev_pts = packet.pts();
-        _packet_index++;
+        _packet_index++;            // TODO check raw()->nb_frames 17.03
     }
 
     bool Stream::timeIsOver() const {

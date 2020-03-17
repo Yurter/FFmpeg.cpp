@@ -10,13 +10,12 @@
 
 namespace fpp {
 
-    /* ? */ //TODO заменить вируальным мтоедодом штампа 03.02
+    /* ? */ // TODO заменить вируальным мтоедодом штампа 03.02
+            // TODO SharedInputStream and SharedOutputStream 17.03
     enum class StampType : uint8_t {
-        /* Штампы сорса */
+        /* Source */
         Copy,
-        Realtime,
-        Offset,
-        /* Штампы синка */
+        /* Sink   */
         Rescale,
     };
 
