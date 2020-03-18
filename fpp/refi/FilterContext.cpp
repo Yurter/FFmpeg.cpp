@@ -19,18 +19,19 @@ namespace fpp {
         init();
     }
 
-    FrameList FilterContext::filter(Frame frame) {  //TODO много параметров захардкожено 14.01
+    FrameList FilterContext::filter(Frame frame) {
         if (const auto ret {
                 ::av_buffersrc_add_frame_flags(
                     _buffersrc_ctx.get()
-                    , &frame.raw()
+                    , frame.ptr()
                     , AV_BUFFERSRC_FLAG_KEEP_REF
-            )}; ret < 0) {
+                )
+            }; ret < 0) {
             throw FFmpegException { "av_buffersrc_add_frame_flags failed", ret };
         }
         FrameList filtered_frames;
         /* pull filtered frames from the filtergraph */
-        int ret { 0 };
+        auto ret { 0 };
         while (ret == 0) {
             Frame output_frame { params->type() };
             ret = ::av_buffersink_get_frame(_buffersink_ctx.get(), output_frame.ptr());
