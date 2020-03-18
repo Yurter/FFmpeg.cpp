@@ -29,6 +29,8 @@ namespace fpp {
         static std::string  time_to_string(int64_t time_stamp, AVRational time_base);
         static std::string  channel_layout_to_string(int nb_channels, uint64_t channel_layout);
 
+        static MediaType    to_media_type(AVMediaType type);
+
         static void         sleep_for(int64_t milliseconds);
         static void         sleep_for_ms(int64_t milliseconds);
         static void         sleep_for_sec(int64_t seconds);

@@ -8,42 +8,41 @@ extern "C" {
 
 namespace fpp {
 
-    //base init
-    Stream::Stream(AVStream* avstream, SharedParameters parameters)
+    // base init (private constructor)
+    Stream::Stream(AVStream* avstream, MediaType type)
         : FFmpegObject(avstream)
-        , MediaData(parameters->type())
-        , params { parameters }
+        , MediaData(type)
         , _used { false }
-        , _stamp_type { StampType::Copy }
         , _prev_dts { 0 }
         , _prev_pts { 0 }
         , _packet_index { 0 }
-        , _packet_dts_delta { 0 }
-        , _packet_pts_delta { 0 }
-        , _packet_duration { 0 }
-        , _pts_offset { 0 }
-        , _dts_offset { 0 }
         , _start_time_point { FROM_START }
         , _end_time_point { TO_END } {
-        setName(utils::to_string(type()) + " stream");
+
+        setName("Stream");
+
     }
 
-    //input stream
+    // input stream
     Stream::Stream(AVStream* avstream)
-        : Stream(avstream, utils::make_params(avstream->codecpar->codec_type)) {
+        : Stream(avstream, utils::to_media_type(avstream->codecpar->codec_type)) {
+
+        setName("In" + utils::to_string(type()) + "Stream");
+        params = utils::make_params(type());
         params->parseStream(avstream);
+
     }
 
-    //output stream
-    Stream::Stream(SharedParameters parameters, AVStream* avstream)
-        : Stream(avstream, parameters) {
+    // output stream
+    Stream::Stream(AVStream* avstream, const SharedParameters parameters)
+        : Stream(avstream, parameters->type()) {
+
+        setName("Out" + utils::to_string(type()) + "Stream");
+        params = parameters;
         params->setStreamIndex(avstream->index);
         avstream->time_base = params->timeBase();
         initCodecpar();
-    }
 
-    Stream::Stream(SharedParameters params)
-        : Stream(nullptr, params) {
     }
 
     std::string Stream::toString() const {
@@ -53,48 +52,24 @@ namespace fpp {
     }
 
     void Stream::stampPacket(Packet& packet) {
-        switch (_stamp_type) {
-            case StampType::Copy:
-                _packet_duration = packet.pts() - _prev_pts;
-                break;
-            case StampType::Rescale: {
 
-                /* Пересчет временных штампов */
-                packet.setDts(::av_rescale_q(packet.dts(), packet.timeBase(), params->timeBase()));
-                packet.setPts(::av_rescale_q(packet.pts(), packet.timeBase(), params->timeBase()));
-
-                /* Контроль за монотонностью временных штампов */
-                if (packet.dts() <= _prev_dts) {
-                    log_warning("Application provided invalid, "
-                                "non monotonically increasing dts to muxer "
-                                "in stream " << packet.streamIndex() << ": "
-                                << _prev_dts << " >= " << packet.dts()
-                    );
-                    packet.setDts(_prev_dts + 1);
-                }
-                if (packet.pts() <= _prev_pts) {
-                    log_warning("Application provided invalid, "
-                                "non monotonically increasing pts to muxer "
-                                "in stream " << packet.streamIndex() << ": "
-                                << _prev_pts << " >= " << packet.pts()
-                    );
-                    packet.setPts(_prev_pts + 1);
-                }
-
-                /* Расчет длительности пакета */
-                _packet_duration = packet.pts() - _prev_pts;
-
-                break;
-            }
+        if (packet.timeBase() != DEFAULT_RATIONAL) {
+            packet.setDts(::av_rescale_q(packet.dts(), packet.timeBase(), params->timeBase()));
+            packet.setPts(::av_rescale_q(packet.pts(), packet.timeBase(), params->timeBase()));
         }
 
+        checkStampMonotonicity(packet);
+
+        const auto packet_duration { packet.pts() - _prev_pts };
         packet.setPos(-1);
-        packet.setDuration(_packet_duration);
+        packet.setDuration(packet_duration);
         packet.setTimeBase(params->timeBase());
+
         params->increaseDuration(packet.duration());
         _prev_dts = packet.dts();
         _prev_pts = packet.pts();
         _packet_index++;
+
     }
 
     bool Stream::timeIsOver() const {
@@ -113,10 +88,6 @@ namespace fpp {
 
     void Stream::setUsed(bool value) {
         _used = value;
-    }
-
-    void Stream::setStampType(StampType value) {
-        _stamp_type = value;
     }
 
     void Stream::setStartTimePoint(int64_t value) {
@@ -157,10 +128,6 @@ namespace fpp {
 
     bool Stream::used() const {
         return _used;
-    }
-
-    StampType Stream::stampType() const {
-        return _stamp_type;
     }
 
     int64_t Stream::startTimePoint() const {
@@ -217,8 +184,25 @@ namespace fpp {
         }
     }
 
-//    SharedStream make_input_stream(const AVStream* avstream) {
-//        return std::make_shared<Stream>(avstream);
-//    }
+    void Stream::checkStampMonotonicity(Packet& packet) {
+        if (packet.dts() <= _prev_dts) {
+            log_warning(
+                "Application provided invalid, "
+                "non monotonically increasing dts to muxer "
+                "in stream " << packet.streamIndex() << ": "
+                << _prev_dts << " >= " << packet.dts()
+            );
+            packet.setDts(_prev_dts + 1);
+        }
+        if (packet.pts() <= _prev_pts) {
+            log_warning(
+                "Application provided invalid, "
+                "non monotonically increasing pts to muxer "
+                "in stream " << packet.streamIndex() << ": "
+                << _prev_pts << " >= " << packet.pts()
+            );
+            packet.setPts(_prev_pts + 1);
+        }
+    }
 
 } // namespace fpp

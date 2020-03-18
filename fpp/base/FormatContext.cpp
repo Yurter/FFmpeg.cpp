@@ -125,8 +125,8 @@ namespace fpp {
         packet_stream->stampPacket(packet);
         const auto packet_type {
             packet_stream->timeIsOver()
-            ? MediaType::EndOF
-            : packet_stream->params->type()
+                ? MediaType::EndOF
+                : packet_stream->type()
         };
         packet.setType(packet_type);
     }

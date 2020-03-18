@@ -148,6 +148,20 @@ namespace fpp {
         return std::string { buf };
     }
 
+    MediaType utils::to_media_type(AVMediaType type) {
+        switch (type) {
+            case AVMediaType::AVMEDIA_TYPE_VIDEO:
+                return MediaType::Video;
+            case AVMediaType::AVMEDIA_TYPE_AUDIO:
+                return MediaType::Audio;
+            default:
+                throw std::invalid_argument {
+                    "toMediaType failed, bad type "
+                    + std::to_string(int(type))
+                };
+        }
+    }
+
     bool utils::exit_code(Code code) {
         if (error_code(code))                   { return true; }
         if (code == Code::EXIT)                 { return true; }
@@ -376,27 +390,27 @@ namespace fpp {
 
     SharedParameters utils::make_params(MediaType type) {
         switch (type) {
-        case MediaType::Video:
-            return VideoParameters::make_shared();
-        case MediaType::Audio:
-            return AudioParameters::make_shared();
-        default:
-            throw std::invalid_argument {
-                "make_params failed: invalid media type"
-            };
+            case MediaType::Video:
+                return VideoParameters::make_shared();
+            case MediaType::Audio:
+                return AudioParameters::make_shared();
+            default:
+                throw std::invalid_argument {
+                    "make_params failed: invalid media type"
+                };
         }
     }
 
     SharedParameters utils::make_params(AVMediaType type) {
         switch (type) {
-        case AVMediaType::AVMEDIA_TYPE_VIDEO:
-            return VideoParameters::make_shared();
-        case AVMediaType::AVMEDIA_TYPE_AUDIO:
-            return AudioParameters::make_shared();
-        default:
-            throw std::invalid_argument {
-                "make_params failed: invalid media type"
-            };
+            case AVMediaType::AVMEDIA_TYPE_VIDEO:
+                return VideoParameters::make_shared();
+            case AVMediaType::AVMEDIA_TYPE_AUDIO:
+                return AudioParameters::make_shared();
+            default:
+                throw std::invalid_argument {
+                    "make_params failed: invalid media type"
+                };
         }
     }
 
