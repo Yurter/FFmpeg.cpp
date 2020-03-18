@@ -25,11 +25,11 @@ namespace fpp {
 
     protected:
 
-        void                init(Dictionary dictionary);
+        void                init(Options options);
 
     private:
 
-        void                open(Dictionary dictionary);
+        void                open(Options options);
         void                close();
         void                setOpened(bool value);
 

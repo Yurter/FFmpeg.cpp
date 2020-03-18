@@ -21,7 +21,7 @@ namespace fpp {
         close();
     }
 
-    void CodecContext::init(Dictionary dictionary) {
+    void CodecContext::init(Options options) {
         log_debug("Initialization");
         reset({
             ::avcodec_alloc_context3(codec())
@@ -30,20 +30,19 @@ namespace fpp {
             }
         });
         setName(name() + " " + codec()->name);
-        open(dictionary);
+        open(options);
     }
 
-    void CodecContext::open(Dictionary dictionary) {
+    void CodecContext::open(Options options) {
         if (opened()) {
             throw std::runtime_error { "Codec already opened" };
         }
         log_debug("Opening");
         initContext();
-        auto avdict { dictionary.alloc() };
+        Dictionary dictionary { options };
         if (const auto ret {
-                ::avcodec_open2(raw(), codec(), &avdict)
+                ::avcodec_open2(raw(), codec(), dictionary.get())
             }; ret != 0) {
-            dictionary.free(avdict);
             throw FFmpegException {
                 "Cannot open "
                     + utils::to_string(raw()->codec_type) + " "
@@ -52,7 +51,6 @@ namespace fpp {
                 , ret
             };
         }
-        dictionary.free(avdict);
         if (_stream->params->isEncoder()) {
             initStreamCodecpar();
         }

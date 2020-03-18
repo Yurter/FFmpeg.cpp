@@ -97,21 +97,17 @@ void startYoutubeStream() {
     fpp::DecoderContext audio_decoder { camera.stream(fpp::MediaType::Audio) };
 
     /* create encoder's options */
-    fpp::Dictionary video_options {
-        fpp::Options {
-            { "threads",        "1"     }
-            , { "thread_type",  "slice" }
-            , { "preset",       "fast"  }
-            , { "crf",          "30"    }
-            , { "profile",      "main"  }
-            , { "tune",         "zerolatency" }
-        }
+    fpp::Options video_options {
+        { "threads",        "1"     }
+        , { "thread_type",  "slice" }
+        , { "preset",       "fast"  }
+        , { "crf",          "30"    }
+        , { "profile",      "main"  }
+        , { "tune",         "zerolatency" }
     };
 
-    fpp::Dictionary audio_options {
-        fpp::Options {
-            { "preset", "low" }
-        }
+    fpp::Options audio_options {
+        { "preset", "low" }
     };
 
     /* create encoders */

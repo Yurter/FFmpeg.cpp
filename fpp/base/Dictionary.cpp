@@ -8,38 +8,46 @@ extern "C" {
 
 namespace fpp {
 
-    Dictionary::Dictionary(Options options)
-        : _options { options } {
+    Dictionary::Dictionary(const Options& options)
+        : _dictionary { alloc(options) } {
         setName("Dictionary");
     }
 
+    Dictionary::~Dictionary() {
+        free();
+    }
+
     void Dictionary::setOption(const std::string_view key, const std::string_view value) {
-        _options.push_back({ key.data(), value.data() });
+        setString(&_dictionary, key, value);
     }
 
     void Dictionary::setOption(const std::string_view key, int64_t value) {
-        _options.push_back({ key.data(), std::to_string(value) });
+        setString(&_dictionary, key, std::to_string(value));
     }
 
-    AVDictionary* Dictionary::alloc() const {
+    AVDictionary** Dictionary::get() {
+        return &_dictionary;
+    }
+
+    AVDictionary* Dictionary::alloc(const Options& options) const {
         AVDictionary* dictionary { nullptr };
-        for (const auto& [key, value] : _options) {
+        for (const auto& [key, value] : options) {
             setString(&dictionary, key, value);
         }
         return dictionary;
     }
 
-    void Dictionary::free(AVDictionary* dict) const {
+    void Dictionary::free() {
         AVDictionaryEntry* entry { nullptr };
-        if (dict) {
+        if (_dictionary) {
             // iterate over all entries in dictionary
-            while ((entry = ::av_dict_get(dict, "", entry, AV_DICT_IGNORE_SUFFIX))) {
+            while ((entry = ::av_dict_get(_dictionary, "", entry, AV_DICT_IGNORE_SUFFIX))) {
                 static_log_warning(
                     "Dictionary"
                     , "Unused option: " << entry->key << " " << entry->value
                 );
             }
-            ::av_dict_free(&dict);
+            ::av_dict_free(&_dictionary);
         }
     }
 
