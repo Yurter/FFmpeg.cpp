@@ -106,6 +106,3 @@ namespace fpp {
     }
 
 } // namespace fpp
-
-#define if_not(x)       if(!(x))
-#define while_not(x)    while(!(x))

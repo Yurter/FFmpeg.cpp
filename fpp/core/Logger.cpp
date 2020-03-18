@@ -103,7 +103,7 @@ namespace fpp {
 
         if (debug_type) { header += " [" + getThreadId() + "]"; }
         if (trace_type) { header += getTraceFormat(code_position); }
-        if_not(trace_type) { header += " "; }
+        if (!trace_type) { header += " "; }
 
         return header + message;
     }

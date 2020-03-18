@@ -9,7 +9,7 @@ namespace fpp {
 
     public:
 
-        EncoderContext(const SharedStream stream, Dictionary&& dictionary = Dictionary {});
+        EncoderContext(const SharedStream stream, Dictionary dictionary = Dictionary {});
 
         PacketList          encode(const Frame& frame);
         PacketList          flush();
