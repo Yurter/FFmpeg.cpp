@@ -107,8 +107,8 @@ namespace fpp {
         if (full_stream_copy) {
             if (const auto ret {
                 ::avcodec_parameters_copy(
-                    created_stream->raw()->codecpar /* dst */
-                    , other->raw()->codecpar        /* src */
+                    created_stream->codecpar() /* dst */
+                    , other->codecpar()        /* src */
                 )
             }; ret < 0) {
                 throw FFmpegException {

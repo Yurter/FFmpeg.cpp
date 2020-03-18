@@ -117,20 +117,21 @@ namespace fpp {
 
     void CodecContext::initContext() {
         if (const auto ret {
-            ::avcodec_parameters_to_context(raw(), _stream->raw()->codecpar)
+            ::avcodec_parameters_to_context(raw(), _stream->codecpar())
         }; ret < 0) {
             throw FFmpegException {
                 "Could not initialize stream codec parameters!"
                 , ret
             };
         }
+        // TODO raw()->gop_size 18.03
         raw()->time_base = params->timeBase();
         raw()->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
     }
 
     void CodecContext::initStreamCodecpar() {
         if (const auto ret {
-            ::avcodec_parameters_from_context(_stream->raw()->codecpar, raw())
+            ::avcodec_parameters_from_context(_stream->codecpar(), raw())
         }; ret < 0) {
             throw FFmpegException {
                 "Could not initialize stream codec parameters!"

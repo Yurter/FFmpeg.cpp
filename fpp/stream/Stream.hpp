@@ -40,7 +40,7 @@ namespace fpp {
         int64_t             endTimePoint()      const;
         int64_t             packetIndex()       const;
 
-        AVCodecParameters*  codecParams();
+        AVCodecParameters*  codecpar();
 
     private:
 
