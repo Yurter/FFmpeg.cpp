@@ -90,7 +90,7 @@ namespace fpp {
 
     SharedStream OutputFormatContext::createStream(SharedParameters params) {
         const auto avstream  { ::avformat_new_stream(raw(), params->codec()) };
-        const auto fppstream { Stream::make_output_stream(avstream, params) };
+        const auto fppstream { Stream::make_output_stream(avstream, params)  };
         addStream(fppstream);
         return fppstream;
     }
