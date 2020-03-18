@@ -25,7 +25,7 @@ namespace fpp {
 
     // input stream
     Stream::Stream(AVStream* avstream)
-        : Stream(avstream, utils::toMediaType(avstream->codecpar->codec_type)) {
+        : Stream(avstream, utils::to_media_type(avstream->codecpar->codec_type)) {
 
         setName("In" + utils::to_string(type()) + "Stream");
         params = utils::make_params(type());
