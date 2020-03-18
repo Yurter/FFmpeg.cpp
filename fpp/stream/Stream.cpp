@@ -39,7 +39,7 @@ namespace fpp {
 
         setName("Out" + utils::to_string(type()) + "Stream");
         params = parameters;
-        params->setStreamIndex(avstream->index);
+        params->setStreamIndex(index());
         avstream->time_base = params->timeBase();
         initCodecpar();
 
