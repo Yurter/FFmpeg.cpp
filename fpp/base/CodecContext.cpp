@@ -10,7 +10,8 @@ extern "C" {
 namespace fpp {
 
     CodecContext::CodecContext(const SharedStream stream)
-        : params { stream->params }
+        : MediaData(stream->type())
+        , params { stream->params }
         , _stream { stream }
         , _opened { false } {
         setName("CodecContext");
@@ -74,7 +75,7 @@ namespace fpp {
 
     std::string CodecContext::toString() const {
         const auto delimeter { ", " };
-        if (params->isVideo()) {
+        if (isVideo()) {
             return utils::to_string(raw()->codec_type) + " "
                 + _stream->params->codecType() + " " + codec()->name        + delimeter
                 + "width: "         + std::to_string(raw()->width)          + delimeter
@@ -84,7 +85,7 @@ namespace fpp {
                 + "time_base: "     + utils::to_string(raw()->time_base)    + delimeter
                 + "pix_fmt: "       + utils::to_string(raw()->pix_fmt);
         }
-        if (params->isAudio()) {
+        if (isAudio()) {
             return utils::to_string(raw()->codec_type) + " "
                 + _stream->params->codecType() + " " + codec()->name        + delimeter
                 + "sample_rate "   + std::to_string(raw()->sample_rate)     + delimeter
