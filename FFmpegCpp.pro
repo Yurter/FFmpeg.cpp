@@ -63,7 +63,6 @@ HEADERS += \
     fpp/core/time/Chronometer.hpp \
     fpp/core/time/Timer.hpp \
     fpp/core/wrap/FFmpegObject.hpp \
-    fpp/core/wrap/SemiSmartPointer.hpp \
     fpp/core/wrap/SharedFFmpegObject.hpp \
     fpp/refi/AudioFilterContext.hpp \
     fpp/refi/FilterContext.hpp \

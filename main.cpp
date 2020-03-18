@@ -58,11 +58,10 @@ void simpleCopyFile() {
 }
 
 void startYoutubeStream() {
+#define FPP_DEBUG
 
     /* create source */
     fpp::InputFormatContext camera { "rtsp://admin:admin@192.168.10.3:554" };
-
-#define FPP_DEBUG
 
     /* create sink */
 #ifndef FPP_DEBUG
@@ -98,22 +97,26 @@ void startYoutubeStream() {
     fpp::DecoderContext audio_decoder { camera.stream(fpp::MediaType::Audio) };
 
     /* create encoder's options */
-    fpp::Dictionary video_options;
-    video_options.setOption("threads",      "1"     );
-    video_options.setOption("thread_type",  "slice" );
-    video_options.setOption("preset",       "fast"  );
-    video_options.setOption("crf",          "30"    );
-    video_options.setOption("profile",      "main"  );
-    video_options.setOption("tune",         "zerolatency");
+    fpp::Dictionary video_options {
+        fpp::Options {
+            { "threads",        "1"     }
+            , { "thread_type",  "slice" }
+            , { "preset",       "fast"  }
+            , { "crf",          "30"    }
+            , { "profile",      "main"  }
+            , { "tune",         "zerolatency" }
+        }
+    };
 
-    fpp::Dictionary audio_options;
-    audio_options.setOption("preset", "low" );
+    fpp::Dictionary audio_options {
+        fpp::Options {
+            { "preset", "low" }
+        }
+    };
 
     /* create encoders */
-    fpp::EncoderContext video_encoder { youtube.stream(fpp::MediaType::Video), std::move(video_options) };
-    fpp::EncoderContext audio_encoder { youtube.stream(fpp::MediaType::Audio), std::move(audio_options) };
-    std::cout << "video_encoder " << video_encoder.toString() << std::endl;
-    std::cout << "audio_encoder " << audio_encoder.toString() << std::endl;
+    fpp::EncoderContext video_encoder { youtube.stream(fpp::MediaType::Video), video_options };
+    fpp::EncoderContext audio_encoder { youtube.stream(fpp::MediaType::Audio), audio_options };
 
     /* create resampler */
     fpp::ResampleContext resample {
@@ -131,7 +134,12 @@ void startYoutubeStream() {
     };
 
     /* set timeout */
+#ifndef FPP_DEBUG
     camera.stream(fpp::MediaType::Video)->setEndTimePoint(10 * 60 * 1000); // 10 min
+#endif
+#ifdef FPP_DEBUG
+    camera.stream(fpp::MediaType::Video)->setEndTimePoint(20 * 1000); // 20 sec
+#endif
 
     fpp::Packet input_packet { fpp::MediaType::Unknown };
     const auto read_packet {
@@ -174,6 +182,7 @@ void startYoutubeStream() {
         }
     }
 
+#undef FPP_DEBUG
 }
 
 int main() {
@@ -190,6 +199,8 @@ int main() {
         startYoutubeStream();
 //        simpleCopyFile();
 
+    } catch (const fpp::FFmpegException& e) {
+        std::cout << "FFmpegException: " << e.what() << "\n";
     } catch (const std::exception& e) {
         std::cout << "Exception: " << e.what() << "\n";
     } catch (...) {

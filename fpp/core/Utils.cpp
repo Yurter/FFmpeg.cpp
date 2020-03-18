@@ -13,12 +13,12 @@ extern "C" {
 
 #define both_params_is_video(params) \
     do {\
-        if_not(params.in->isVideo()) {\
+        if (!params.in->isVideo()) {\
             throw std::runtime_error {\
                 std::string { __FUNCTION__ } + " failed - in is not a video param"\
             };\
         }\
-        if_not(params.out->isVideo()) {\
+        if (!params.out->isVideo()) {\
             throw std::runtime_error {\
                 std::string { __FUNCTION__ } + " failed - out is not a video param"\
             };\
@@ -27,12 +27,12 @@ extern "C" {
 
 #define both_params_is_audio(params) \
     do {\
-        if_not(params.in->isAudio()) {\
+        if (!params.in->isAudio()) {\
             throw std::runtime_error {\
                 std::string { __FUNCTION__ } + " failed - in is not a audio param"\
             };\
         }\
-        if_not(params.out->isAudio()) {\
+        if (!params.out->isAudio()) {\
             throw std::runtime_error {\
                 std::string { __FUNCTION__ } + " failed - out is not a audio param"\
             };\

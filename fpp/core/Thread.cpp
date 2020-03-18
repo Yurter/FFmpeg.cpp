@@ -65,7 +65,7 @@ namespace fpp {
                     if (_stop_flag) { break; }
                     log_trace("Execute loop function");
                     _exit_code = _loop_function();
-                } while_not (utils::exit_code(_exit_code));
+                } while (!utils::exit_code(_exit_code));
 
                 const std::string log_message = utils::error_code(_exit_code)
                         ? "Thread finished with error code: "

@@ -50,7 +50,7 @@ namespace fpp {
             log_error("Cannot set pixel format before codec");
             return;
         }
-        if_not(utils::compatible_with_pixel_format(_codec, pixel_format)) { //TODO ? почему формат захардкожен? _codec->pix_fmts[0] ? 14.01
+        if (!utils::compatible_with_pixel_format(_codec, pixel_format)) { //TODO ? почему формат захардкожен? _codec->pix_fmts[0] ? 14.01
             const auto defailt_h264_pixel_format = AV_PIX_FMT_YUV420P;                                      //  _codec->pix_fmts = 0x0 если кодек не открыт
             log_warning("Cannot set pixel format: " << pixel_format
                         << " - " << _codec->name << " doesn't compatible with it, "
