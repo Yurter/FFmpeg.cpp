@@ -3,8 +3,6 @@
 #include <fpp/core/FFmpegException.hpp>
 #include <fpp/core/Utils.hpp>
 
-#include <fpp/stream/AudioParameters.hpp> //TODO убрать, см onOpen() 02.02
-
 namespace fpp {
 
     EncoderContext::EncoderContext(const SharedStream stream, Options options)
@@ -50,9 +48,7 @@ namespace fpp {
         auto ret { 0 };
         while (0 == ret) {
             Packet output_packet { params->type() };
-            const auto ret {
-                ::avcodec_receive_packet(raw(), &output_packet.raw())
-            };
+            ret = ::avcodec_receive_packet(raw(), &output_packet.raw());
             if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
                 break;
             }
