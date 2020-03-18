@@ -69,10 +69,10 @@ namespace fpp {
     void OutputFormatContext::openContext() {
         if (!(raw()->flags & AVFMT_NOFILE)) {
             if (const auto ret {
-                    ::avio_open( // TODO: avio_open2 [interrupt callback] 03.03
-                        &raw()->pb                          /* AVIOContext  */
-                        , mediaResourceLocator().c_str()    /* url          */
-                        , AVIO_FLAG_WRITE                   /* flags        */
+                    ::avio_open(
+                        &raw()->pb                       /* AVIOContext */
+                        , mediaResourceLocator().c_str() /* url         */
+                        , AVIO_FLAG_WRITE                /* flags       */
                     )
                 }; ret < 0) {
                 throw FFmpegException {
