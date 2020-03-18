@@ -144,7 +144,7 @@ namespace fpp {
 
     AVCodecParameters* Stream::codecpar() {
         if (not_inited_ptr(raw())) {
-            throw std::runtime_error { "stream is nullptr" }; // TODO перенести выброс в метод raw() 04.02
+            throw std::runtime_error { "stream is null" };
         }
         return raw()->codecpar;
     }
