@@ -57,6 +57,11 @@ namespace fpp {
         if (params->isAudio()) { // TODO 16.03
             std::static_pointer_cast<AudioParameters>(params)->setFrameSize(raw()->frame_size);
         }
+        if (params->isVideo()) { // TODO 19.03
+            if (params->isDecoder()) {
+                std::static_pointer_cast<VideoParameters>(params)->setGopSize(raw()->gop_size);
+            }
+        }
         setOpened(true);
     }
 
