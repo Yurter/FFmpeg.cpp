@@ -67,6 +67,9 @@ namespace fpp {
     }
 
     void OutputFormatContext::openContext() {
+        if (streamNumber() == 0) {
+            throw std::logic_error { "Can't open context without streams" };
+        }
         if (!(raw()->flags & AVFMT_NOFILE)) {
             if (const auto ret {
                     ::avio_open(
