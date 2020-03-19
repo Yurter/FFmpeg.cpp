@@ -271,6 +271,9 @@ namespace fpp {
         if (media_resurs_locator.find("rtsp://") != std::string_view::npos) {
             return "rtsp";
         }
+        if (media_resurs_locator.find("rtp://") != std::string_view::npos) {
+            return "rtp";
+        }
         if (media_resurs_locator.find("rtmp://") != std::string_view::npos) {
             return "flv";
         }

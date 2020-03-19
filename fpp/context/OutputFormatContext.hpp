@@ -24,6 +24,8 @@ namespace fpp {
         void                write(Packet packet, WriteMode write_mode = WriteMode::Instant);
         void                flush();
 
+        std::string         sdp();
+
     private:
 
         virtual void        createContext()         override;
