@@ -46,17 +46,12 @@ namespace fpp {
     }
 
     void VideoParameters::setPixelFormat(AVPixelFormat pixel_format) {
-        if (not_inited_ptr(_codec)) {
-            log_error("Cannot set pixel format before codec");
-            return;
-        }
-        if (!utils::compatible_with_pixel_format(_codec, pixel_format)) { //TODO ? почему формат захардкожен? _codec->pix_fmts[0] ? 14.01
-            const auto defailt_h264_pixel_format = AV_PIX_FMT_YUV420P;                                      //  _codec->pix_fmts = 0x0 если кодек не открыт
-            log_warning("Cannot set pixel format: " << pixel_format
-                        << " - " << _codec->name << " doesn't compatible with it, "
-                        << "setting default: " << defailt_h264_pixel_format);
-            _pixel_format = defailt_h264_pixel_format;
-            return;
+        if (!utils::compatible_with_pixel_format(codec(), pixel_format)) {
+            throw std::invalid_argument {
+                utils::to_string(pixel_format)
+                + " doesn't compatible with "
+                + codecName()
+            };
         }
         _pixel_format = pixel_format;
     }
@@ -93,7 +88,7 @@ namespace fpp {
         return Parameters::toString() + ", "
             + std::to_string(width()) + "x" + std::to_string(height()) + ", "
             + utils::to_string(frameRate()) + " fps, "
-            + "gop " + std::to_string(gopSize()) + ", "
+            + "gop " + (gopSize() ? std::to_string(gopSize()) : "N/A")+ ", "
             + utils::to_string(pixelFormat());
     }
 
@@ -115,16 +110,15 @@ namespace fpp {
         setAspectRatio(avstream->codecpar->sample_aspect_ratio);
         setFrameRate(avstream->avg_frame_rate);
         setPixelFormat(AVPixelFormat(avstream->codecpar->format));
-        setGopSize(avstream->codec->gop_size);  // TODO дефолтный ноль заставляет энкодер делать каждый кадр ключевым
-                                                // либо сделать проверку в утилитах при копировании в кодекпар,
-                                                // либо изменить дефолтное значение на 10-30 03.02
     }
 
     void VideoParameters::initStream(AVStream* avstream) const {
         Parameters::initStream(avstream);
-        avstream->codecpar->width = int(width());
-        avstream->codecpar->height = int(height());
-        avstream->avg_frame_rate = frameRate();
+        avstream->codecpar->width   = int(width());
+        avstream->codecpar->height  = int(height());
+        avstream->codecpar->format  = pixelFormat();
+        avstream->avg_frame_rate    = frameRate();
+        avstream->codecpar->sample_aspect_ratio = aspectRatio();
     }
 
     bool VideoParameters::betterThen(const SharedParameters& other) {
