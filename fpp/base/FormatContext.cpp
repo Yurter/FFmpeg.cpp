@@ -55,9 +55,6 @@ namespace fpp {
         if (opened()) {
             throw std::runtime_error { "Context already opened" };
         }
-//        if (streamAmount() == 0) { потоков у инпута нет до открытия
-//            throw std::logic_error { "Can't open context without streams" };
-//        }
         setInteruptCallback(InterruptedProcess::Opening);
         openContext();
         resetInteruptCallback();
@@ -135,7 +132,7 @@ namespace fpp {
         _streams.push_back(stream);
     }
 
-    int64_t FormatContext::streamAmount() const {
+    int64_t FormatContext::streamNumber() const {
         return int64_t(raw()->nb_streams);
     }
 
