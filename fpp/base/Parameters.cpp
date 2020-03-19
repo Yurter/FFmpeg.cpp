@@ -38,11 +38,6 @@ namespace fpp {
     }
 
     void Parameters::setCodec(AVCodec* codec) {
-        if (not_inited_ptr(codec)) {
-            throw std::runtime_error {
-                std::string { __FUNCTION__ } + " failed: codec is null"
-            };
-        }
         _codec = codec;
     }
 
@@ -51,12 +46,7 @@ namespace fpp {
     }
 
     void Parameters::setDuration(int64_t duration) {
-        if (duration < 0) {
-            log_warning("Cannot set duration less then zero: " << duration << ", ignored");
-            return;
-        }
-        if (duration > LONG_MAX) {
-            log_warning("Cannot set duration more then LONG_MAX, ignored");
+        if ((duration - 1) == INT64_MAX) {
             return;
         }
         _duration = duration;
