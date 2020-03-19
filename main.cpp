@@ -25,11 +25,11 @@ void simpleCopyFile() {
     /* create source */
     fpp::InputFormatContext camera { "rtsp://admin:admin@192.168.10.3:554" };
 
-    /* create sink */
-    fpp::OutputFormatContext youtube { "rtsp_copy.flv" };
-
     /* open source */
     camera.open();
+
+    /* create sink */
+    fpp::OutputFormatContext youtube { "rtsp_copy.flv" };
 
     /* copy source's streams to sink */
     for (const auto& input_stream : camera.streams()) {
@@ -63,6 +63,9 @@ void startYoutubeStream() {
     /* create source */
     fpp::InputFormatContext camera { "rtsp://admin:admin@192.168.10.3:554" };
 
+    /* open source */
+    camera.open();
+
     /* create sink */
 #ifndef FPP_DEBUG
     const std::string stream_key { "apaj-8d8z-0ksj-6qxe" };
@@ -74,9 +77,6 @@ void startYoutubeStream() {
 #ifdef FPP_DEBUG
     fpp::OutputFormatContext youtube { "youtube.flv" };
 #endif
-
-    /* open source */
-    camera.open();
 
     /* copy source's streams to sink */
     for (const auto& input_stream : camera.streams()) {
@@ -192,8 +192,8 @@ int main() {
         ::avformat_network_init();
         ::avdevice_register_all();
 
-        startYoutubeStream();
-//        simpleCopyFile();
+//        startYoutubeStream();
+        simpleCopyFile();
 
     } catch (const fpp::FFmpegException& e) {
         std::cout << "FFmpegException: " << e.what() << "\n";
