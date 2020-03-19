@@ -185,10 +185,10 @@ int main() {
 
     try {
 
-        #pragma warning( push )
-        #pragma warning( disable : 4974)
+//        #pragma warning( push )
+//        #pragma warning( disable : 4974)
         ::av_register_all();
-        #pragma warning( pop )
+//        #pragma warning( pop )
         ::avformat_network_init();
         ::avdevice_register_all();
 
