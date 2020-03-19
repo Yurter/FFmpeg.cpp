@@ -37,9 +37,6 @@ namespace fpp {
         for (const auto& stream : streams()) {
             context_info += '\n' + stream->toString();
         }
-        if (context_info.back() == ',') {
-            context_info += "without streams";
-        }
         return context_info;
     }
 
@@ -59,6 +56,7 @@ namespace fpp {
         openContext();
         resetInteruptCallback();
         setOpened(true);
+        log_info(toString());
     }
 
     void FormatContext::setInteruptCallback(InterruptedProcess process) {
@@ -129,6 +127,7 @@ namespace fpp {
     }
 
     void FormatContext::addStream(SharedStream stream) {
+        stream->setUsed(true);
         _streams.push_back(stream);
     }
 
