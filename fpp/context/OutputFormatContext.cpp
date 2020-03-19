@@ -67,12 +67,15 @@ namespace fpp {
     }
 
     void OutputFormatContext::openContext() {
+        if (streamNumber() == 0) {
+            throw std::logic_error { "Can't open context without streams" };
+        }
         if (!(raw()->flags & AVFMT_NOFILE)) {
             if (const auto ret {
-                    ::avio_open( // TODO: avio_open2 [interrupt callback] 03.03
-                        &raw()->pb                          /* AVIOContext  */
-                        , mediaResourceLocator().c_str()    /* url          */
-                        , AVIO_FLAG_WRITE                   /* flags        */
+                    ::avio_open(
+                        &raw()->pb                       /* AVIOContext */
+                        , mediaResourceLocator().c_str() /* url         */
+                        , AVIO_FLAG_WRITE                /* flags       */
                     )
                 }; ret < 0) {
                 throw FFmpegException {
@@ -82,6 +85,11 @@ namespace fpp {
             }
         }
         writeHeader();
+        parseStreamsTimeBase();
+    }
+
+    std::string OutputFormatContext::formatName() const {
+        return raw()->oformat->name;
     }
 
     void OutputFormatContext::beforeCloseContext() {
@@ -101,14 +109,13 @@ namespace fpp {
         if (full_stream_copy) {
             output_params = utils::make_params(input_params->type());
         }
-        output_params->setTimeBase(DEFAULT_TIME_BASE); // TODO timebase hardcoded 12.03
         output_params->completeFrom(input_params);
         const auto created_stream { createStream(output_params) };
         if (full_stream_copy) {
             if (const auto ret {
                 ::avcodec_parameters_copy(
-                    created_stream->raw()->codecpar /* dst */
-                    , other->raw()->codecpar        /* src */
+                    created_stream->codecpar() /* dst */
+                    , other->codecpar()        /* src */
                 )
             }; ret < 0) {
                 throw FFmpegException {
@@ -149,6 +156,12 @@ namespace fpp {
                 "Failed to write stream trailer to " + mediaResourceLocator()
                 , ret
             };
+        }
+    }
+
+    void OutputFormatContext::parseStreamsTimeBase() {
+        for (const auto& stream : streams()) {
+            stream->params->setTimeBase(stream->raw()->time_base);
         }
     }
 

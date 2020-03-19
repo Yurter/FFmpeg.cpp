@@ -5,7 +5,7 @@
 
 namespace fpp {
 
-    DecoderContext::DecoderContext(const SharedStream stream, Dictionary dictionary)
+    DecoderContext::DecoderContext(const SharedStream stream, Options options)
         : CodecContext(stream) {
         setName("DecCtx");
         if (!stream->params->isDecoder()) {
@@ -13,7 +13,7 @@ namespace fpp {
                 "Decoder cannot be initialized with encoder parameters"
             };
         }
-        init(dictionary);
+        init(options);
     }
 
     FrameList DecoderContext::decode(const Packet& packet) {

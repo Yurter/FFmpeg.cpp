@@ -138,13 +138,13 @@ namespace fpp {
         return std::to_string(hh) + ':' + std::to_string(mm) + ':' + std::to_string(ss) + '.' + std::to_string(ms);
     }
 
-    std::string utils::channel_layout_to_string(int nb_channels, uint64_t channel_layout) {
+    std::string utils::channel_layout_to_string(int64_t nb_channels, uint64_t channel_layout) {
         if (channel_layout == 0) {
             return "Unknown or unspecified";
         }
         const auto buf_size { 32 };
         char buf[buf_size];
-        ::av_get_channel_layout_string(buf, buf_size, nb_channels, channel_layout);
+        ::av_get_channel_layout_string(buf, buf_size, int(nb_channels), channel_layout);
         return std::string { buf };
     }
 
@@ -201,28 +201,54 @@ namespace fpp {
     }
 
     bool utils::compatible_with_pixel_format(const AVCodec* codec, AVPixelFormat pixel_format) {
-        if (not_inited_ptr(codec->pix_fmts)) {
-            static_log_warning("utils", "compatible_with_pixel_format failed: codec->pix_fmts is NULL");
+        if (!codec) {
+            throw std::runtime_error {
+                __FUNCTION__" failed: codec is NULL"
+            };
+        }
+        if (!codec->pix_fmts) {
+            static_log_warning(
+                "utils"
+                , __FUNCTION__" failed: codec->pix_fmts is NULL"
+            );
             return true;
+//            throw std::runtime_error {
+//               __FUNCTION__" failed: codec->pix_fmts is NULL"
+//            };
         }
 
-        auto pix_fmt = codec->pix_fmts;
+        auto pix_fmt { codec->pix_fmts };
         while (pix_fmt[0] != AV_PIX_FMT_NONE) {
-            if (pix_fmt[0] == pixel_format) { return true; }
+            if (pix_fmt[0] == pixel_format) {
+                return true;
+            }
             pix_fmt++;
         }
         return false;
     }
 
     bool utils::compatible_with_sample_format(const AVCodec* codec, AVSampleFormat sample_format) {
-        if (not_inited_ptr(codec->sample_fmts)) {
-            static_log_warning("utils", "compatible_with_sample_format failed: codec->sample_fmts is NULL");
+        if (!codec) {
+            throw std::runtime_error {
+                __FUNCTION__" failed: codec is NULL"
+            };
+        }
+        if (!codec->sample_fmts) {
+            static_log_warning(
+                "utils"
+                , __FUNCTION__" failed: codec->sample_fmts is NULL"
+            );
             return true;
+//            throw std::runtime_error {
+//                __FUNCTION__" failed: codec->sample_fmts is NULL"
+//            };
         }
 
-        auto smp_fmt = codec->sample_fmts;
+        auto smp_fmt { codec->sample_fmts };
         while (smp_fmt[0] != AV_SAMPLE_FMT_NONE) {
-            if (smp_fmt[0] == sample_format) { return true; }
+            if (smp_fmt[0] == sample_format) {
+                return true;
+            }
             smp_fmt++;
         }
         return false;
@@ -371,7 +397,6 @@ namespace fpp {
         const auto params { fpp::VideoParameters::make_shared() };
         params->setEncoder(AVCodecID::AV_CODEC_ID_H264);
         params->setPixelFormat(AVPixelFormat::AV_PIX_FMT_YUV420P);
-        params->setTimeBase(DEFAULT_TIME_BASE);
         params->setGopSize(12);
         return params;
     }
@@ -380,7 +405,6 @@ namespace fpp {
         const auto params { fpp::AudioParameters::make_shared() };
         params->setEncoder(AVCodecID::AV_CODEC_ID_AAC);
         params->setSampleFormat(AV_SAMPLE_FMT_FLTP);
-        params->setTimeBase(DEFAULT_TIME_BASE);
         params->setSampleRate(44'100);
         params->setBitrate(128 * 1024);
         params->setChannelLayout(AV_CH_LAYOUT_STEREO);

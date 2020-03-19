@@ -7,7 +7,7 @@ struct AVCodecContext;
 
 namespace fpp {
 
-    class CodecContext : public SharedFFmpegObject<AVCodecContext> { // TODO унаследовать от MediaType ? 16.03
+    class CodecContext : public SharedFFmpegObject<AVCodecContext>, public MediaData {
 
     public:
 
@@ -25,11 +25,11 @@ namespace fpp {
 
     protected:
 
-        void                init(Dictionary dictionary);
+        void                init(Options options);
 
     private:
 
-        void                open(Dictionary dictionary);
+        void                open(Options options);
         void                close();
         void                setOpened(bool value);
 

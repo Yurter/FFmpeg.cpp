@@ -91,6 +91,10 @@ namespace fpp {
         setStreams(parseFormatContext());
     }
 
+    std::string InputFormatContext::formatName() const {
+        return raw()->iformat->name;
+    }
+
     StreamVector InputFormatContext::parseFormatContext() {
         StreamVector result;
         for (unsigned i { 0 }; i < raw()->nb_streams; ++i) {

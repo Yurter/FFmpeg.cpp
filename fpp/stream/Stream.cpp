@@ -12,7 +12,6 @@ namespace fpp {
     Stream::Stream(AVStream* avstream, MediaType type)
         : FFmpegObject(avstream)
         , MediaData(type)
-        , _used { false }
         , _prev_dts { 0 }
         , _prev_pts { 0 }
         , _packet_index { 0 }
@@ -39,8 +38,7 @@ namespace fpp {
 
         setName("Out" + utils::to_string(type()) + "Stream");
         params = parameters;
-        params->setStreamIndex(avstream->index);
-        avstream->time_base = params->timeBase();
+        params->setStreamIndex(index());
         initCodecpar();
 
     }
@@ -48,7 +46,7 @@ namespace fpp {
     std::string Stream::toString() const {
         return "[" + std::to_string(params->streamIndex()) + "] "
                 + utils::to_string(type()) + " stream: "
-                + (used() ? params->toString() : "not used");
+                + params->toString();
     }
 
     void Stream::stampPacket(Packet& packet) {
@@ -84,10 +82,6 @@ namespace fpp {
             return true;
         }
         return false;
-    }
-
-    void Stream::setUsed(bool value) {
-        _used = value;
     }
 
     void Stream::setStartTimePoint(int64_t value) {
@@ -126,10 +120,6 @@ namespace fpp {
         return raw()->index;
     }
 
-    bool Stream::used() const {
-        return _used;
-    }
-
     int64_t Stream::startTimePoint() const {
         return _start_time_point;
     }
@@ -142,39 +132,38 @@ namespace fpp {
         return _packet_index;
     }
 
-    AVCodecParameters* Stream::codecParams() {
+    AVCodecParameters* Stream::codecpar() {
         if (not_inited_ptr(raw())) {
-            throw std::runtime_error { "stream is nullptr" }; // TODO перенести выброс в метод raw() 04.02
+            throw std::runtime_error { "stream is null" };
         }
         return raw()->codecpar;
     }
 
     void Stream::initCodecpar() {
-        auto codecpar { raw()->codecpar };
-        codecpar->codec_id = params->codecId();
-        codecpar->bit_rate = params->bitrate();
+        codecpar()->codec_id = params->codecId();
+        codecpar()->bit_rate = params->bitrate();
 
         switch (params->type()) {
         case MediaType::Video: {
             const auto video_parameters {
                 std::static_pointer_cast<VideoParameters>(params)
             };
-            codecpar->codec_type        = AVMediaType::AVMEDIA_TYPE_VIDEO;
-            codecpar->width             = int(video_parameters->width());
-            codecpar->height            = int(video_parameters->height());
-    //        codec->sample_aspect_ratio    = video_parameters->sampl; //TODO
-            codecpar->format            = int(video_parameters->pixelFormat());
+            codecpar()->codec_type          = AVMediaType::AVMEDIA_TYPE_VIDEO;
+            codecpar()->width               = int(video_parameters->width());
+            codecpar()->height              = int(video_parameters->height());
+            codecpar()->sample_aspect_ratio = video_parameters->aspectRatio();
+            codecpar()->format              = int(video_parameters->pixelFormat());
             break;
         }
         case MediaType::Audio: {
             const auto audio_parameters {
                 std::static_pointer_cast<AudioParameters>(params)
             };
-            codecpar->codec_type        = AVMediaType::AVMEDIA_TYPE_AUDIO;
-            codecpar->channel_layout    = audio_parameters->channelLayout();
-            codecpar->channels          = int(audio_parameters->channels());
-            codecpar->sample_rate       = int(audio_parameters->sampleRate());
-            codecpar->format            = int(audio_parameters->sampleFormat());
+            codecpar()->codec_type          = AVMediaType::AVMEDIA_TYPE_AUDIO;
+            codecpar()->channel_layout      = audio_parameters->channelLayout();
+            codecpar()->channels            = int(audio_parameters->channels());
+            codecpar()->sample_rate         = int(audio_parameters->sampleRate());
+            codecpar()->format              = int(audio_parameters->sampleFormat());
             break;
         }
         default:

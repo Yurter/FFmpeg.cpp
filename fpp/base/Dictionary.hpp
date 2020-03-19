@@ -14,23 +14,26 @@ namespace fpp {
 
     public:
 
-        Dictionary(Options options = Options {});
+        Dictionary(const Options& options);
+        virtual ~Dictionary() override;
 
         void setOption(const std::string_view key, const std::string_view value);
         void setOption(const std::string_view key,                int64_t value);
 
-        [[nodiscard]]
-        AVDictionary*       alloc()                     const;
-        void                free(AVDictionary* dict)    const;
+        AVDictionary**  get();
 
     private:
+
+        [[nodiscard]]
+        AVDictionary*   alloc(const Options&) const;
+        void            free();
 
         static void setString(AVDictionary** dict, const std::string_view key, const std::string_view value);
         static void setInt   (AVDictionary** dict, const std::string_view key,                int64_t value);
 
     private:
 
-        Options _options;
+        AVDictionary*       _dictionary;
 
     };
 

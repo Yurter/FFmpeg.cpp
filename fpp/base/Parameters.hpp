@@ -59,7 +59,7 @@ namespace fpp {
 
         void                setCodec(AVCodec* codec);
 
-    protected:
+    private:
 
         AVCodec*            _codec;
         int64_t             _bitrate;

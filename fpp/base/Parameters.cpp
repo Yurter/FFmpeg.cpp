@@ -7,7 +7,6 @@ extern "C" {
 }
 
 #define DEFAULT_CODEC_ID        AV_CODEC_ID_NONE
-#define inited_codec_id(x)      ((x) != DEFAULT_CODEC_ID)
 #define not_inited_codec_id(x)  ((x) == DEFAULT_CODEC_ID)
 
 namespace fpp {
@@ -113,8 +112,8 @@ namespace fpp {
     std::string Parameters::toString() const {
         return utils::to_string(type()) + " "
             + codecName() + " "
-            + (::av_codec_is_decoder(codec()) ? "decoder" : "encoder") + " "
-            + std::to_string(bitrate()) + " bit/s, "
+            + (::av_codec_is_decoder(codec()) ? "decoder" : "encoder") + ", "
+            + (bitrate() ? std::to_string(bitrate()) : "N/A") + " bit/s, "
             + "dur " + std::to_string(duration()) + ", "
             + "tb " + utils::to_string(timeBase());
     }
@@ -136,7 +135,7 @@ namespace fpp {
     void Parameters::initStream(AVStream* avstream) const {
         avstream->codecpar->codec_id = codecId();
         avstream->codecpar->bit_rate = bitrate();
-        avstream->duration = duration();
+        avstream->duration  = duration();
         avstream->time_base = timeBase();
     }
 

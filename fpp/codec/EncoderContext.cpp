@@ -3,11 +3,9 @@
 #include <fpp/core/FFmpegException.hpp>
 #include <fpp/core/Utils.hpp>
 
-#include <fpp/stream/AudioParameters.hpp> //TODO убрать, см onOpen() 02.02
-
 namespace fpp {
 
-    EncoderContext::EncoderContext(const SharedStream stream, Dictionary dictionary)
+    EncoderContext::EncoderContext(const SharedStream stream, Options options)
         : CodecContext(stream) {
         setName("EncCtx");
         if (!stream->params->isEncoder()) {
@@ -15,7 +13,7 @@ namespace fpp {
                 "Encoder cannot be initialized with decoder parameters"
             };
         }
-        init(dictionary);
+        init(options);
     }
 
     PacketList EncoderContext::encode(const Frame& frame) {
@@ -50,9 +48,7 @@ namespace fpp {
         auto ret { 0 };
         while (0 == ret) {
             Packet output_packet { params->type() };
-            const auto ret {
-                ::avcodec_receive_packet(raw(), &output_packet.raw())
-            };
+            ret = ::avcodec_receive_packet(raw(), &output_packet.raw());
             if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
                 break;
             }
@@ -63,7 +59,6 @@ namespace fpp {
             }
             output_packet.setStreamIndex(params->streamIndex());
             output_packet.setTimeBase(time_base);
-            output_packet.setDts(output_packet.pts()); //TODO костыль, разобраться, почему смещение во времени (0, -45)
             encoded_packets.push_back(output_packet);
         }
         return encoded_packets;

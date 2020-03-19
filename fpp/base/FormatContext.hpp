@@ -28,7 +28,7 @@ namespace fpp {
 
         SharedStream        stream(int64_t index);
         SharedStream        stream(MediaType stream_type);
-        int64_t             streamAmount() const;
+        int64_t             streamNumber() const;
         void                setStreams(StreamVector stream_list);
 
         void                processPacket(Packet& packet);
@@ -65,8 +65,10 @@ namespace fpp {
         virtual void        createContext() = 0;
         virtual void        openContext()   = 0;
         virtual void        beforeCloseContext();
+        virtual std::string formatName() const = 0;
 
-        [[nodiscard]] virtual StreamVector parseFormatContext() = 0;
+        [[nodiscard]]
+        virtual StreamVector parseFormatContext() = 0;
 
         void                addStream(SharedStream stream);
 

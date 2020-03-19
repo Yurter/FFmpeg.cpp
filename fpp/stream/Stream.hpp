@@ -30,17 +30,15 @@ namespace fpp {
         void                stampPacket(Packet& packet);
         bool                timeIsOver() const;
 
-        void                setUsed(bool value);
         void                setStartTimePoint(int64_t value);
         void                setEndTimePoint(int64_t value);
 
         int64_t             index()             const;
-        bool                used()              const;
         int64_t             startTimePoint()    const;
         int64_t             endTimePoint()      const;
         int64_t             packetIndex()       const;
 
-        AVCodecParameters*  codecParams();
+        AVCodecParameters*  codecpar();
 
     private:
 
@@ -52,8 +50,6 @@ namespace fpp {
         SharedParameters    params;
 
     private:
-
-        bool                _used;
 
         int64_t             _prev_dts;
         int64_t             _prev_pts;

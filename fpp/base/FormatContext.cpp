@@ -33,12 +33,13 @@ namespace fpp {
     }
 
     std::string FormatContext::toString() const {
-        std::string context_info { "'" + mediaResourceLocator() + "'," };
+         auto context_info {
+            '\n'
+            + formatName() + ',' + ' '
+            + mediaResourceLocator() + ':'
+        };
         for (const auto& stream : streams()) {
             context_info += '\n' + stream->toString();
-        }
-        if (context_info.back() == ',') {
-            context_info += "without streams";
         }
         return context_info;
     }
@@ -55,13 +56,11 @@ namespace fpp {
         if (opened()) {
             throw std::runtime_error { "Context already opened" };
         }
-//        if (streamAmount() == 0) { потоков у инпута нет до открытия
-//            throw std::logic_error { "Can't open context without streams" };
-//        }
         setInteruptCallback(InterruptedProcess::Opening);
         openContext();
         resetInteruptCallback();
         setOpened(true);
+        log_info(toString());
     }
 
     void FormatContext::setInteruptCallback(InterruptedProcess process) {
@@ -135,7 +134,7 @@ namespace fpp {
         _streams.push_back(stream);
     }
 
-    int64_t FormatContext::streamAmount() const {
+    int64_t FormatContext::streamNumber() const {
         return int64_t(raw()->nb_streams);
     }
 
