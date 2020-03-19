@@ -136,7 +136,7 @@ namespace fpp {
     void Parameters::initStream(AVStream* avstream) const {
         avstream->codecpar->codec_id = codecId();
         avstream->codecpar->bit_rate = bitrate();
-        avstream->duration = duration();
+        avstream->duration  = duration();
         avstream->time_base = timeBase();
     }
 
