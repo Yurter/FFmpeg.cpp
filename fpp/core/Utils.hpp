@@ -65,6 +65,8 @@ namespace fpp {
         static SharedParameters make_youtube_video_params();
         static SharedParameters make_youtube_audio_params();
 
+        static std::string  merge_sdp_files(const std::string& sdp_one, const std::string& sdp_two);
+
     };
 
     inline bool operator==(const AVRational& lhs, const AVRational& rhs) {
