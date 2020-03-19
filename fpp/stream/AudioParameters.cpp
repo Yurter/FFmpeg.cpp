@@ -37,7 +37,7 @@ namespace fpp {
             return;
         }
         if (!utils::compatible_with_sample_format(_codec, sample_format)) {
-            const auto defailt_mp3_sample_format = _codec->sample_fmts[0];;
+            const auto defailt_mp3_sample_format = _codec->sample_fmts[0];
             log_warning("Cannot set pixel format: " << sample_format
                         << " - " << _codec->name << " doesn't compatible with it, "
                         << "setting default: " << defailt_mp3_sample_format);
@@ -91,7 +91,7 @@ namespace fpp {
         return Parameters::toString() + "; "
             + "sample_rate: " + std::to_string(sampleRate()) + ", "
             + utils::to_string(sampleFormat()) + ", "
-            + "channel_layout: " + std::to_string(channelLayout()) + ", "
+            + "channel_layout: " + utils::channel_layout_to_string(channels(), channelLayout()) + ", "
             + "channels: " + std::to_string(channels());
     }
 
@@ -116,11 +116,6 @@ namespace fpp {
             avstream->codecpar->channel_layout
                 = uint64_t(::av_get_default_channel_layout(int(channels())));
         }
-//        setChannelLayout(
-//            avstream->codecpar->channel_layout == 0
-//                ? uint64_t(::av_get_default_channel_layout(int(channels())))
-//                : avstream->codecpar->channel_layout
-//        );
         setChannelLayout(avstream->codecpar->channel_layout);
         setFrameSize(avstream->codecpar->frame_size);
     }
