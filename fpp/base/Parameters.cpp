@@ -7,7 +7,6 @@ extern "C" {
 }
 
 #define DEFAULT_CODEC_ID        AV_CODEC_ID_NONE
-#define inited_codec_id(x)      ((x) != DEFAULT_CODEC_ID)
 #define not_inited_codec_id(x)  ((x) == DEFAULT_CODEC_ID)
 
 namespace fpp {
