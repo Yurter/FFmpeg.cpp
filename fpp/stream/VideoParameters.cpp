@@ -92,9 +92,8 @@ namespace fpp {
     std::string VideoParameters::toString() const {
         return Parameters::toString() + ", "
             + std::to_string(width()) + "x" + std::to_string(height()) + ", "
-            + utils::to_string(aspectRatio()) + ", "
             + utils::to_string(frameRate()) + " fps, "
-            + std::to_string(gopSize()) + " gop, "
+            + "gop " + std::to_string(gopSize()) + ", "
             + utils::to_string(pixelFormat());
     }
 

@@ -88,11 +88,11 @@ namespace fpp {
     }
 
     std::string AudioParameters::toString() const {
-        return Parameters::toString() + "; "
-            + "sample_rate: " + std::to_string(sampleRate()) + ", "
+        return Parameters::toString() + ", "
+            + "sample_rate " + std::to_string(sampleRate()) + ", "
             + utils::to_string(sampleFormat()) + ", "
-            + "channel_layout: " + utils::channel_layout_to_string(channels(), channelLayout()) + ", "
-            + "channels: " + std::to_string(channels());
+            + "channel_layout " + utils::channel_layout_to_string(channels(), channelLayout()) + ", "
+            + "channels " + std::to_string(channels());
     }
 
     void AudioParameters::completeFrom(const SharedParameters other) {

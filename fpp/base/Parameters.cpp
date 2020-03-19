@@ -113,8 +113,8 @@ namespace fpp {
     std::string Parameters::toString() const {
         return utils::to_string(type()) + " "
             + codecName() + " "
-            + (::av_codec_is_decoder(codec()) ? "decoder" : "encoder") + " "
-            + std::to_string(bitrate()) + " bit/s, "
+            + (::av_codec_is_decoder(codec()) ? "decoder" : "encoder") + ", "
+            + (bitrate() ? std::to_string(bitrate()) : "N/A") + " bit/s, "
             + "dur " + std::to_string(duration()) + ", "
             + "tb " + utils::to_string(timeBase());
     }
