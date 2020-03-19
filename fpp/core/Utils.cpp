@@ -201,28 +201,54 @@ namespace fpp {
     }
 
     bool utils::compatible_with_pixel_format(const AVCodec* codec, AVPixelFormat pixel_format) {
-        if (not_inited_ptr(codec->pix_fmts)) {
-            static_log_warning("utils", "compatible_with_pixel_format failed: codec->pix_fmts is NULL");
+        if (!codec) {
+            throw std::runtime_error {
+                __FUNCTION__" failed: codec is NULL"
+            };
+        }
+        if (!codec->pix_fmts) {
+            static_log_warning(
+                "utils"
+                , __FUNCTION__" failed: codec->pix_fmts is NULL"
+            );
             return true;
+//            throw std::runtime_error {
+//               __FUNCTION__" failed: codec->pix_fmts is NULL"
+//            };
         }
 
-        auto pix_fmt = codec->pix_fmts;
+        auto pix_fmt { codec->pix_fmts };
         while (pix_fmt[0] != AV_PIX_FMT_NONE) {
-            if (pix_fmt[0] == pixel_format) { return true; }
+            if (pix_fmt[0] == pixel_format) {
+                return true;
+            }
             pix_fmt++;
         }
         return false;
     }
 
     bool utils::compatible_with_sample_format(const AVCodec* codec, AVSampleFormat sample_format) {
-        if (not_inited_ptr(codec->sample_fmts)) {
-            static_log_warning("utils", "compatible_with_sample_format failed: codec->sample_fmts is NULL");
+        if (!codec) {
+            throw std::runtime_error {
+                __FUNCTION__" failed: codec is NULL"
+            };
+        }
+        if (!codec->sample_fmts) {
+            static_log_warning(
+                "utils"
+                , __FUNCTION__" failed: codec->sample_fmts is NULL"
+            );
             return true;
+//            throw std::runtime_error {
+//                __FUNCTION__" failed: codec->sample_fmts is NULL"
+//            };
         }
 
-        auto smp_fmt = codec->sample_fmts;
+        auto smp_fmt { codec->sample_fmts };
         while (smp_fmt[0] != AV_SAMPLE_FMT_NONE) {
-            if (smp_fmt[0] == sample_format) { return true; }
+            if (smp_fmt[0] == sample_format) {
+                return true;
+            }
             smp_fmt++;
         }
         return false;
