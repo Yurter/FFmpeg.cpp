@@ -44,6 +44,39 @@ namespace fpp {
         }
     }
 
+    std::string OutputFormatContext::sdp() {
+        char buf[256] {};
+        AVFormatContext* ctxs[] { raw() };
+        if (const auto ret {
+                ::av_sdp_create(ctxs, 1, buf, sizeof(buf))
+            }; ret < 0) {
+            throw FFmpegException {
+                "av_sdp_create failed", ret
+            };
+        }
+
+        std::string sdp_str { buf };
+        sdp_str.append("\n");
+
+        const auto remove_bug_param {
+            [](std::string& str) {
+                if (const auto pos_begin_param {
+                    str.find("; sprop-parameter-sets")
+                }; pos_begin_param != std::string::npos) {
+                    str.erase(
+                        pos_begin_param
+                        , str.find('\n', pos_begin_param) - pos_begin_param
+                    );
+                }
+                return str;
+            }
+        };
+
+        remove_bug_param(sdp_str);
+
+        return sdp_str;
+    }
+
     void OutputFormatContext::createContext() {
         const auto format_short_name {
             utils::guess_format_short_name(mediaResourceLocator())

@@ -52,8 +52,11 @@ namespace fpp {
     void Stream::stampPacket(Packet& packet) {
 
         if (packet.timeBase() != DEFAULT_RATIONAL) {
-            packet.setDts(::av_rescale_q(packet.dts(), packet.timeBase(), params->timeBase()));
-            packet.setPts(::av_rescale_q(packet.pts(), packet.timeBase(), params->timeBase()));
+            ::av_packet_rescale_ts(
+                packet.ptr()
+                , packet.timeBase()
+                , params->timeBase()
+            );
         }
 
         checkStampMonotonicity(packet);
