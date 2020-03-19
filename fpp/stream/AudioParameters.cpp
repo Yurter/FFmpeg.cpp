@@ -28,13 +28,12 @@ namespace fpp {
     }
 
     void AudioParameters::setSampleFormat(AVSampleFormat sample_format) {
-        if (!utils::compatible_with_sample_format(_codec, sample_format)) {
-            const auto defailt_mp3_sample_format = _codec->sample_fmts[0];
-            log_warning("Cannot set pixel format: " << sample_format
-                        << " - " << _codec->name << " doesn't compatible with it, "
-                        << "setting default: " << defailt_mp3_sample_format);
-            _sample_format = defailt_mp3_sample_format;
-            return;
+        if (!utils::compatible_with_sample_format(codec(), sample_format)) {
+            throw std::invalid_argument {
+                utils::to_string(sample_format)
+                + " doesn't compatible with "
+                + codecName()
+            };
         }
         _sample_format = sample_format;
     }
