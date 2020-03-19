@@ -87,6 +87,10 @@ namespace fpp {
         writeHeader();
     }
 
+    std::string OutputFormatContext::formatName() const {
+        return raw()->oformat->name;
+    }
+
     void OutputFormatContext::beforeCloseContext() {
         writeTrailer();
     }

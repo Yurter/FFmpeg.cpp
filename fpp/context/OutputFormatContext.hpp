@@ -28,6 +28,7 @@ namespace fpp {
 
         virtual void        createContext()         override;
         virtual void        openContext()           override;
+        virtual std::string formatName() const      override;
         virtual void        beforeCloseContext()    override;
 
         Code                guessOutputFromat();

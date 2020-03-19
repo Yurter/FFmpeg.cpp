@@ -12,7 +12,6 @@ namespace fpp {
     Stream::Stream(AVStream* avstream, MediaType type)
         : FFmpegObject(avstream)
         , MediaData(type)
-        , _used { false }
         , _prev_dts { 0 }
         , _prev_pts { 0 }
         , _packet_index { 0 }
@@ -48,7 +47,7 @@ namespace fpp {
     std::string Stream::toString() const {
         return "[" + std::to_string(params->streamIndex()) + "] "
                 + utils::to_string(type()) + " stream: "
-                + (used() ? params->toString() : "not used");
+                + params->toString();
     }
 
     void Stream::stampPacket(Packet& packet) {
@@ -86,10 +85,6 @@ namespace fpp {
         return false;
     }
 
-    void Stream::setUsed(bool value) {
-        _used = value;
-    }
-
     void Stream::setStartTimePoint(int64_t value) {
         if (_start_time_point == value) {
             return;
@@ -124,10 +119,6 @@ namespace fpp {
 
     int64_t Stream::index() const {
         return raw()->index;
-    }
-
-    bool Stream::used() const {
-        return _used;
     }
 
     int64_t Stream::startTimePoint() const {

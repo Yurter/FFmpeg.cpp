@@ -33,7 +33,11 @@ namespace fpp {
     }
 
     std::string FormatContext::toString() const {
-        std::string context_info { "'" + mediaResourceLocator() + "'," };
+         auto context_info {
+            '\n'
+            + formatName() + ',' + ' '
+            + mediaResourceLocator() + ':'
+        };
         for (const auto& stream : streams()) {
             context_info += '\n' + stream->toString();
         }
@@ -127,7 +131,6 @@ namespace fpp {
     }
 
     void FormatContext::addStream(SharedStream stream) {
-        stream->setUsed(true);
         _streams.push_back(stream);
     }
 
