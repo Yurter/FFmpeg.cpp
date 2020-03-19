@@ -24,18 +24,10 @@ namespace fpp {
     }
 
     void AudioParameters::setSampleRate(int64_t sample_rate) {
-        if (sample_rate < 1) {
-            log_warning("Sample rate cannot be zero or less: " << sample_rate << ", ignored");
-            return;
-        }
         _sample_rate = sample_rate;
     }
 
     void AudioParameters::setSampleFormat(AVSampleFormat sample_format) {
-        if (sample_format == AVSampleFormat::AV_SAMPLE_FMT_NONE) {
-            log_warning("Sample format cannot be AV_SAMPLE_FMT_NONE, ignored");
-            return;
-        }
         if (!utils::compatible_with_sample_format(_codec, sample_format)) {
             const auto defailt_mp3_sample_format = _codec->sample_fmts[0];
             log_warning("Cannot set pixel format: " << sample_format
@@ -52,18 +44,10 @@ namespace fpp {
     }
 
     void AudioParameters::setChannels(int64_t channels) {
-        if (channels < 1) {
-            log_warning("Channels cannot be less than one: " << channels << ", ignored");
-            return;
-        }
         _channels = channels;
     }
 
     void AudioParameters::setFrameSize(int64_t value) {
-        if (value < 1) {
-            log_warning("Frame size cannot be less than one: " << value << ", ignored");
-            return;
-        }
         _frame_size = value;
     }
 
