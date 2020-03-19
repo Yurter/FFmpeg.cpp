@@ -138,13 +138,13 @@ namespace fpp {
         return std::to_string(hh) + ':' + std::to_string(mm) + ':' + std::to_string(ss) + '.' + std::to_string(ms);
     }
 
-    std::string utils::channel_layout_to_string(int nb_channels, uint64_t channel_layout) {
+    std::string utils::channel_layout_to_string(int64_t nb_channels, uint64_t channel_layout) {
         if (channel_layout == 0) {
             return "Unknown or unspecified";
         }
         const auto buf_size { 32 };
         char buf[buf_size];
-        ::av_get_channel_layout_string(buf, buf_size, nb_channels, channel_layout);
+        ::av_get_channel_layout_string(buf, buf_size, int(nb_channels), channel_layout);
         return std::string { buf };
     }
 
