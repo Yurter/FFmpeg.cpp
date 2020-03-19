@@ -44,7 +44,7 @@ namespace fpp {
     }
 
     std::string Stream::toString() const {
-        return "[" + std::to_string(params->streamIndex()) + "] "
+        return "[" + std::to_string(index()) + "] "
                 + utils::to_string(type()) + " stream: "
                 + params->toString();
     }
