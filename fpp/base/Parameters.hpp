@@ -21,10 +21,6 @@ namespace fpp {
     public:
 
         Parameters(MediaType type);
-        Parameters(const Parameters&) = default;
-        virtual ~Parameters() override = default;
-
-        Parameters& operator=(const Parameters&) = default;
 
         void                setDecoder(AVCodecID codec_id);
         void                setEncoder(AVCodecID codec_id);
