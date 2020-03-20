@@ -415,6 +415,21 @@ namespace fpp {
         return params;
     }
 
+    std::string utils::merge_sdp_files(const std::string& sdp_one, const std::string& sdp_two) {
+        std::string result { sdp_one };
+
+        std::istringstream iss(sdp_two);
+        std::string line;
+
+        while (std::getline(iss, line)) {
+            if (result.find(line) == std::string::npos) {
+                result.append(line + '\n');
+            }
+        }
+
+        return result;
+    }
+
     SharedParameters utils::make_params(MediaType type) {
         switch (type) {
             case MediaType::Video:
