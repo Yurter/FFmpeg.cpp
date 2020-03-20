@@ -144,6 +144,9 @@ namespace fpp {
         }
         output_params->completeFrom(input_params);
         const auto created_stream { createStream(output_params) };
+        if (output_params->isAudio()) { // TODO rtp cructh 19.03
+            created_stream->raw()->index = 1;
+        }
         if (full_stream_copy) {
             if (const auto ret {
                 ::avcodec_parameters_copy(
