@@ -38,8 +38,14 @@ namespace fpp {
 
         setName("Out" + utils::to_string(type()) + "Stream");
         params = parameters;
-        params->setStreamIndex(index());
         initCodecpar();
+        if (invalid_int(params->streamIndex())) {
+            // index pre-setted for some reason
+            params->setStreamIndex(index());
+        }
+        else {
+            raw()->index = int(params->streamIndex());
+        }
 
     }
 
@@ -85,6 +91,11 @@ namespace fpp {
             return true;
         }
         return false;
+    }
+
+    void Stream::setIndex(int64_t value) {
+        raw()->index = int(value);
+        params->setStreamIndex(value);
     }
 
     void Stream::setStartTimePoint(int64_t value) {
