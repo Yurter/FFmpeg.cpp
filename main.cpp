@@ -395,10 +395,8 @@ auto main() -> int {
 
     try {
 
-        ::avdevice_register_all();
-
 //        transmuxing_file();
-        youtube_stream();
+//        youtube_stream();
 //        rtp_video_stream();
 //        rtp_audio_stream();
 //        rtp_video_and_audio_stream();
