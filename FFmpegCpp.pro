@@ -14,6 +14,7 @@ LIBS += -lpostproc -lswresample -lswscale
 INCLUDEPATH += include
 
 SOURCES += \
+    fpp/refi/VideoFilters/DrawText.cpp \
     fpp/refi/ResampleContext.cpp \
     main.cpp \
     fpp/base/CodecContext.cpp \
@@ -65,6 +66,7 @@ HEADERS += \
     fpp/core/wrap/FFmpegObject.hpp \
     fpp/core/wrap/SharedFFmpegObject.hpp \
     fpp/refi/AudioFilterContext.hpp \
+    fpp/refi/VideoFilters/DrawText.hpp \
     fpp/refi/FilterContext.hpp \
     fpp/refi/ResampleContext.hpp \
     fpp/refi/RescaleContext.hpp \

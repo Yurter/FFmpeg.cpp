@@ -30,8 +30,12 @@ namespace fpp {
 
         void                init();
 
-        virtual void        initBufferSource(){}// = 0;
-        virtual void        initBufferSink(){}// = 0;
+        virtual void        initBufferSource() = 0;/*{
+            std::cout << __FUNCTION__ " Base class called ! ! ! !\n";
+        }// = 0;*/
+        virtual void        initBufferSink() = 0;/*{
+            std::cout << __FUNCTION__ " Base class called ! ! ! !\n";
+        }// = 0;*/
 
     private:
 

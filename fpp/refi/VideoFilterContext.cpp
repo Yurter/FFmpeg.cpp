@@ -9,12 +9,22 @@ extern "C" {
 
 namespace fpp {
 
+    VideoFilterContext::VideoFilterContext(SharedParameters parameters, const std::string/*_view*/ filters_descr)
+        : FilterContext(parameters, filters_descr) {
+        setName("VideoFltCtx");
+        init();
+    }
+
     std::string VideoFilterContext::set_pts(float coef) {
         return "setpts=" + std::to_string(coef) + "*PTS";
     }
 
     std::string VideoFilterContext::keep_every_frame(int n) {
         return "select='not(mod(n," + std::to_string(n) + "))'";
+    }
+
+    std::string VideoFilterContext::toString() const {
+        return std::string { "TODO 23.03" };
     }
 
     void VideoFilterContext::initBufferSource() {
@@ -85,3 +95,13 @@ namespace fpp {
     }
 
 } // namespace fpp
+
+
+
+
+
+
+
+
+
+
