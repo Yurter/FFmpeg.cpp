@@ -9,6 +9,7 @@
 
 extern "C" {
     #include <libavutil/imgutils.h>
+    #include <libavdevice/avdevice.h>
 }
 
 #define both_params_is_video(params) \
@@ -265,6 +266,14 @@ namespace fpp {
 
     uid_t utils::get_context_uid(uid_t stream_uid) {
         return stream_uid / 100;
+    }
+
+    void utils::device_register_all() {
+        static auto register_flag { false };
+        if (!register_flag) {
+            ::avdevice_register_all();
+            register_flag = true;
+        }
     }
 
     const char* utils::guess_format_short_name(const std::string_view media_resurs_locator) {
