@@ -17,6 +17,8 @@ namespace fpp {
         static uid_t        gen_stream_uid(uid_t context_uid, uid_t stream_index);
         static uid_t        get_context_uid(uid_t stream_uid);
 
+        static void         device_register_all();
+
         static std::string  to_string(AVMediaType type);
         static std::string  to_string(AVCodecID codec_id);
         static std::string  to_string(AVRational rational);
@@ -66,6 +68,9 @@ namespace fpp {
         static SharedParameters make_youtube_audio_params();
 
         static std::string  merge_sdp_files(const std::string& sdp_one, const std::string& sdp_two);
+
+        static std::vector<std::string> video_device_list();
+        static std::vector<std::string> audio_device_list();
 
     };
 
