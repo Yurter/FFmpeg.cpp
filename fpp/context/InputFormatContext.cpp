@@ -12,7 +12,7 @@ namespace fpp {
     InputFormatContext::InputFormatContext(const std::string_view mrl)
         : FormatContext(mrl)
         , _input_format { nullptr } {
-        setName("InpFmtCtx");
+        setName("InFmtCtx");
         createContext();
     }
 
@@ -73,20 +73,25 @@ namespace fpp {
 
     void InputFormatContext::openContext() {
         guessInputFromat();
-        auto fmt_ctx { raw() };
+        auto fmt_ctx { raw() }; // TODO 23.03
         if (const auto ret {
                 ::avformat_open_input(
-                    &fmt_ctx                            /* AVFormatContext  */
-                    , mediaResourceLocator().c_str()    /* url              */
-                    , inputFormat()                     /* AVInputFormat    */
-                    , nullptr                           /* AVDictionary     */
+                    &fmt_ctx
+                    , mediaResourceLocator().c_str()
+                    , inputFormat()
+                    , nullptr /* options */ // TODO add options 23.03
                 )
             }; ret < 0) {
             throw FFmpegException { "Failed to open input context", ret };
         }
         setInputFormat(raw()->iformat);
-        if (const auto ret { ::avformat_find_stream_info(raw(), nullptr) }; ret < 0 ) {
-            throw FFmpegException { "Failed to retrieve input stream information", ret };
+        if (const auto ret {
+                ::avformat_find_stream_info(raw(), nullptr)
+            }; ret < 0 ) {
+            throw FFmpegException {
+                "Failed to retrieve input stream information"
+                , ret
+            };
         }
         setStreams(parseFormatContext());
     }
@@ -104,7 +109,12 @@ namespace fpp {
     }
 
     void InputFormatContext::guessInputFromat() {
-        const auto short_name { utils::guess_format_short_name(mediaResourceLocator()) };
+        const auto short_name {
+            utils::guess_format_short_name(mediaResourceLocator())
+        };
+        if (std::string { short_name } == "dshow") {
+            utils::device_register_all();
+        }
         setInputFormat(::av_find_input_format(short_name));
     }
 
