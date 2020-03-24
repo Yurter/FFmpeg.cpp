@@ -28,14 +28,19 @@ namespace fpp {
     }
 
     void VideoFilterContext::initBufferSource() {
-        const AVFilter* buffersrc { ::avfilter_get_by_name("buffer") };
-        const auto video_params { std::static_pointer_cast<const VideoParameters>(params) };
+        const auto buffersrc {
+            ::avfilter_get_by_name("buffer")
+        };
+        const auto video_params {
+            std::static_pointer_cast<const VideoParameters>(params)
+        };
         char args[512];
 
         { /* buffer video source: the decoded frames from the decoder will be inserted here. */
             ::snprintf(args, sizeof(args)
                 , "video_size=%dx%d:pix_fmt=%d:time_base=%d/%d:pixel_aspect=%d/%d"
-                , int(video_params->width()), int(video_params->height()), video_params->pixelFormat()
+                , int(video_params->width()), int(video_params->height())
+                , video_params->pixelFormat()
                 , video_params->timeBase().num, video_params->timeBase().den
                 , video_params->aspectRatio().num, video_params->aspectRatio().den
             );
@@ -58,8 +63,12 @@ namespace fpp {
     }
 
     void VideoFilterContext::initBufferSink() {
-        const AVFilter* buffersink { ::avfilter_get_by_name("buffersink") };
-        const auto video_params { std::static_pointer_cast<const VideoParameters>(params) };
+        const auto buffersink {
+            ::avfilter_get_by_name("buffersink")
+        };
+        const auto video_params {
+            std::static_pointer_cast<const VideoParameters>(params)
+        };
         char args[512];
 
         { /* buffer video sink: to terminate the filter chain. */

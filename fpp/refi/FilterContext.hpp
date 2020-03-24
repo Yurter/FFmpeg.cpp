@@ -15,7 +15,7 @@ namespace fpp {
         FilterContext(SharedParameters parameters, const std::string& filters_descr);
         virtual ~FilterContext() override = default;
 
-        FrameList           filter(Frame frame);
+        FrameList           filter(Frame source_frame);
         std::string         description() const;
 
         const SharedParameters params;
@@ -30,12 +30,8 @@ namespace fpp {
 
         void                init();
 
-        virtual void        initBufferSource() = 0;/*{
-            std::cout << __FUNCTION__ " Base class called ! ! ! !\n";
-        }// = 0;*/
-        virtual void        initBufferSink() = 0;/*{
-            std::cout << __FUNCTION__ " Base class called ! ! ! !\n";
-        }// = 0;*/
+        virtual void        initBufferSource()  = 0;
+        virtual void        initBufferSink()    = 0;
 
     private:
 
