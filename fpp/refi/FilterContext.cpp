@@ -51,26 +51,23 @@ namespace fpp {
     }
 
     void FilterContext::init() {
-        auto inputs {
-            std::shared_ptr<AVFilterInOut> {
-                ::avfilter_inout_alloc()
-                , [](auto* filter) { /*::avfilter_inout_free(&filter);*/ } // TODO: приходит мусор, падение 04.02
-            }
-        };
 
-        auto outputs {
-            std::shared_ptr<AVFilterInOut> {
-                ::avfilter_inout_alloc()
-                , [](auto* filter) { /*::avfilter_inout_free(&filter);*/ } // TODO: приходит мусор, падение 04.02
-            }
-        };
+        /*
+         * Set the endpoints for the filter graph. The filter_graph will
+         * be linked to the graph described by filters_descr.
+         */
+        initInputs();
+        initOutputs();
 
         _filter_graph = {
             ::avfilter_graph_alloc()
             , [](auto* graph) { ::avfilter_graph_free(&graph); }
         };
-        if (!outputs || !inputs || !_filter_graph) {
-            throw FFmpegException { "avfilter_graph_alloc failed", AVERROR(ENOMEM) };
+        if (!_filter_graph) {
+            throw FFmpegException {
+                "avfilter_graph_alloc failed"
+                , AVERROR(ENOMEM)
+            };
         }
 
         { /* Костыль на количество потоков */ // TODO словарик 12.02
@@ -80,35 +77,8 @@ namespace fpp {
         initBufferSource();
         initBufferSink();
 
-        /*
-         * Set the endpoints for the filter graph. The filter_graph will
-         * be linked to the graph described by filters_descr.
-         */
-
-        /*
-         * The buffer source output must be connected to the input pad of
-         * the first filter described by filters_descr; since the first
-         * filter input label is not specified, it is set to "in" by
-         * default.
-         */
-        outputs->name       = ::av_strdup("in");
-        outputs->filter_ctx = _buffersrc_ctx.get();
-        outputs->pad_idx    = 0;
-        outputs->next       = nullptr;
-
-        /*
-         * The buffer sink input must be connected to the output pad of
-         * the last filter described by filters_descr; since the last
-         * filter output label is not specified, it is set to "out" by
-         * default.
-         */
-        inputs->name       = ::av_strdup("out");
-        inputs->filter_ctx = _buffersink_ctx.get();
-        inputs->pad_idx    = 0;
-        inputs->next       = nullptr;
-
-        auto raw_inputs  { inputs.get()  };
-        auto raw_outputs { outputs.get() };
+        auto raw_inputs  { _inputs.get()  };
+        auto raw_outputs { _outputs.get() };
 
         if (const auto ret {
                 ::avfilter_graph_parse_ptr(
@@ -116,7 +86,7 @@ namespace fpp {
                     , _filters_descr.c_str()
                     , &raw_inputs
                     , &raw_outputs
-                    , nullptr       /* context used for logging */
+                    , nullptr /* context used for logging */
             )}; ret < 0) {
             throw FFmpegException { "avfilter_graph_parse_ptr failed", ret };
         }
@@ -126,11 +96,66 @@ namespace fpp {
         if (const auto ret {
                 ::avfilter_graph_config(
                     _filter_graph.get()
-                    , nullptr   /* context used for logging */
+                    , nullptr /* context used for logging */
                 )
             }; ret < 0) {
             throw FFmpegException { "avfilter_graph_config failed", ret };
         }
+    }
+
+    void FilterContext::initInputs() {
+
+        _inputs = std::shared_ptr<AVFilterInOut> {
+            ::avfilter_inout_alloc()
+            , [](auto* filter) { /*::avfilter_inout_free(&filter);*/ } // TODO: приходит мусор, падение 04.02
+        };
+
+        if (!_inputs) {
+            throw FFmpegException {
+                __FUNCTION__" failed"
+                , AVERROR(ENOMEM)
+            };
+        }
+
+        /*
+         * The buffer sink input must be connected to the output pad of
+         * the last filter described by filters_descr; since the last
+         * filter output label is not specified, it is set to "out" by
+         * default.
+         */
+        _inputs->name       = ::av_strdup("out");
+        _inputs->filter_ctx = _buffersink_ctx.get();
+        _inputs->pad_idx    = 0;
+        _inputs->next       = nullptr;
+
+    }
+
+    void FilterContext::initOutputs() {
+
+        _outputs = std::shared_ptr<AVFilterInOut> {
+            ::avfilter_inout_alloc()
+            , [](auto* filter) { /*::avfilter_inout_free(&filter);*/ } // TODO: приходит мусор, падение 04.02
+        };
+
+
+        if (!_outputs) {
+            throw FFmpegException {
+                __FUNCTION__" failed"
+                , AVERROR(ENOMEM)
+            };
+        }
+
+        /*
+         * The buffer source output must be connected to the input pad of
+         * the first filter described by filters_descr; since the first
+         * filter input label is not specified, it is set to "in" by
+         * default.
+         */
+        _outputs->name       = ::av_strdup("in");
+        _outputs->filter_ctx = _buffersrc_ctx.get();
+        _outputs->pad_idx    = 0;
+        _outputs->next       = nullptr;
+
     }
 
 } // namespace fpp
