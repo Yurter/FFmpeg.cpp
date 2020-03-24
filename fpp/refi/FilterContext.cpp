@@ -52,30 +52,17 @@ namespace fpp {
 
     void FilterContext::init() {
 
+        initFilterGraph();
+
+        initBufferSource();
+        initBufferSink();
+
         /*
          * Set the endpoints for the filter graph. The filter_graph will
          * be linked to the graph described by filters_descr.
          */
         initInputs();
         initOutputs();
-
-        _filter_graph = {
-            ::avfilter_graph_alloc()
-            , [](auto* graph) { ::avfilter_graph_free(&graph); }
-        };
-        if (!_filter_graph) {
-            throw FFmpegException {
-                "avfilter_graph_alloc failed"
-                , AVERROR(ENOMEM)
-            };
-        }
-
-        { /* Костыль на количество потоков */ // TODO словарик 12.02
-            _filter_graph->nb_threads = 1;
-        }
-
-        initBufferSource();
-        initBufferSink();
 
         auto raw_inputs  { _inputs.get()  };
         auto raw_outputs { _outputs.get() };
@@ -87,7 +74,7 @@ namespace fpp {
                     , &raw_inputs
                     , &raw_outputs
                     , nullptr /* context used for logging */
-            )}; ret < 0) {
+        )}; ret < 0) {
             throw FFmpegException { "avfilter_graph_parse_ptr failed", ret };
         }
 
@@ -156,6 +143,23 @@ namespace fpp {
         _outputs->pad_idx    = 0;
         _outputs->next       = nullptr;
 
+    }
+
+    void FilterContext::initFilterGraph() {
+        _filter_graph = {
+            ::avfilter_graph_alloc()
+            , [](auto* graph) { ::avfilter_graph_free(&graph); }
+        };
+        if (!_filter_graph) {
+            throw FFmpegException {
+                "avfilter_graph_alloc failed"
+                , AVERROR(ENOMEM)
+            };
+        }
+
+        { /* Костыль на количество потоков */ // TODO словарик 12.02
+            _filter_graph->nb_threads = 1;
+        }
     }
 
 } // namespace fpp

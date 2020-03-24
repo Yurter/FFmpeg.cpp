@@ -40,6 +40,7 @@ namespace fpp {
 
         void                initInputs();
         void                initOutputs();
+        void                initFilterGraph();
 
     private:
 
