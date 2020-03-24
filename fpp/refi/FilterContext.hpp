@@ -5,6 +5,7 @@
 struct AVFilterGraph;
 struct AVFilterContext;
 struct AVFilterContext;
+struct AVFilterInOut;
 
 namespace fpp {
 
@@ -15,7 +16,7 @@ namespace fpp {
         FilterContext(SharedParameters parameters, const std::string& filters_descr);
         virtual ~FilterContext() override = default;
 
-        FrameList           filter(Frame frame);
+        FrameList           filter(Frame source_frame);
         std::string         description() const;
 
         const SharedParameters params;
@@ -30,8 +31,16 @@ namespace fpp {
 
         void                init();
 
-        virtual void        initBufferSource(){}// = 0;
-        virtual void        initBufferSink(){}// = 0;
+    protected:
+
+        virtual void        initBufferSource()  = 0;
+        virtual void        initBufferSink()    = 0;
+
+    private:
+
+        void                initInputs();
+        void                initOutputs();
+        void                initFilterGraph();
 
     private:
 
@@ -40,6 +49,10 @@ namespace fpp {
     protected:
 
         std::shared_ptr<AVFilterGraph>      _filter_graph;
+
+        std::shared_ptr<AVFilterInOut>      _inputs;
+        std::shared_ptr<AVFilterInOut>      _outputs;
+
         std::shared_ptr<AVFilterContext>    _buffersrc_ctx;
         std::shared_ptr<AVFilterContext>    _buffersink_ctx;
 

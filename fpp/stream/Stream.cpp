@@ -98,36 +98,36 @@ namespace fpp {
         params->setStreamIndex(value);
     }
 
-    void Stream::setStartTimePoint(int64_t value) {
-        if (_start_time_point == value) {
+    void Stream::setStartTimePoint(int64_t msec) {
+        if (_start_time_point == msec) {
             return;
         }
-        if ((value != FROM_START) && (value < 0)) {
-            log_warning("Cannot set start time point less then zero: " << value << ", ignored");
+        if ((msec != FROM_START) && (msec < 0)) {
+            log_warning("Cannot set start time point less then zero: " << msec << ", ignored");
             return;
         }
-        if ((_end_time_point != TO_END) && (value > _end_time_point)) {
+        if ((_end_time_point != TO_END) && (msec > _end_time_point)) {
             log_warning("Cannot set start time point more then end time point "
-                        << _end_time_point <<  ": " << value << ", ignored");
+                        << _end_time_point <<  ": " << msec << ", ignored");
             return;
         }
-        _start_time_point = value;
+        _start_time_point = msec;
     }
 
-    void Stream::setEndTimePoint(int64_t value) {
-        if (_end_time_point == value) {
+    void Stream::setEndTimePoint(int64_t msec) {
+        if (_end_time_point == msec) {
             return;
         }
-        if ((value != TO_END) && (value < 0)) {
-            log_warning("Cannot set end time point less then zero: " << value << ", ignored");
+        if ((msec != TO_END) && (msec < 0)) {
+            log_warning("Cannot set end time point less then zero: " << msec << ", ignored");
             return;
         }
-        if ((_start_time_point != FROM_START) && (value < _start_time_point)) {
+        if ((_start_time_point != FROM_START) && (msec < _start_time_point)) {
             log_warning("Cannot set end time point less then start time point "
-                        << _start_time_point <<  ": " << value << ", ignored");
+                        << _start_time_point <<  ": " << msec << ", ignored");
             return;
         }
-        _end_time_point = value;
+        _end_time_point = msec;
     }
 
     int64_t Stream::index() const {
