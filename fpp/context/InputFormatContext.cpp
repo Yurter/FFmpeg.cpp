@@ -50,7 +50,7 @@ namespace fpp {
 
     Packet InputFormatContext::read() {
         Packet packet { MediaType::Unknown };
-        if (const auto ret { ::av_read_frame(raw(), &packet.raw()) }; ret < 0) {
+        if (const auto ret { ::av_read_frame(raw(), packet.ptr()) }; ret < 0) {
             if (ret == AVERROR_EOF) {
                 return Packet { MediaType::EndOF };
             }
