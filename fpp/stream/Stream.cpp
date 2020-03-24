@@ -182,7 +182,7 @@ namespace fpp {
         }
         default:
             throw std::invalid_argument {
-                "Stream::initCodecpar failed becose of bad param's type"
+                "Stream::initCodecpar failed because of bad param's type"
             };
         }
     }
