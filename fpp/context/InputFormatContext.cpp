@@ -71,15 +71,16 @@ namespace fpp {
         });
     }
 
-    void InputFormatContext::openContext() {
+    void InputFormatContext::openContext(Options options) {
         guessInputFromat();
+        Dictionary dictionary { options };
         auto fmt_ctx { raw() }; // TODO 23.03
         if (const auto ret {
                 ::avformat_open_input(
                     &fmt_ctx
                     , mediaResourceLocator().c_str()
                     , inputFormat()
-                    , nullptr /* options */ // TODO add options 23.03
+                    , dictionary.get()
                 )
             }; ret < 0) {
             throw FFmpegException { "Failed to open input context", ret };

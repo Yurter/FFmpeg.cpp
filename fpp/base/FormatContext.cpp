@@ -52,12 +52,12 @@ namespace fpp {
         _opened = opened;
     }
 
-    void FormatContext::open() {
+    void FormatContext::open(Options options) {
         if (opened()) {
             throw std::runtime_error { "Context already opened" };
         }
         setInteruptCallback(InterruptedProcess::Opening);
-        openContext();
+        openContext(options);
         resetInteruptCallback();
         setOpened(true);
         log_info(toString());
