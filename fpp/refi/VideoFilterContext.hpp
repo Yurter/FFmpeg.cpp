@@ -15,7 +15,7 @@ namespace fpp {
 
         virtual std::string toString() const override;
 
-    public:
+    protected:
 
         virtual void        initBufferSource()  override;
         virtual void        initBufferSink()    override;
