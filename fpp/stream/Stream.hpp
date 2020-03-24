@@ -31,8 +31,8 @@ namespace fpp {
         bool                timeIsOver() const;
 
         void                setIndex(int64_t value);
-        void                setStartTimePoint(int64_t value);
-        void                setEndTimePoint(int64_t value);
+        void                setStartTimePoint(int64_t msec);
+        void                setEndTimePoint(int64_t msec);
 
         int64_t             index()             const;
         int64_t             startTimePoint()    const;
