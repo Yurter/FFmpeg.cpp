@@ -1,12 +1,13 @@
 #pragma once
 #include <fpp/core/wrap/SharedFFmpegObject.hpp>
 #include <fpp/core/time/Chronometer.hpp>
+#include <fpp/base/Dictionary.hpp>
 #include <fpp/stream/Stream.hpp>
 
 struct AVFormatContext;
-struct AVStream;
-struct AVInputFormat;
 struct AVOutputFormat;
+struct AVInputFormat;
+struct AVStream;
 
 namespace fpp {
 
@@ -20,7 +21,7 @@ namespace fpp {
         const StreamVector  streams()               const;
         StreamVector        streams();
 
-        void                open();
+        void                open(Options options = {});
         void                close();
 
         bool                opened() const;
@@ -63,7 +64,7 @@ namespace fpp {
     protected:
 
         virtual void        createContext() = 0;
-        virtual void        openContext()   = 0;
+        virtual void        openContext(Options options) = 0;
         virtual void        beforeCloseContext();
         virtual std::string formatName() const = 0;
 

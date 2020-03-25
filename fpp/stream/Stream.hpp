@@ -6,7 +6,7 @@
 #include <vector>
 
 #define FROM_START  0
-#define TO_END      LONG_MAX
+#define TO_END      LLONG_MAX
 
 namespace fpp {
 
@@ -45,6 +45,7 @@ namespace fpp {
 
         void                initCodecpar();
         void                checkStampMonotonicity(Packet& packet);
+        void                checkDtsPtsOrder(Packet& packet);
 
     public:
 
@@ -56,7 +57,7 @@ namespace fpp {
         int64_t             _prev_pts;
         int64_t             _packet_index;
 
-        int64_t             _start_time_point;
+        int64_t             _start_time_point; // TODO not used 25.03
         int64_t             _end_time_point;
 
     public:

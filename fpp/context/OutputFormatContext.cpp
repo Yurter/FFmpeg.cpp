@@ -99,7 +99,7 @@ namespace fpp {
         );
     }
 
-    void OutputFormatContext::openContext() {
+    void OutputFormatContext::openContext(Options options) { // TODO avio_open2 24.03
         if (streamNumber() == 0) {
             throw std::logic_error { "Can't open context without streams" };
         }

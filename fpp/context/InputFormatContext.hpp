@@ -33,9 +33,9 @@ namespace fpp {
 
     private:
 
-        virtual void        createContext()     override;
-        virtual void        openContext()       override;
-        virtual std::string formatName() const  override;
+        virtual void        createContext() override;
+        virtual void        openContext(Options options) override;
+        virtual std::string formatName() const override;
 
         [[nodiscard]]
         virtual StreamVector parseFormatContext() override;

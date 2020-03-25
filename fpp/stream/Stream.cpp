@@ -12,8 +12,8 @@ namespace fpp {
     Stream::Stream(AVStream* avstream, MediaType type)
         : FFmpegObject(avstream)
         , MediaData(type)
-        , _prev_dts { 0 }
-        , _prev_pts { 0 }
+        , _prev_dts { AV_NOPTS_VALUE }
+        , _prev_pts { AV_NOPTS_VALUE }
         , _packet_index { 0 }
         , _start_time_point { FROM_START }
         , _end_time_point { TO_END } {
@@ -40,10 +40,10 @@ namespace fpp {
         params = parameters;
         initCodecpar();
         if (invalid_int(params->streamIndex())) {
-            // index pre-setted for some reason
             params->setStreamIndex(index());
         }
         else {
+            // index pre-setted for some reason
             raw()->index = int(params->streamIndex());
         }
 
@@ -64,12 +64,34 @@ namespace fpp {
                 , params->timeBase()
             );
         }
+        else if (raw()->start_time != AV_NOPTS_VALUE) {
+            packet.setDts(packet.dts() - raw()->start_time);
+            packet.setPts(packet.pts() - raw()->start_time);
+        }
+
+        if (packet.duration() == 0) {
+            if (raw()->cur_dts == AV_NOPTS_VALUE) {
+                const auto fps {
+                    ::av_q2intfloat(
+                        std::static_pointer_cast<VideoParameters>(params)->frameRate()
+                    )
+                };
+                const auto inv_tb {
+                    ::av_q2intfloat(::av_inv_q(params->timeBase()))
+                };
+                const auto avg_pkt_dur {
+                    inv_tb / fps
+                };
+                packet.setDuration(avg_pkt_dur);
+            } else {
+                packet.setDuration(std::abs(packet.dts() - raw()->cur_dts));
+            }
+        }
 
         checkStampMonotonicity(packet);
+        checkDtsPtsOrder(packet);
 
-        const auto packet_duration { packet.pts() - _prev_pts };
         packet.setPos(-1);
-        packet.setDuration(packet_duration);
         packet.setTimeBase(params->timeBase());
 
         params->increaseDuration(packet.duration());
@@ -80,13 +102,20 @@ namespace fpp {
     }
 
     bool Stream::timeIsOver() const {
-        const auto planned_duration { _end_time_point - _start_time_point };
+        const auto planned_duration {
+            _end_time_point - _start_time_point
+        };
         const auto actual_duration {
-            ::av_rescale_q(params->duration(), params->timeBase(), DEFAULT_TIME_BASE)
+            ::av_rescale_q(
+                params->duration()
+                , params->timeBase()
+                , DEFAULT_TIME_BASE
+            )
         };
         if (actual_duration >= planned_duration) {
-            log_debug("Time is over: "
-                      << utils::time_to_string(actual_duration, DEFAULT_TIME_BASE)
+            log_debug(
+                "Time is over: "
+                << utils::time_to_string(actual_duration, DEFAULT_TIME_BASE)
             );
             return true;
         }
@@ -182,12 +211,15 @@ namespace fpp {
         }
         default:
             throw std::invalid_argument {
-                "Stream::initCodecpar failed becose of bad param's type"
+                __FUNCTION__ " failed because of bad param's type"
             };
         }
     }
 
     void Stream::checkStampMonotonicity(Packet& packet) {
+        if (_prev_dts == AV_NOPTS_VALUE) {
+            return;
+        }
         if (packet.dts() <= _prev_dts) {
             log_warning(
                 "Application provided invalid, "
@@ -197,14 +229,15 @@ namespace fpp {
             );
             packet.setDts(_prev_dts + 1);
         }
-        if (packet.pts() <= _prev_pts) {
+    }
+
+    void Stream::checkDtsPtsOrder(Packet& packet) {
+        if (packet.pts() < packet.dts()) {
             log_warning(
-                "Application provided invalid, "
-                "non monotonically increasing pts to muxer "
-                "in stream " << packet.streamIndex() << ": "
-                << _prev_pts << " >= " << packet.pts()
+                "pts (" << packet.pts() << ") < dts (" << packet.dts() << ") "
+                << "in stream " << packet.streamIndex()
             );
-            packet.setPts(_prev_pts + 1);
+            packet.setPts(packet.dts());
         }
     }
 
