@@ -120,7 +120,9 @@ namespace fpp {
     }
 
     void FormatContext::processPacket(Packet& packet) {
-        const auto packet_stream { stream(packet.streamIndex()) };
+        const auto packet_stream {
+            stream(packet.streamIndex())
+        };
         packet_stream->stampPacket(packet);
         const auto packet_type {
             packet_stream->timeIsOver()
