@@ -23,6 +23,7 @@ namespace fpp {
             , rescaled_frame.raw().linesize /* dstStride[] */
         );
         ::av_frame_copy_props(rescaled_frame.ptr(), source_frame.ptr());
+        rescaled_frame.setTimeBase(params.in->timeBase());
         return rescaled_frame;
     }
 
