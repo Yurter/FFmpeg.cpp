@@ -80,7 +80,9 @@ namespace fpp {
     }
 
     bool Stream::timeIsOver() const {
-        const auto planned_duration { _end_time_point - _start_time_point };
+        const auto planned_duration {
+            _end_time_point - _start_time_point
+        };
         const auto actual_duration {
             ::av_rescale_q(params->duration(), params->timeBase(), DEFAULT_TIME_BASE)
         };
@@ -197,15 +199,15 @@ namespace fpp {
             );
             packet.setDts(_prev_dts + 1);
         }
-        if (packet.pts() <= _prev_pts) {
-            log_warning(
-                "Application provided invalid, "
-                "non monotonically increasing pts to muxer "
-                "in stream " << packet.streamIndex() << ": "
-                << _prev_pts << " >= " << packet.pts()
-            );
-            packet.setPts(_prev_pts + 1);
-        }
+//        if (packet.pts() <= _prev_pts) {
+//            log_warning(
+//                "Application provided invalid, "
+//                "non monotonically increasing pts to muxer "
+//                "in stream " << packet.streamIndex() << ": "
+//                << _prev_pts << " >= " << packet.pts()
+//            );
+//            packet.setPts(_prev_pts + 1);
+//        }
     }
 
 } // namespace fpp
