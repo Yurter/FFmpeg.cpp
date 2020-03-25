@@ -32,7 +32,7 @@ namespace fpp {
 
         void                setIndex(int64_t value);
         void                setStartTimePoint(int64_t msec);
-        void                setEndTimePoint(int64_t msec); // TODO doesnt work in OutFmtCtx 24.03
+        void                setEndTimePoint(int64_t msec);
 
         int64_t             index()             const;
         int64_t             startTimePoint()    const;
@@ -45,6 +45,7 @@ namespace fpp {
 
         void                initCodecpar();
         void                checkStampMonotonicity(Packet& packet);
+        void                checkDtsPtsOrder(Packet& packet);
 
     public:
 
@@ -56,7 +57,7 @@ namespace fpp {
         int64_t             _prev_pts;
         int64_t             _packet_index;
 
-        int64_t             _start_time_point;
+        int64_t             _start_time_point; // TODO not used 25.03
         int64_t             _end_time_point;
 
     public:
