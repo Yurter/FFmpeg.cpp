@@ -5,6 +5,7 @@
 #include <fpp/codec/DecoderContext.hpp>
 #include <fpp/codec/EncoderContext.hpp>
 #include <fpp/refi/ResampleContext.hpp>
+#include <fpp/refi/RescaleContext.hpp>
 #include <fpp/refi/VideoFilterContext.hpp>
 #include <fpp/refi/VideoFilters/DrawText.hpp>
 #include <fpp/core/Utils.hpp>
@@ -14,6 +15,7 @@
     video=HP Wide Vision HD
     video=Webcam C170
     video=USB2.0 PC CAMERA
+    video=KVYcam Video Driver
 */
 
 /* USB audio
@@ -164,8 +166,6 @@ void youtube_stream() {
             return !input_packet.isEOF();
         }
     };
-
-    source.stream(0)->setEndTimePoint(10 * 60 * 1000);
 
     /* read and write packets */
     while (read_packet()) {
@@ -488,6 +488,101 @@ void text_on_video() {
 
 }
 
+void webcam_to_file() {
+
+    /* create source */
+    fpp::InputFormatContext webcam {
+        "video=HP Wide Vision HD"
+    };
+
+    /* change default image size (480x360) */
+    fpp::Options webcam_options {
+        { "video_size", "1280x720" }
+    };
+
+    /* open source */
+    webcam.open(webcam_options);
+
+    /* create sink */
+    fpp::OutputFormatContext video_file {
+        "webcam.flv"
+    };
+
+    /* encode video because of camera's rawvideo codec */
+    const auto params { fpp::VideoParameters::make_shared() };
+    params->setEncoder(AVCodecID::AV_CODEC_ID_H264);
+    params->setPixelFormat(AVPixelFormat::AV_PIX_FMT_YUV420P);
+    params->setGopSize(12);
+
+    /* copy source's video stream to sink */
+    for (const auto& input_stream : webcam.streams()) {
+        if (input_stream->isVideo()) {
+            video_file.copyStream( /* with predefined params */
+                input_stream
+                , params
+            );
+        }
+    }
+
+    /* create decoder */
+    fpp::DecoderContext video_decoder {
+        webcam.stream(fpp::MediaType::Video)
+    };
+
+    /* create encoder's options */
+    fpp::Options video_options {
+        { "threads",        "1"          }
+        , { "thread_type",  "slice"       }
+        , { "preset",       "ultrafast"   }
+        , { "crf",          "15"          } // 0-51
+        , { "profile",      "main"        }
+        , { "tune",         "zerolatency" }
+    };
+
+    /* create encoders */
+    fpp::EncoderContext video_encoder {
+        video_file.stream(fpp::MediaType::Video), video_options
+    };
+
+    /* create rescaler (because of pixel format mismatch) */
+    fpp::RescaleContext rescaler {{
+        webcam.stream(fpp::MediaType::Video)->params
+        , video_file.stream(fpp::MediaType::Video)->params
+    }};
+
+    /* open sink */
+    video_file.open();
+
+    fpp::Packet input_packet {
+        fpp::MediaType::Unknown
+    };
+    const auto read_packet {
+        [&input_packet,&webcam]() {
+            input_packet = webcam.read();
+            return !input_packet.isEOF();
+        }
+    };
+
+    /* because of endless webcam's video */
+    webcam.stream(0)->setEndTimePoint(10 * 1000);
+
+    /* read and write packets */
+    while (read_packet()) {
+        if (input_packet.isVideo()) {
+            for (const auto& v_frame  : video_decoder.decode(input_packet)) {
+            const auto rv_frame { rescaler.scale(v_frame) };
+            for (const auto& v_packet : video_encoder.encode(rv_frame))     {
+                video_file.write(v_packet);
+            }}
+        }
+    }
+
+    /* explicitly close contexts */
+    webcam.close();
+    video_file.close();
+
+}
+
 auto main() -> int {
 
     std::cout << "Started\n";
@@ -500,6 +595,7 @@ auto main() -> int {
 //        rtp_audio_stream();
 //        rtp_video_and_audio_stream();
 //        text_on_video();
+//        webcam_to_file();
 
     } catch (const fpp::FFmpegException& e) {
         std::cout << "FFmpegException: " << e.what() << "\n";
