@@ -6,7 +6,7 @@
 #include <vector>
 
 #define FROM_START  0
-#define TO_END      LONG_MAX
+#define TO_END      LLONG_MAX
 
 namespace fpp {
 
@@ -32,7 +32,7 @@ namespace fpp {
 
         void                setIndex(int64_t value);
         void                setStartTimePoint(int64_t msec);
-        void                setEndTimePoint(int64_t msec);
+        void                setEndTimePoint(int64_t msec); // TODO doesnt work in OutFmtCtx 24.03
 
         int64_t             index()             const;
         int64_t             startTimePoint()    const;
