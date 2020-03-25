@@ -33,7 +33,7 @@ SOURCES += \
     fpp/core/Thread.cpp \
     fpp/core/Utils.cpp \
     fpp/refi/AudioFilterContext.cpp \
-    fpp/refi/FilterContext.cpp \
+    fpp/base/FilterContext.cpp \
     fpp/refi/RescaleContext.cpp \
     fpp/refi/VideoFilterContext.cpp \
     fpp/stream/AudioParameters.cpp \
@@ -67,7 +67,7 @@ HEADERS += \
     fpp/core/wrap/SharedFFmpegObject.hpp \
     fpp/refi/AudioFilterContext.hpp \
     fpp/refi/VideoFilters/DrawText.hpp \
-    fpp/refi/FilterContext.hpp \
+    fpp/base/FilterContext.hpp \
     fpp/refi/ResampleContext.hpp \
     fpp/refi/RescaleContext.hpp \
     fpp/refi/VideoFilterContext.hpp \
