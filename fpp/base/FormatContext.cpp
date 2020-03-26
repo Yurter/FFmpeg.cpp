@@ -52,15 +52,19 @@ namespace fpp {
         _opened = opened;
     }
 
-    void FormatContext::open(Options options) {
+    bool FormatContext::open(Options options) {
         if (opened()) {
             throw std::runtime_error { "Context already opened" };
         }
         setInteruptCallback(InterruptedProcess::Opening);
-        openContext(options);
+        if (!openContext(options)) {
+            log_error("Could not open output: " + mediaResourceLocator());
+            return false;
+        }
         resetInteruptCallback();
         setOpened(true);
         log_info(toString());
+        return true;
     }
 
     void FormatContext::setInteruptCallback(InterruptedProcess process) {

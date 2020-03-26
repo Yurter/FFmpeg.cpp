@@ -21,7 +21,7 @@ namespace fpp {
         const StreamVector  streams()               const;
         StreamVector        streams();
 
-        void                open(Options options = {});
+        bool                open(Options options = {});
         void                close();
 
         bool                opened() const;
@@ -64,7 +64,7 @@ namespace fpp {
     protected:
 
         virtual void        createContext() = 0;
-        virtual void        openContext(Options options) = 0;
+        virtual bool        openContext(Options options) = 0;
         virtual void        beforeCloseContext();
         virtual std::string formatName() const = 0;
 

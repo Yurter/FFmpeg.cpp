@@ -99,7 +99,7 @@ namespace fpp {
         );
     }
 
-    void OutputFormatContext::openContext(Options options) { // TODO avio_open2 24.03
+    bool OutputFormatContext::openContext(Options options) { // TODO avio_open2 24.03
         if (streamNumber() == 0) {
             throw std::logic_error { "Can't open context without streams" };
         }
@@ -111,14 +111,12 @@ namespace fpp {
                         , AVIO_FLAG_WRITE                /* flags       */
                     )
                 }; ret < 0) {
-                throw FFmpegException {
-                    "Could not open output: " + mediaResourceLocator()
-                    , ret
-                };
+                return false;
             }
         }
         writeHeader();
         parseStreamsTimeBase();
+        return true;
     }
 
     std::string OutputFormatContext::formatName() const {
