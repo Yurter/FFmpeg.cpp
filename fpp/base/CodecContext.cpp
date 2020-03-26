@@ -81,12 +81,12 @@ namespace fpp {
         if (isVideo()) {
             return utils::to_string(raw()->codec_type) + " "
                 + _stream->params->codecType() + " " + codec()->name        + delimeter
-                + "width: "         + std::to_string(raw()->width)          + delimeter
-                + "height: "        + std::to_string(raw()->height)         + delimeter
-                + "coded_width: "   + std::to_string(raw()->coded_width)    + delimeter
-                + "coded_height: "  + std::to_string(raw()->coded_height)   + delimeter
-                + "time_base: "     + utils::to_string(raw()->time_base)    + delimeter
-                + "pix_fmt: "       + utils::to_string(raw()->pix_fmt);
+                + "width "         + std::to_string(raw()->width)          + delimeter
+                + "height "        + std::to_string(raw()->height)         + delimeter
+                + "coded_width "   + std::to_string(raw()->coded_width)    + delimeter
+                + "coded_height "  + std::to_string(raw()->coded_height)   + delimeter
+                + "time_base "     + utils::to_string(raw()->time_base)    + delimeter
+                + "pix_fmt "       + utils::to_string(raw()->pix_fmt);
         }
         if (isAudio()) {
             return utils::to_string(raw()->codec_type) + " "
