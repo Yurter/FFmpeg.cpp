@@ -155,11 +155,27 @@ namespace fpp {
                 return MediaType::Video;
             case AVMediaType::AVMEDIA_TYPE_AUDIO:
                 return MediaType::Audio;
-            default:
+            default: {
                 throw std::invalid_argument {
-                    "toMediaType failed, bad type "
+                    __FUNCTION__ " failed, bad type "
                     + std::to_string(int(type))
                 };
+            }
+        }
+    }
+
+    AVMediaType utils::from_media_type(MediaType type) {
+        switch (type) {
+            case MediaType::Video:
+                return AVMediaType::AVMEDIA_TYPE_VIDEO;
+            case MediaType::Audio:
+                return AVMediaType::AVMEDIA_TYPE_AUDIO;
+            default: {
+                throw std::invalid_argument {
+                    __FUNCTION__ " failed, bad type "
+                    + std::to_string(int(type))
+                };
+            }
         }
     }
 

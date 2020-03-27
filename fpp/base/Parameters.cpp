@@ -7,8 +7,7 @@ extern "C" {
     #include <libavformat/avformat.h>
 }
 
-#define DEFAULT_CODEC_ID        AV_CODEC_ID_NONE
-#define not_inited_codec_id(x)  ((x) == DEFAULT_CODEC_ID)
+#define not_inited_codec_id(x) ((x) == AVCodecID::AV_CODEC_ID_NONE)
 
 namespace fpp {
 
@@ -40,6 +39,7 @@ namespace fpp {
 
     void Parameters::setCodec(AVCodec* codec) {
         _codec = codec;
+        raw().codec_id = _codec->id;
     }
 
     void Parameters::setBitrate(int64_t bitrate) {
@@ -79,12 +79,18 @@ namespace fpp {
     }
 
     std::string Parameters::codecName() const {
+        if (not_inited_ptr(_codec)) {
+            throw std::runtime_error {
+                __FUNCTION__ "failed: codec is null" };
+        }
         return _codec->name;
     }
 
     AVCodec* Parameters::codec() const {
         if (not_inited_ptr(_codec)) {
-            throw std::runtime_error { "codec is null" };
+            throw std::runtime_error {
+                __FUNCTION__ "failed: codec is null"
+            };
         }
         return _codec;
     }
@@ -173,6 +179,7 @@ namespace fpp {
         }
 
         codec_context->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
+        codec_context->time_base = timeBase();
     }
 
     void Parameters::parseCodecContext(const AVCodecContext* codec_context) {
@@ -193,7 +200,8 @@ namespace fpp {
 
         ::memset(ptr(), 0, sizeof(raw()));
 
-        raw().codec_type          = AVMEDIA_TYPE_UNKNOWN;
+//        raw().codec_type          = AVMEDIA_TYPE_UNKNOWN;
+        raw().codec_type          = utils::from_media_type(type());
         raw().codec_id            = AV_CODEC_ID_NONE;
         raw().format              = -1;
         raw().field_order         = AV_FIELD_UNKNOWN;

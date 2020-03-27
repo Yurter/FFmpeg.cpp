@@ -32,6 +32,7 @@ namespace fpp {
         static std::string  channel_layout_to_string(int64_t nb_channels, uint64_t channel_layout);
 
         static MediaType    to_media_type(AVMediaType type);
+        static AVMediaType  from_media_type(MediaType type);
 
         static void         sleep_for(int64_t milliseconds);
         static void         sleep_for_ms(int64_t milliseconds);
