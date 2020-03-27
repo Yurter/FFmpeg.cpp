@@ -102,8 +102,11 @@ namespace fpp {
 
     bool OutputFormatContext::openContext(Options options) { // TODO avio_open2 24.03
         if (streamNumber() == 0) {
-            throw std::logic_error { "Can't open context without streams" };
+            throw std::logic_error {
+                "Can't open context without streams"
+            };
         }
+        initStreamsCodecpar(); // TODO check it 27.03
         if (!(raw()->flags & AVFMT_NOFILE)) {
             if (const auto ret {
                     ::avio_open(
@@ -190,6 +193,12 @@ namespace fpp {
                 "Failed to write stream trailer to " + mediaResourceLocator()
                 , ret
             };
+        }
+    }
+
+    void OutputFormatContext::initStreamsCodecpar() {
+        for (const auto& stream : streams()) {
+            stream->params->initCodecpar(stream->codecpar());
         }
     }
 
