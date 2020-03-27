@@ -38,6 +38,7 @@ namespace fpp {
         }
         log_debug("Opening");
         params->initCodecContext(raw());
+        raw()->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
         Dictionary dictionary { options };
         if (const auto ret {
                 ::avcodec_open2(raw(), codec(), dictionary.get())
