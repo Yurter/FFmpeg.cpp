@@ -77,26 +77,26 @@ namespace fpp {
     }
 
     std::string CodecContext::toString() const {
-        const auto delimeter { ", " };
+        const auto separator { ", " };
         if (isVideo()) {
             return utils::to_string(raw()->codec_type) + " "
-                + _stream->params->codecType() + " " + codec()->name        + delimeter
-                + "width: "         + std::to_string(raw()->width)          + delimeter
-                + "height: "        + std::to_string(raw()->height)         + delimeter
-                + "coded_width: "   + std::to_string(raw()->coded_width)    + delimeter
-                + "coded_height: "  + std::to_string(raw()->coded_height)   + delimeter
-                + "time_base: "     + utils::to_string(raw()->time_base)    + delimeter
-                + "pix_fmt: "       + utils::to_string(raw()->pix_fmt);
+                + _stream->params->codecType() + " " + codec()->name        + separator
+                + "width "         + std::to_string(raw()->width)           + separator
+                + "height "        + std::to_string(raw()->height)          + separator
+                + "coded_width "   + std::to_string(raw()->coded_width)     + separator
+                + "coded_height "  + std::to_string(raw()->coded_height)    + separator
+                + "time_base "     + utils::to_string(raw()->time_base)     + separator
+                + "pix_fmt "       + utils::to_string(raw()->pix_fmt);
         }
         if (isAudio()) {
             return utils::to_string(raw()->codec_type) + " "
-                + _stream->params->codecType() + " " + codec()->name        + delimeter
-                + "sample_rate "   + std::to_string(raw()->sample_rate)     + delimeter
-                + "sample_fmt "    + utils::to_string(raw()->sample_fmt)    + delimeter
+                + _stream->params->codecType() + " " + codec()->name        + separator
+                + "sample_rate "   + std::to_string(raw()->sample_rate)     + separator
+                + "sample_fmt "    + utils::to_string(raw()->sample_fmt)    + separator
                 + "ch_layout "     + utils::channel_layout_to_string(
                                         raw()->channels
-                                        , raw()->channel_layout)            + delimeter
-                + "channels "      + std::to_string(raw()->channels)        + delimeter
+                                        , raw()->channel_layout)            + separator
+                + "channels "      + std::to_string(raw()->channels)        + separator
                 + "frame_size "    + std::to_string(raw()->frame_size);
         }
         throw std::runtime_error {

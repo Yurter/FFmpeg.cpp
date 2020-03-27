@@ -71,7 +71,7 @@ namespace fpp {
         });
     }
 
-    void InputFormatContext::openContext(Options options) {
+    bool InputFormatContext::openContext(Options options) {
         guessInputFromat();
         Dictionary dictionary { options };
         auto fmt_ctx { raw() }; // TODO 23.03
@@ -82,8 +82,8 @@ namespace fpp {
                     , inputFormat()
                     , dictionary.get()
                 )
-            }; ret < 0) {
-            throw FFmpegException { "Failed to open input context", ret };
+            }; ret < 0) { // TODO ret code explanation 26.03
+            return false;
         }
         setInputFormat(raw()->iformat);
         if (const auto ret {
@@ -95,6 +95,7 @@ namespace fpp {
             };
         }
         setStreams(parseFormatContext());
+        return true;
     }
 
     std::string InputFormatContext::formatName() const {

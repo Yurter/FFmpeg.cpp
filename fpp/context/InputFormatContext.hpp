@@ -34,7 +34,7 @@ namespace fpp {
     private:
 
         virtual void        createContext() override;
-        virtual void        openContext(Options options) override;
+        virtual bool        openContext(Options options) override;
         virtual std::string formatName() const override;
 
         [[nodiscard]]
