@@ -15,10 +15,16 @@ namespace fpp {
         : Parameters(MediaType::Video)
         , _width { 0 }
         , _height { 0 }
-        , _aspect_ratio { DEFAULT_RATIONAL }
+        , _sample_aspect_ratio { DEFAULT_RATIONAL }
         , _frame_rate { DEFAULT_RATIONAL }
         , _pixel_format { DEFAULT_PIXEL_FORMAT }
-        , _gop_size { 0 } {
+        , _field_order { AVFieldOrder::AV_FIELD_UNKNOWN }
+        , _color_range { AVColorRange::AVCOL_RANGE_UNSPECIFIED }
+        , _color_primaries { AVColorPrimaries::AVCOL_PRI_UNSPECIFIED }
+        , _color_space { AVColorSpace::AVCOL_SPC_UNSPECIFIED }
+        , _chroma_location { AVChromaLocation::AVCHROMA_LOC_UNSPECIFIED }
+        , _video_delay { 0 }
+        , _color_trc { AVColorTransferCharacteristic::AVCOL_TRC_UNSPECIFIED } {
         setName("VideoParameters");
     }
 
@@ -30,8 +36,8 @@ namespace fpp {
         _height = height - (height % 2);
     }
 
-    void VideoParameters::setAspectRatio(AVRational aspect_ratio) {
-        _aspect_ratio = aspect_ratio;
+    void VideoParameters::setSampleAspectRatio(AVRational sample_aspect_ratio) {
+        _sample_aspect_ratio = sample_aspect_ratio;
     }
 
     void VideoParameters::setFrameRate(AVRational frame_rate) {
@@ -68,16 +74,16 @@ namespace fpp {
         return _height;
     }
 
-    AVRational VideoParameters::aspectRatio() const {
-        return _aspect_ratio;
-    }
-
     AVRational VideoParameters::frameRate() const {
         return _frame_rate;
     }
 
     AVPixelFormat VideoParameters::pixelFormat() const {
         return _pixel_format;
+    }
+
+    AVRational VideoParameters::sampleAspectRatio() const {
+        return _sample_aspect_ratio;
     }
 
     int64_t VideoParameters::gopSize() const {
@@ -97,28 +103,62 @@ namespace fpp {
         const auto other_video_parames { std::static_pointer_cast<VideoParameters>(other) };
         if (not_inited_int(width()))            { setWidth(other_video_parames->width());               }
         if (not_inited_int(height()))           { setHeight(other_video_parames->height());             }
-        if (not_inited_q(aspectRatio()))        { setAspectRatio(other_video_parames->aspectRatio());   }
         if (not_inited_q(frameRate()))          { setFrameRate(other_video_parames->frameRate());       }
         if (not_inited_pix_fmt(pixelFormat()))  { setPixelFormat(other_video_parames->pixelFormat());   }
         if (not_inited_int(gopSize()))          { setGopSize(other_video_parames->gopSize());           }
+        if (not_inited_q(sampleAspectRatio()))  { setSampleAspectRatio(other_video_parames->sampleAspectRatio()); }
     }
 
     void VideoParameters::parseStream(const AVStream* avstream) {
         Parameters::parseStream(avstream);
         setWidth(avstream->codecpar->width);
         setHeight(avstream->codecpar->height);
-        setAspectRatio(avstream->codecpar->sample_aspect_ratio);
         setFrameRate(avstream->avg_frame_rate);
         setPixelFormat(AVPixelFormat(avstream->codecpar->format));
+        setSampleAspectRatio(avstream->codecpar->sample_aspect_ratio);
     }
 
-    void VideoParameters::initStream(AVStream* avstream) const {
-        Parameters::initStream(avstream);
-        avstream->codecpar->width   = int(width());
-        avstream->codecpar->height  = int(height());
-        avstream->codecpar->format  = pixelFormat();
-        avstream->avg_frame_rate    = frameRate();
-        avstream->codecpar->sample_aspect_ratio = aspectRatio();
+    void VideoParameters::initCodecContext(AVCodecContext* codec_context) const {
+        Parameters::initCodecContext(codec_context);
+        codec_context->pix_fmt                = pixelFormat();
+        codec_context->width                  = int(width());
+        codec_context->height                 = int(height());
+        codec_context->field_order            = _field_order;
+        codec_context->color_range            = _color_range;
+        codec_context->color_primaries        = _color_primaries;
+        codec_context->color_trc              = _color_trc;
+        codec_context->colorspace             = _color_space;
+        codec_context->chroma_sample_location = _chroma_location;
+        codec_context->sample_aspect_ratio    = sampleAspectRatio();
+        codec_context->has_b_frames           = int(_video_delay);
+        codec_context->gop_size               = int(gopSize());
+    }
+
+    void VideoParameters::parseCodecContext(const AVCodecContext* codec_context) {
+        Parameters::parseCodecContext(codec_context);
+        setPixelFormat(codec_context->pix_fmt);
+        setWidth(codec_context->width);
+        setHeight(codec_context->height);
+        _field_order         = codec_context->field_order;
+        _color_range         = codec_context->color_range;
+        _color_primaries     = codec_context->color_primaries;
+        _color_trc           = codec_context->color_trc;
+        _color_space         = codec_context->colorspace;
+        _chroma_location     = codec_context->chroma_sample_location;
+        _sample_aspect_ratio = codec_context->sample_aspect_ratio;
+        _video_delay         = codec_context->has_b_frames;
+    }
+
+    void VideoParameters::initCodecpar(AVCodecParameters* codecpar) const {
+        Parameters::initCodecpar(codecpar);
+        codecpar->format              = pixelFormat();
+        codecpar->width               = int(width());
+        codecpar->height              = int(height());
+        codecpar->field_order         = _field_order;
+        codecpar->color_range         = _color_range;
+        codecpar->color_primaries     = _color_primaries;
+        codecpar->color_trc           = _color_trc;
+        codecpar->sample_aspect_ratio = sampleAspectRatio();
     }
 
     bool VideoParameters::betterThen(const SharedParameters& other) {

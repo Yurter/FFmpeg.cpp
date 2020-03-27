@@ -31,6 +31,11 @@ namespace fpp {
         virtual void        parseStream(const AVStream* avstream)       override;
         virtual bool        betterThen(const SharedParameters& other)   override;
 
+        virtual void        initCodecContext(AVCodecContext* codec_context) const override;
+        virtual void        parseCodecContext(const AVCodecContext* codec_context) override;
+
+        virtual void        initCodecpar(AVCodecParameters* codecpar) const override;
+
         static SharedAudioParameters make_shared() {
             return std::make_shared<AudioParameters>();
         }
@@ -42,6 +47,11 @@ namespace fpp {
         uint64_t            _channel_layout;
         int64_t             _channels;
         int64_t             _frame_size;
+
+        int64_t             _block_align;
+        int64_t             _initial_padding;
+        int64_t             _trailing_padding;
+        int64_t             _seek_preroll;
 
     };
 

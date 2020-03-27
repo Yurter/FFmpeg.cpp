@@ -43,7 +43,6 @@ namespace fpp {
 
     private:
 
-        void                initCodecpar();
         void                checkStampMonotonicity(Packet& packet);
         void                checkDtsPtsOrder(Packet& packet);
 

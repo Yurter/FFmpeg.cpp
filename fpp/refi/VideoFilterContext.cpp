@@ -40,10 +40,13 @@ namespace fpp {
          * will be inserted here */
         ::snprintf(args, sizeof(args)
             , "video_size=%dx%d:pix_fmt=%d:time_base=%d/%d:pixel_aspect=%d/%d"
-            , int(video_params->width()), int(video_params->height())
+            , int(video_params->width())
+            , int(video_params->height())
             , video_params->pixelFormat()
-            , video_params->timeBase().num, video_params->timeBase().den
-            , video_params->aspectRatio().num, video_params->aspectRatio().den
+            , video_params->timeBase().num
+            , video_params->timeBase().den
+            , video_params->sampleAspectRatio().num
+            , video_params->sampleAspectRatio().den
         );
 
         AVFilterContext* raw_ptr { nullptr };

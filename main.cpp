@@ -23,9 +23,47 @@
 */
 
 /* RTSP
+
+private:
+
     rtsp://admin:admin@192.168.10.189:554/ch01.264
     rtsp://admin:Admin2019@192.168.10.12:554
     rtsp://admin:admin@192.168.10.3:554 (1080p + audio)
+
+public:
+
+    rtsp://80.26.155.227/live/ch00_0
+    rtsp://80.76.108.241/live/ch00_0
+
+rtsp://195.46.114.132/live/ch00_0
+rtsp://87.197.138.187/live/ch00_0 (shop)
+rtsp://163.47.188.104/live/ch00_0
+rtsp://98.163.61.242/live/ch00_0
+rtsp://213.129.131.54/live/ch00_0
+rtsp://90.80.246.160/live/ch00_0 (прихожая кресла)
+rtsp://186.38.89.5/live/ch00_0
+rtsp://98.163.61.243/live/ch00_0
+rtsp://82.79.117.37/live/ch00_0
+rtsp://75.147.239.197/live/ch00_0
+rtsp://109.183.182.53/live/ch00_0
+rtsp://205.120.142.79/live/ch00_0
+rtsp://79.101.6.26/live/ch00_0    (tennis)
+rtsp://38.130.64.34/live/ch00_0
+rtsp://186.1.213.236/live/ch00_0
+rtsp://185.41.129.79/live/ch00_0 (аквапарк)
+rtsp://217.117.185.129/live/ch00_0
+rtsp://109.70.190.112/live/ch00_0 (cars man moovs)
+rtsp://109.73.212.169/live/ch00_0 (черепахи)
+rtsp://91.197.91.139/live/ch00_0 (двор)
+rtsp://82.150.185.64/live/ch00_0 (поле)
+rtsp://80.76.108.241/live/ch00_0 (рашн двор)
+rtsp://193.124.147.207/live/ch00_0
+
+
+rtsp://80.26.155.227/live/ch00_0 (shop)
+
+Юрий Животков, [26.03.20 13:42]
+сильно
 */
 
 void transmuxing_file() {
@@ -91,8 +129,7 @@ void youtube_stream() {
         "aaaa-bbbb-cccc-dddd"
     };
     fpp::OutputFormatContext youtube {
-        "rtmp://a.rtmp.youtube.com/live2/"
-        + stream_key
+        "video.flv"
     };
 
     /* copy source's streams to sink */
@@ -113,10 +150,10 @@ void youtube_stream() {
 
     /* create decoders */
     fpp::DecoderContext video_decoder {
-        source.stream(fpp::MediaType::Video)
+        source.stream(fpp::MediaType::Video)->params
     };
     fpp::DecoderContext audio_decoder {
-        source.stream(fpp::MediaType::Audio)
+        source.stream(fpp::MediaType::Audio)->params
     };
 
     /* create encoder's options */
@@ -135,10 +172,10 @@ void youtube_stream() {
 
     /* create encoders */
     fpp::EncoderContext video_encoder {
-        youtube.stream(fpp::MediaType::Video), video_options
+        youtube.stream(fpp::MediaType::Video)->params, video_options
     };
     fpp::EncoderContext audio_encoder {
-        youtube.stream(fpp::MediaType::Audio), audio_options
+        youtube.stream(fpp::MediaType::Audio)->params, audio_options
     };
 
     /* create resampler */
@@ -412,7 +449,7 @@ void text_on_video() {
 
     /* create decoder */
     fpp::DecoderContext video_decoder {
-        source.stream(fpp::MediaType::Video)
+        source.stream(fpp::MediaType::Video)->params
     };
 
     /* encoder's options */
@@ -427,7 +464,7 @@ void text_on_video() {
 
     /* create encoder */
     fpp::EncoderContext video_encoder {
-        sink.stream(fpp::MediaType::Video), video_options
+        sink.stream(fpp::MediaType::Video)->params, video_options
     };
 
     const auto drow_text {
@@ -509,24 +546,24 @@ void webcam_to_file() {
     };
 
     /* encode video because of camera's rawvideo codec */
-    const auto params { fpp::VideoParameters::make_shared() };
-    params->setEncoder(AVCodecID::AV_CODEC_ID_H264);
-    params->setPixelFormat(AVPixelFormat::AV_PIX_FMT_YUV420P);
-    params->setGopSize(12);
+    const auto out_params { fpp::VideoParameters::make_shared() };
+    out_params->setEncoder(AVCodecID::AV_CODEC_ID_H264);
+    out_params->setPixelFormat(AVPixelFormat::AV_PIX_FMT_YUV420P);
+    out_params->setGopSize(12);
 
     /* copy source's video stream to sink */
     for (const auto& input_stream : webcam.streams()) {
         if (input_stream->isVideo()) {
             video_file.copyStream( /* with predefined params */
                 input_stream
-                , params
+                , out_params
             );
         }
     }
 
     /* create decoder */
     fpp::DecoderContext video_decoder {
-        webcam.stream(fpp::MediaType::Video)
+        webcam.stream(fpp::MediaType::Video)->params
     };
 
     /* create encoder's options */
@@ -541,7 +578,7 @@ void webcam_to_file() {
 
     /* create encoders */
     fpp::EncoderContext video_encoder {
-        video_file.stream(fpp::MediaType::Video), video_options
+        video_file.stream(fpp::MediaType::Video)->params, video_options
     };
 
     /* create rescaler (because of pixel format mismatch) */
@@ -565,6 +602,7 @@ void webcam_to_file() {
 
     /* because of endless webcam's video */
     webcam.stream(0)->setEndTimePoint(10 * 1000);
+//    video_file.stream(0)->params->setTimeBase(DEFAULT_TIME_BASE);
 
     /* read and write packets */
     while (read_packet()) {
@@ -593,7 +631,7 @@ auto main() -> int {
 //        youtube_stream();
 //        rtp_video_stream();
 //        rtp_audio_stream();
-//        rtp_video_and_audio_stream();
+        rtp_video_and_audio_stream();
 //        text_on_video();
 //        webcam_to_file();
 

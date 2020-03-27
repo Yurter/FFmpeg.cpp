@@ -5,10 +5,10 @@
 
 namespace fpp {
 
-    DecoderContext::DecoderContext(const SharedStream stream, Options options)
-        : CodecContext(stream) {
+    DecoderContext::DecoderContext(const SharedParameters params, Options options)
+        : CodecContext(params) {
         setName("DecCtx");
-        if (!stream->params->isDecoder()) {
+        if (!params->isDecoder()) {
             throw std::runtime_error {
                 "Decoder cannot be initialized with encoder parameters"
             };
