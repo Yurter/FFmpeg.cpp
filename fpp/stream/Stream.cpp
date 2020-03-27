@@ -184,6 +184,7 @@ namespace fpp {
 
     void Stream::checkStampMonotonicity(Packet& packet) {
         if (_prev_dts == AV_NOPTS_VALUE) {
+            _prev_dts = packet.dts();
             return;
         }
         if (packet.dts() <= _prev_dts) {
