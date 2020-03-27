@@ -114,8 +114,10 @@ namespace fpp {
         const auto short_name {
             utils::guess_format_short_name(mediaResourceLocator())
         };
-        if (std::string { short_name } == "dshow") {
-            utils::device_register_all();
+        if (short_name) {
+            if (std::string { short_name } == "dshow") {
+                utils::device_register_all();
+            }
         }
         setInputFormat(::av_find_input_format(short_name));
     }
