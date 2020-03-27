@@ -592,6 +592,7 @@ void webcam_to_file() {
     }};
 
     /* open sink */
+    video_file.stream(0)->params->initCodecpar(video_file.stream(0)->codecpar());
     video_file.open();
 
     fpp::Packet input_packet {
@@ -606,8 +607,10 @@ void webcam_to_file() {
 
     /* because of endless webcam's video */
     webcam.stream(0)->setEndTimePoint(10 * 1000);
+
 //    video_file.stream(0)->params->setTimeBase(DEFAULT_TIME_BASE);
 
+    const auto deb0 { video_file.stream(0)->codecpar() };
     /* read and write packets */
     while (read_packet()) {
         if (input_packet.isVideo()) {
@@ -632,12 +635,12 @@ auto main() -> int {
     try {
 
 //        transmuxing_file();
-        youtube_stream();
+//        youtube_stream();
 //        rtp_video_stream();
 //        rtp_audio_stream();
 //        rtp_video_and_audio_stream();
 //        text_on_video();
-//        webcam_to_file();
+        webcam_to_file();
 
     } catch (const fpp::FFmpegException& e) {
         std::cout << "FFmpegException: " << e.what() << "\n";
