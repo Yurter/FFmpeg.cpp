@@ -1,5 +1,6 @@
 #include "Frame.hpp"
 #include <fpp/core/Utils.hpp>
+#include <fpp/core/FFmpegException.hpp>
 
 extern "C" {
     #include <libavutil/imgutils.h>

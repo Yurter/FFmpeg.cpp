@@ -14,21 +14,12 @@ extern "C" {
 namespace fpp {
 
     AudioParameters::AudioParameters()
-        : Parameters(MediaType::Audio)
-        , _sample_rate { 0 }
-        , _sample_format { DEFAULT_SAMPLE_FORMAT }
-        , _channel_layout { DEFAULT_CHANEL_LAYOUT }
-        , _channels { 0 }
-        , _frame_size { 0 }
-        , _block_align { 0 }
-        , _initial_padding { 0 }
-        , _trailing_padding { 0 }
-        , _seek_preroll { 0 } {
+        : Parameters(MediaType::Audio) {
         setName("AudioParameters");
     }
 
-    void AudioParameters::setSampleRate(int64_t sample_rate) {
-        _sample_rate = sample_rate;
+    void AudioParameters::setSampleRate(int sample_rate) {
+        raw().sample_rate = sample_rate;
     }
 
     void AudioParameters::setSampleFormat(AVSampleFormat sample_format) {
@@ -39,39 +30,39 @@ namespace fpp {
                 + codecName()
             };
         }
-        _sample_format = sample_format;
+        raw().format = int(sample_format);
     }
 
     void AudioParameters::setChannelLayout(uint64_t channel_layout) {
-        _channel_layout = channel_layout;
+        raw().channel_layout = channel_layout;
     }
 
-    void AudioParameters::setChannels(int64_t channels) {
-        _channels = channels;
+    void AudioParameters::setChannels(int channels) {
+        raw().channels = channels;
     }
 
-    void AudioParameters::setFrameSize(int64_t value) {
-        _frame_size = value;
+    void AudioParameters::setFrameSize(int frame_size) {
+        raw().frame_size = frame_size;
     }
 
-    int64_t AudioParameters::sampleRate() const {
-        return _sample_rate;
+    int AudioParameters::sampleRate() const {
+        return raw().sample_rate;
     }
 
     AVSampleFormat AudioParameters::sampleFormat() const {
-        return _sample_format;
+        return AVSampleFormat(raw().format);
     }
 
     uint64_t AudioParameters::channelLayout() const {
-        return _channel_layout;
+        return raw().channel_layout;
     }
 
-    int64_t AudioParameters::channels() const {
-        return _channels;
+    int AudioParameters::channels() const {
+        return raw().channels;
     }
 
-    int64_t AudioParameters::frameSize() const {
-        return _frame_size;
+    int AudioParameters::frameSize() const {
+        return raw().frame_size;
     }
 
     std::string AudioParameters::toString() const {
@@ -112,46 +103,6 @@ namespace fpp {
         const auto this_sound_quality { sampleRate() * channels() };
         const auto other_sound_quality { other_audio->sampleRate() * other_audio->channels() };
         return this_sound_quality > other_sound_quality;
-    }
-
-    void AudioParameters::initCodecContext(AVCodecContext* codec_context) const {
-        Parameters::initCodecContext(codec_context);
-        codec_context->sample_fmt       = sampleFormat();
-        codec_context->channel_layout   = channelLayout();
-        codec_context->channels         = int(channels());
-        codec_context->sample_rate      = int(sampleRate());
-        codec_context->block_align      = int(_block_align);
-        codec_context->frame_size       = int(frameSize());
-        codec_context->delay            =
-        codec_context->initial_padding  = int(_initial_padding);
-        codec_context->trailing_padding = int(_trailing_padding);
-        codec_context->seek_preroll     = int(_seek_preroll);
-    }
-
-    void AudioParameters::parseCodecContext(const AVCodecContext* codec_context) {
-        Parameters::parseCodecContext(codec_context);
-        setSampleFormat(codec_context->sample_fmt);
-        setChannelLayout(codec_context->channel_layout);
-        setChannels(codec_context->channels);
-        setSampleRate(codec_context->sample_rate);
-        setFrameSize(codec_context->frame_size);
-        _block_align      = codec_context->block_align;
-        _initial_padding  = codec_context->initial_padding;
-        _trailing_padding = codec_context->trailing_padding;
-        _seek_preroll     = codec_context->seek_preroll;
-    }
-
-    void AudioParameters::initCodecpar(AVCodecParameters* codecpar) const {
-        Parameters::initCodecpar(codecpar);
-        codecpar->format           = sampleFormat();
-        codecpar->channel_layout   = channelLayout();
-        codecpar->channels         = int(channels());
-        codecpar->sample_rate      = int(sampleRate());
-        codecpar->block_align      = int(_block_align);
-        codecpar->frame_size       = int(frameSize());
-        codecpar->initial_padding  = int(_initial_padding);
-        codecpar->trailing_padding = int(_trailing_padding);
-        codecpar->seek_preroll     = int(_seek_preroll);
     }
 
 } // namespace fpp

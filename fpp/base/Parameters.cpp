@@ -1,4 +1,5 @@
 #include "Parameters.hpp"
+#include <fpp/core/FFmpegException.hpp>
 #include <fpp/core/Utils.hpp>
 #include <fpp/core/Logger.hpp>
 
@@ -14,16 +15,11 @@ namespace fpp {
     Parameters::Parameters(MediaType type)
         : MediaData(type)
         , _codec { nullptr }
-        , _codec_tag { 0 }
-        , _bitrate { 0 }
         , _duration { 0 }
         , _stream_index { INVALID_INT }
-        , _time_base { DEFAULT_RATIONAL }
-        , _bits_per_coded_sample { 0 }
-        , _bits_per_raw_sample { 0 }
-        , _profile { 0 }
-        , _level { 0 } {
+        , _time_base { DEFAULT_RATIONAL } {
         setName("Parameters");
+        reset();
     }
 
     void Parameters::setDecoder(AVCodecID codec_id) {
@@ -47,7 +43,7 @@ namespace fpp {
     }
 
     void Parameters::setBitrate(int64_t bitrate) {
-        _bitrate = bitrate;
+        raw().bit_rate = bitrate;
     }
 
     void Parameters::setDuration(int64_t duration) {
@@ -66,11 +62,20 @@ namespace fpp {
     }
 
     void Parameters::setExtradata(Extradata extradata) {
-        _extradata = extradata;
+        ::av_freep(&raw().extradata);
+        const auto& [data,data_size] { extradata };
+        raw().extradata = reinterpret_cast<uint8_t*>(
+            ::av_mallocz(data_size + AV_INPUT_BUFFER_PADDING_SIZE)
+        );
+        if (!raw().extradata) {
+            throw std::bad_alloc {};
+        }
+        ::memcpy(raw().extradata, data, data_size);
+        raw().extradata_size = int(data_size);
     }
 
     AVCodecID Parameters::codecId() const {
-        return not_inited_ptr(_codec) ? DEFAULT_CODEC_ID : _codec->id;
+        return raw().codec_id;
     }
 
     std::string Parameters::codecName() const {
@@ -85,7 +90,7 @@ namespace fpp {
     }
 
     int64_t Parameters::bitrate() const {
-        return _bitrate;
+        return raw().bit_rate;
     }
 
     int64_t Parameters::duration() const {
@@ -101,7 +106,7 @@ namespace fpp {
     }
 
     Extradata Parameters::extradata() const {
-        return _extradata;
+        return { raw().extradata, raw().extradata_size };
     }
 
     std::string Parameters::codecType() const {
@@ -128,85 +133,78 @@ namespace fpp {
     }
 
     void Parameters::parseStream(const AVStream* avstream) {
-        setDecoder(avstream->codecpar->codec_id);
-        setBitrate(avstream->codecpar->bit_rate);
+        parseCodecpar(avstream->codecpar);
+        setDecoder(codecId());
         setDuration(avstream->duration);
         setStreamIndex(avstream->index);
         setTimeBase(avstream->time_base);
     }
 
     void Parameters::initCodecpar(AVCodecParameters* codecpar) const {
-        codecpar->codec_type = codec()->type;
-        codecpar->codec_id   = codecId();
-        codecpar->codec_tag  = _codec_tag;
-        codecpar->bits_per_coded_sample = int(_bits_per_coded_sample);
-        codecpar->bits_per_raw_sample   = int(_bits_per_raw_sample);
-
-        codecpar->bit_rate = bitrate();
-        codecpar->profile  = _profile;
-        codecpar->level    = _level;
-
-        if (!_extradata.empty()) {
-            ::av_freep(&codecpar->extradata);
-            const auto extradata_size {
-                size_t (_extradata.size())
+        if (const auto ret {
+            ::avcodec_parameters_copy(codecpar, ptr())
+        }; ret < 0) {
+            throw FFmpegException {
+                __FUNCTION__ ", avcodec_parameters_copy() failed"
+                , ret
             };
-            codecpar->extradata
-                = reinterpret_cast<uint8_t*>(::av_mallocz(extradata_size + AV_INPUT_BUFFER_PADDING_SIZE));
-            if (!codecpar->extradata) {
-                throw std::bad_alloc {};
-            }
-            ::memcpy(codecpar->extradata, _extradata.data(), extradata_size);
-            codecpar->extradata_size = int(extradata_size);
+        }
+    }
+
+    void Parameters::parseCodecpar(AVCodecParameters* codecpar) {
+        if (const auto ret {
+            ::avcodec_parameters_copy(ptr(), codecpar)
+        }; ret < 0) {
+            throw FFmpegException {
+                __FUNCTION__ ", avcodec_parameters_copy() failed"
+                , ret
+            };
         }
     }
 
     void Parameters::initCodecContext(AVCodecContext* codec_context) const {
-        codec_context->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
-
-        codec_context->codec_type = codec()->type;
-        codec_context->codec_id   = codecId();
-        codec_context->codec_tag  = _codec_tag;
-        codec_context->time_base  = timeBase();
-        codec_context->bits_per_coded_sample = int(_bits_per_coded_sample);
-        codec_context->bits_per_raw_sample   = int(_bits_per_raw_sample);
-
-        codec_context->bit_rate = bitrate();
-        codec_context->profile  = _profile;
-        codec_context->level    = _level;
-
-        if (!_extradata.empty()) {
-            ::av_freep(&codec_context->extradata);
-            const auto extradata_size {
-                size_t (_extradata.size())
+        if (const auto ret {
+            ::avcodec_parameters_to_context(codec_context, ptr())
+        }; ret < 0) {
+            throw FFmpegException {
+                __FUNCTION__ ", avcodec_parameters_to_context() failed"
+                , ret
             };
-            codec_context->extradata
-                = reinterpret_cast<uint8_t*>(::av_mallocz(extradata_size + AV_INPUT_BUFFER_PADDING_SIZE));
-            if (!codec_context->extradata) {
-                throw std::bad_alloc {};
-            }
-            ::memcpy(codec_context->extradata, _extradata.data(), extradata_size);
-            codec_context->extradata_size = int(extradata_size);
         }
+
+        codec_context->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
     }
 
     void Parameters::parseCodecContext(const AVCodecContext* codec_context) {
-        codec()->type = codec_context->codec_type;
-        _codec_id   = codec_context->codec_id;
-        _codec_tag  = codec_context->codec_tag;
+        if (const auto ret {
+            ::avcodec_parameters_from_context(ptr(), codec_context)
+        }; ret < 0) {
+            throw FFmpegException {
+                __FUNCTION__ ", avcodec_parameters_from_context() failed"
+                , ret
+            };
+        }
+    }
 
-        setBitrate(codec_context->bit_rate);
-        _bits_per_coded_sample = codec_context->bits_per_coded_sample;
-        _bits_per_raw_sample   = codec_context->bits_per_raw_sample;
-        _profile               = codec_context->profile;
-        _level                 = codec_context->level;
+    void Parameters::reset() {
+        if (raw().extradata) {
+            ::av_freep(raw().extradata);
+        }
 
-        if (codec_context->extradata) {
-            setExtradata({
-                codec_context->extradata
-                , codec_context->extradata + codec_context->extradata_size
-            });
-       }
+        ::memset(ptr(), 0, sizeof(raw()));
+
+        raw().codec_type          = AVMEDIA_TYPE_UNKNOWN;
+        raw().codec_id            = AV_CODEC_ID_NONE;
+        raw().format              = -1;
+        raw().field_order         = AV_FIELD_UNKNOWN;
+        raw().color_range         = AVCOL_RANGE_UNSPECIFIED;
+        raw().color_primaries     = AVCOL_PRI_UNSPECIFIED;
+        raw().color_trc           = AVCOL_TRC_UNSPECIFIED;
+        raw().color_space         = AVCOL_SPC_UNSPECIFIED;
+        raw().chroma_location     = AVCHROMA_LOC_UNSPECIFIED;
+        raw().sample_aspect_ratio = AVRational { 0, 1 };
+        raw().profile             = FF_PROFILE_UNKNOWN;
+        raw().level               = FF_LEVEL_UNKNOWN;
     }
 
     bool Parameters::betterThen(const SharedParameters& other) {

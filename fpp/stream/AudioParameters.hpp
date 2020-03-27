@@ -11,19 +11,18 @@ namespace fpp {
     public:
 
         AudioParameters();
-        virtual ~AudioParameters() override = default;
 
-        void                setSampleRate(int64_t sample_rate);
+        void                setSampleRate(int sample_rate);
         void                setSampleFormat(AVSampleFormat sample_format);
         void                setChannelLayout(uint64_t channels_layout);
-        void                setChannels(int64_t channels);
-        void                setFrameSize(int64_t value);
+        void                setChannels(int channels);
+        void                setFrameSize(int frame_size);
 
-        int64_t             sampleRate()    const;
+        int                 sampleRate()    const;
         AVSampleFormat      sampleFormat()  const;
         uint64_t            channelLayout() const;
-        int64_t             channels()      const;
-        int64_t             frameSize()     const;
+        int                 channels()      const;
+        int                 frameSize()     const;
 
         std::string         toString() const override;
 
@@ -31,27 +30,9 @@ namespace fpp {
         virtual void        parseStream(const AVStream* avstream)       override;
         virtual bool        betterThen(const SharedParameters& other)   override;
 
-        virtual void        initCodecContext(AVCodecContext* codec_context) const override;
-        virtual void        parseCodecContext(const AVCodecContext* codec_context) override;
-
-        virtual void        initCodecpar(AVCodecParameters* codecpar) const override;
-
         static SharedAudioParameters make_shared() {
             return std::make_shared<AudioParameters>();
         }
-
-    private:
-
-        int64_t             _sample_rate;
-        AVSampleFormat      _sample_format;
-        uint64_t            _channel_layout;
-        int64_t             _channels;
-        int64_t             _frame_size;
-
-        int64_t             _block_align;
-        int64_t             _initial_padding;
-        int64_t             _trailing_padding;
-        int64_t             _seek_preroll;
 
     };
 

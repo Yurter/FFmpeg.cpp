@@ -1,11 +1,12 @@
 #pragma once
-#include <fpp/core/wrap/SharedFFmpegObject.hpp>
+#include <fpp/core/wrap/FFmpegObject.hpp>
 #include <fpp/base/MediaData.hpp>
 #include <vector>
 
 #define DEFAULT_TIME_BASE AVRational { 1, 1000 }
 
 struct AVStream;
+struct AVCodecParams;
 
 extern "C" {
     #include <libavcodec/avcodec.h>
@@ -16,9 +17,9 @@ namespace fpp {
     class Parameters;
     using SharedParameters = std::shared_ptr<Parameters>;
     using IOParams = struct { SharedParameters in; SharedParameters out; };
-    using Extradata = std::vector<uint8_t>;
+    using Extradata = std::pair<uint8_t*,size_t>;
 
-    class Parameters : public Object, public MediaData {
+    class Parameters : public FFmpegObject<AVCodecParameters>, public MediaData {
 
     public:
 
@@ -54,29 +55,22 @@ namespace fpp {
 
         virtual void        parseStream(const AVStream* avstream);
 
-        virtual void        initCodecpar(AVCodecParameters* codecpar) const;
-        virtual void        initCodecContext(AVCodecContext* codec_context) const;
-        virtual void        parseCodecContext(const AVCodecContext* codec_context);
+        void                initCodecpar(AVCodecParameters* codecpar) const;
+        void                parseCodecpar(AVCodecParameters* codecpar);
+        void                initCodecContext(AVCodecContext* codec_context) const;
+        void                parseCodecContext(const AVCodecContext* codec_context);
 
     private:
 
+        void                reset();
         void                setCodec(AVCodec* codec);
 
     private:
 
         AVCodec*            _codec;
-        AVCodecID           _codec_id;
-        unsigned            _codec_tag;
-        int64_t             _bitrate;
         int64_t             _duration;
         uid_t               _stream_index;
         AVRational          _time_base;
-        Extradata           _extradata;
-
-        int64_t             _bits_per_coded_sample;
-        int64_t             _bits_per_raw_sample;
-        int                 _profile;
-        int                 _level;
 
     };
 

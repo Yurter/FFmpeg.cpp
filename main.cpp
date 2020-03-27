@@ -551,6 +551,7 @@ void webcam_to_file() {
     out_params->setPixelFormat(AVPixelFormat::AV_PIX_FMT_YUV420P);
     out_params->setGopSize(12);
 
+    std::cout << ">>>> " << video_file.stream(fpp::MediaType::Video)->params->toString() << '\n';
     /* copy source's video stream to sink */
     for (const auto& input_stream : webcam.streams()) {
         if (input_stream->isVideo()) {
@@ -565,6 +566,7 @@ void webcam_to_file() {
     fpp::DecoderContext video_decoder {
         webcam.stream(fpp::MediaType::Video)->params
     };
+    std::cout << ">>>> " << video_file.stream(fpp::MediaType::Video)->params->toString() << '\n';
 
     /* create encoder's options */
     fpp::Options video_options {
@@ -576,6 +578,7 @@ void webcam_to_file() {
         , { "tune",         "zerolatency" }
     };
 
+    std::cout << ">>>> " << video_file.stream(fpp::MediaType::Video)->params->toString() << '\n';
     /* create encoders */
     fpp::EncoderContext video_encoder {
         video_file.stream(fpp::MediaType::Video)->params, video_options
@@ -631,9 +634,9 @@ auto main() -> int {
 //        youtube_stream();
 //        rtp_video_stream();
 //        rtp_audio_stream();
-        rtp_video_and_audio_stream();
+//        rtp_video_and_audio_stream();
 //        text_on_video();
-//        webcam_to_file();
+        webcam_to_file();
 
     } catch (const fpp::FFmpegException& e) {
         std::cout << "FFmpegException: " << e.what() << "\n";

@@ -1,4 +1,5 @@
 #include "VideoFilterContext.hpp"
+#include <fpp/core/FFmpegException.hpp>
 #include <fpp/core/Logger.hpp>
 #include <fpp/core/Utils.hpp>
 
