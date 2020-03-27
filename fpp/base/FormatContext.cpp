@@ -32,6 +32,10 @@ namespace fpp {
         return !_opened;
     }
 
+    void FormatContext::flushContextAfterEachPacket(bool value) {
+        raw()->flush_packets = int(value);
+    }
+
     std::string FormatContext::toString() const {
          auto context_info {
             '\n'
