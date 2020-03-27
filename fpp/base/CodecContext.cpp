@@ -38,7 +38,6 @@ namespace fpp {
         }
         log_debug("Opening");
         params->initCodecContext(raw());
-        raw()->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
         Dictionary dictionary { options };
         if (const auto ret {
                 ::avcodec_open2(raw(), codec(), dictionary.get())
@@ -52,7 +51,7 @@ namespace fpp {
             };
         }
         if (params->isEncoder()) {
-            params->parseCodecContext(raw());
+            params->parseCodecContext(raw()); // TODO check why original fps 90'000 27.03
         }
         if (params->isAudio()) { // TODO 16.03
             std::static_pointer_cast<AudioParameters>(params)->setFrameSize(raw()->frame_size);
