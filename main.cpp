@@ -129,7 +129,8 @@ void youtube_stream() {
         "aaaa-bbbb-cccc-dddd"
     };
     fpp::OutputFormatContext youtube {
-        "video.flv"
+        "rtmp://a.rtmp.youtube.com/live2/"
+        + stream_key
     };
 
     /* copy source's streams to sink */
