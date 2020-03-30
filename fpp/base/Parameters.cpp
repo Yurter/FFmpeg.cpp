@@ -182,7 +182,9 @@ namespace fpp {
         }
 
         codec_context->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
-        codec_context->time_base = timeBase();
+//        codec_context->time_base = timeBase();
+//        codec_context->time_base = AVRational { 1, framerate };
+
     }
 
     void Parameters::parseCodecContext(const AVCodecContext* codec_context) {
