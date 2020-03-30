@@ -18,20 +18,23 @@ namespace fpp {
 
     PacketList EncoderContext::encode(const Frame& frame) {
         sendFrame(frame);
-        return receivePackets(frame.timeBase());
+        return receivePackets();
     }
 
     PacketList EncoderContext::flush() {
         log_debug("Flushing");
         sendFlushFrame();
-        return receivePackets({ DEFAULT_TIME_BASE });
+        return receivePackets();
     }
 
     void EncoderContext::sendFrame(const Frame& frame) {
         if (const auto ret {
                 ::avcodec_send_frame(raw(), &frame.raw())
             }; ret != 0) {
-            throw FFmpegException { utils::send_frame_error_to_string(ret), ret };
+            throw FFmpegException {
+                utils::send_frame_error_to_string(ret)
+                , ret
+            };
         }
     }
 
@@ -39,26 +42,30 @@ namespace fpp {
         if (const auto ret {
                 ::avcodec_send_frame(raw(), nullptr)
             }; ret != 0) {
-            throw FFmpegException { utils::send_frame_error_to_string(ret), ret };
+            throw FFmpegException {
+                utils::send_frame_error_to_string(ret)
+                , ret
+            };
         }
     }
 
-    PacketList EncoderContext::receivePackets(AVRational time_base) {
+    PacketList EncoderContext::receivePackets() {
         PacketList encoded_packets;
         auto ret { 0 };
         while (0 == ret) {
             Packet output_packet { params->type() };
-            ret = ::avcodec_receive_packet(raw(), &output_packet.raw());
+            ret = ::avcodec_receive_packet(raw(), output_packet.ptr());
             if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
                 break;
             }
             if (ret < 0) {
                 throw FFmpegException {
-                    utils::receive_packet_error_to_string(ret), ret
+                    utils::receive_packet_error_to_string(ret)
+                    , ret
                 };
             }
             output_packet.setStreamIndex(params->streamIndex());
-            output_packet.setTimeBase(time_base);
+            output_packet.setTimeBase(raw()->time_base);
             encoded_packets.push_back(output_packet);
         }
         return encoded_packets;
