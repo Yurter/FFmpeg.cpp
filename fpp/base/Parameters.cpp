@@ -64,13 +64,15 @@ namespace fpp {
     void Parameters::setExtradata(Extradata extradata) {
         ::av_freep(&raw().extradata);
         const auto& [data,data_size] { extradata };
-        raw().extradata = reinterpret_cast<uint8_t*>(
-            ::av_mallocz(data_size + AV_INPUT_BUFFER_PADDING_SIZE)
-        );
-        if (!raw().extradata) {
-            throw std::bad_alloc {};
+        if (data_size != 0) {
+            raw().extradata = reinterpret_cast<uint8_t*>(
+                ::av_mallocz(data_size + AV_INPUT_BUFFER_PADDING_SIZE)
+            );
+            if (!raw().extradata) {
+                throw std::bad_alloc {};
+            }
+            ::memcpy(raw().extradata, data, data_size);
         }
-        ::memcpy(raw().extradata, data, data_size);
         raw().extradata_size = int(data_size);
     }
 
