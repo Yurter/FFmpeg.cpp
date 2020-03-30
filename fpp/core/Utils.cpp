@@ -425,6 +425,7 @@ namespace fpp {
         const auto params { fpp::VideoParameters::make_shared() };
         params->setEncoder(AVCodecID::AV_CODEC_ID_H264);
         params->setPixelFormat(AVPixelFormat::AV_PIX_FMT_YUV420P);
+        params->setTimeBase(DEFAULT_TIME_BASE);
         params->setGopSize(12);
         return params;
     }
@@ -433,6 +434,7 @@ namespace fpp {
         const auto params { fpp::AudioParameters::make_shared() };
         params->setEncoder(AVCodecID::AV_CODEC_ID_AAC);
         params->setSampleFormat(AV_SAMPLE_FMT_FLTP);
+        params->setTimeBase(DEFAULT_TIME_BASE);
         params->setSampleRate(44'100);
         params->setBitrate(128 * 1024);
         params->setChannelLayout(AV_CH_LAYOUT_STEREO);
