@@ -18,13 +18,13 @@ namespace fpp {
 
     PacketList EncoderContext::encode(const Frame& frame) {
         sendFrame(frame);
-        return receivePackets();
+        return receivePackets(frame.timeBase());
     }
 
     PacketList EncoderContext::flush() {
         log_debug("Flushing");
         sendFlushFrame();
-        return receivePackets();
+        return receivePackets({ DEFAULT_TIME_BASE });
     }
 
     void EncoderContext::sendFrame(const Frame& frame) {
@@ -49,12 +49,12 @@ namespace fpp {
         }
     }
 
-    PacketList EncoderContext::receivePackets() {
+    PacketList EncoderContext::receivePackets(AVRational time_base) {
         PacketList encoded_packets;
         auto ret { 0 };
         while (0 == ret) {
-            Packet output_packet { params->type() };
-            ret = ::avcodec_receive_packet(raw(), output_packet.ptr());
+            Packet packet { params->type() };
+            ret = ::avcodec_receive_packet(raw(), packet.ptr());
             if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
                 break;
             }
@@ -64,9 +64,9 @@ namespace fpp {
                     , ret
                 };
             }
-            output_packet.setStreamIndex(params->streamIndex());
-            output_packet.setTimeBase(raw()->time_base);
-            encoded_packets.push_back(output_packet);
+            packet.setStreamIndex(params->streamIndex());
+            packet.setTimeBase(time_base);
+            encoded_packets.push_back(packet);
         }
         return encoded_packets;
     }
