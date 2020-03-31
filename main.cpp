@@ -10,19 +10,21 @@
 #include <fpp/refi/VideoFilters/DrawText.hpp>
 #include <fpp/core/Utils.hpp>
 
-/* USB video
+/*
+
+======================== USB video ========================
+
     video=HP Wide Vision FHD Camera
     video=HP Wide Vision HD
     video=Webcam C170
     video=USB2.0 PC CAMERA
     video=KVYcam Video Driver
-*/
 
-/* USB audio
+======================== USB audio ========================
+
     audio=Набор микрофонов (Realtek High Definition Audio)
-*/
 
-/* RTSP
+========================== RTSP ===========================
 
 private:
 
@@ -32,30 +34,32 @@ private:
 
 public:
 
-    rtsp://80.26.155.227/live/ch00_0
-    rtsp://195.46.114.132/live/ch00_0
-    rtsp://87.197.138.187/live/ch00_0 (shop)
+    (!)Check channels ch01_0, ch02_0 and ch03_0
+    for lower quality but lower latency
+
+    rtsp://80.26.155.227/live/ch00_0    (food store)
+    rtsp://195.46.114.132/live/ch00_0   (building)
+    rtsp://87.197.138.187/live/ch00_0   (sports nutrition store (with audio))
+    rtsp://213.129.131.54/live/ch00_0   (parking place)
+    rtsp://90.80.246.160/live/ch00_0    (lobby)
+    rtsp://186.38.89.5/live/ch00_0      (tree)
+    rtsp://82.79.117.37/live/ch00_0     (auto parts store)
+    rtsp://75.147.239.197/live/ch00_0   (street)
+    rtsp://109.183.182.53/live/ch00_0   (yard)
+    rtsp://205.120.142.79/live/ch00_0   (server room)
+    rtsp://79.101.6.26/live/ch00_0      (tennis tables)
+    rtsp://186.1.213.236/live/ch00_0    (street)
+    rtsp://185.41.129.79/live/ch00_0    (aquapark)
+    rtsp://109.70.190.112/live/ch00_0   (street)
+    rtsp://109.73.212.169/live/ch00_0   (turtles)
+    rtsp://91.197.91.139/live/ch00_0    (park)
+    rtsp://82.150.185.64/live/ch00_0    (field)
+    rtsp://80.76.108.241/live/ch00_0    (yard)
+    rtsp://193.124.147.207/live/ch00_0  (tree)
     rtsp://163.47.188.104/live/ch00_0
     rtsp://98.163.61.242/live/ch00_0
-    rtsp://213.129.131.54/live/ch00_0
-    rtsp://90.80.246.160/live/ch00_0 (прихожая кресла)
-    rtsp://186.38.89.5/live/ch00_0
     rtsp://98.163.61.243/live/ch00_0
-    rtsp://82.79.117.37/live/ch00_0
-    rtsp://75.147.239.197/live/ch00_0
-    rtsp://109.183.182.53/live/ch00_0
-    rtsp://205.120.142.79/live/ch00_0
-    rtsp://79.101.6.26/live/ch00_0    (tennis)
     rtsp://38.130.64.34/live/ch00_0
-    rtsp://186.1.213.236/live/ch00_0
-    rtsp://185.41.129.79/live/ch00_0 (аквапарк)
-    rtsp://217.117.185.129/live/ch00_0
-    rtsp://109.70.190.112/live/ch00_0 (cars man moovs)
-    rtsp://109.73.212.169/live/ch00_0 (черепахи)
-    rtsp://91.197.91.139/live/ch00_0 (двор)
-    rtsp://82.150.185.64/live/ch00_0 (поле)
-    rtsp://80.76.108.241/live/ch00_0 (рашн двор)
-    rtsp://193.124.147.207/live/ch00_0
 
 */
 
@@ -323,8 +327,13 @@ void rtp_video_stream() {
     const std::string ip { "127.0.0.1" };
     const auto rtp_port  { 16700 };
     const auto rtcp_port { rtp_port + 1 };
+//    Important notes:
+//
+//    If rtcpport is not set the RTCP port will be set to the RTP port value plus 1.
+//    If localrtpport (the local RTP port) is not set any available port will be used for the local RTP and RTCP ports.
+//    If localrtcpport (the local RTCP port) is not set it will be set to the local RTP port value plus 1.
     fpp::OutputFormatContext rtp_restreamer {
-        "rtp://" + ip + ":" + std::to_string(rtp_port)
+        "rtp://" + ip + ":" + std::to_string(rtp_port) // TODO add local optional 31.03 (localrtpport, localrtcpport)
             + "?rtcpport=" + std::to_string(rtcp_port)
     };
 
