@@ -3,11 +3,15 @@ CONFIG += console c++17
 CONFIG -= app_bundle
 CONFIG -= qt
 
-#FFmpeg
-#INCLUDEPATH += ../00_ffmpeg/ffmpeg-4.1.3-win64-dev/include
-#LIBS += -L../../00_ffmpeg/ffmpeg-4.1.3-win64-dev/lib
+INCLUDEPATH += ../00_ffmpeg/ffmpeg-4.1.3-win64-dev/include
+LIBS += -L../../00_ffmpeg/ffmpeg-4.1.3-win64-dev/lib
+
+INCLUDEPATH += G:\dev\00_ffmpeg\ffmpeg-4.1.1-win64-dev\include
+LIBS += -LG:\dev\00_ffmpeg\ffmpeg-4.1.1-win64-dev\lib
+
 INCLUDEPATH += D:\dev\00_ffmpeg\ffmpeg-4.1.3-win64-dev\include
 LIBS += -LD:\dev\00_ffmpeg\ffmpeg-4.1.3-win64-dev\lib
+
 LIBS += -lavcodec -lavdevice -lavfilter -lavformat -lavutil
 LIBS += -lpostproc -lswresample -lswscale
 

@@ -139,13 +139,13 @@ namespace fpp {
         return std::to_string(hh) + ':' + std::to_string(mm) + ':' + std::to_string(ss) + '.' + std::to_string(ms);
     }
 
-    std::string utils::channel_layout_to_string(int64_t nb_channels, uint64_t channel_layout) {
+    std::string utils::channel_layout_to_string(int nb_channels, uint64_t channel_layout) {
         if (channel_layout == 0) {
             return "Unknown or unspecified";
         }
         const auto buf_size { 32 };
         char buf[buf_size];
-        ::av_get_channel_layout_string(buf, buf_size, int(nb_channels), channel_layout);
+        ::av_get_channel_layout_string(buf, buf_size, nb_channels, channel_layout);
         return std::string { buf };
     }
 
@@ -155,11 +155,27 @@ namespace fpp {
                 return MediaType::Video;
             case AVMediaType::AVMEDIA_TYPE_AUDIO:
                 return MediaType::Audio;
-            default:
+            default: {
                 throw std::invalid_argument {
-                    "toMediaType failed, bad type "
+                    __FUNCTION__ " failed, bad type "
                     + std::to_string(int(type))
                 };
+            }
+        }
+    }
+
+    AVMediaType utils::from_media_type(MediaType type) {
+        switch (type) {
+            case MediaType::Video:
+                return AVMediaType::AVMEDIA_TYPE_VIDEO;
+            case MediaType::Audio:
+                return AVMediaType::AVMEDIA_TYPE_AUDIO;
+            default: {
+                throw std::invalid_argument {
+                    __FUNCTION__ " failed, bad type "
+                    + std::to_string(int(type))
+                };
+            }
         }
     }
 
@@ -409,6 +425,7 @@ namespace fpp {
         const auto params { fpp::VideoParameters::make_shared() };
         params->setEncoder(AVCodecID::AV_CODEC_ID_H264);
         params->setPixelFormat(AVPixelFormat::AV_PIX_FMT_YUV420P);
+        params->setTimeBase(DEFAULT_TIME_BASE);
         params->setGopSize(12);
         return params;
     }
@@ -417,6 +434,7 @@ namespace fpp {
         const auto params { fpp::AudioParameters::make_shared() };
         params->setEncoder(AVCodecID::AV_CODEC_ID_AAC);
         params->setSampleFormat(AV_SAMPLE_FMT_FLTP);
+        params->setTimeBase(DEFAULT_TIME_BASE);
         params->setSampleRate(44'100);
         params->setBitrate(128 * 1024);
         params->setChannelLayout(AV_CH_LAYOUT_STEREO);

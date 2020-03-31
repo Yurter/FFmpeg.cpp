@@ -9,10 +9,9 @@ extern "C" {
 
 namespace fpp {
 
-    CodecContext::CodecContext(const SharedStream stream)
-        : MediaData(stream->type())
-        , params { stream->params }
-        , _stream { stream }
+    CodecContext::CodecContext(const SharedParameters params)
+        : MediaData(params->type())
+        , params { params }
         , _opened { false } {
         setName("CodecContext");
     }
@@ -38,7 +37,15 @@ namespace fpp {
             throw std::runtime_error { "Codec already opened" };
         }
         log_debug("Opening");
-        initContext();
+//        if (params->isEncoder()) {
+//            params->setExtradata({});
+//        }
+        params->initCodecContext(raw());
+//        if (params->isEncoder()) {
+//            if (params->isVideo()) {
+//                raw()->time_base = ::av_inv_q(std::static_pointer_cast<VideoParameters>(params)->frameRate());
+//            }
+//        }
         Dictionary dictionary { options };
         if (const auto ret {
                 ::avcodec_open2(raw(), codec(), dictionary.get())
@@ -46,22 +53,23 @@ namespace fpp {
             throw FFmpegException {
                 "Cannot open "
                     + utils::to_string(raw()->codec_type) + " "
-                    + _stream->params->codecType() + " "
+                    + params->codecType() + " "
                     + codec()->name
                 , ret
             };
         }
-        if (_stream->params->isEncoder()) {
-            initStreamCodecpar();
-        }
-        if (params->isAudio()) { // TODO 16.03
-            std::static_pointer_cast<AudioParameters>(params)->setFrameSize(raw()->frame_size);
-        }
-        if (params->isVideo()) { // TODO 19.03
-            if (params->isDecoder()) {
-                std::static_pointer_cast<VideoParameters>(params)->setGopSize(raw()->gop_size);
-            }
-        }
+        params->parseCodecContext(raw());
+//        if (params->isEncoder()) {
+//            params->parseCodecContext(raw()); // TODO check why original fps 90'000 27.03
+//        }
+//        if (params->isAudio()) { // TODO 16.03
+//            std::static_pointer_cast<AudioParameters>(params)->setFrameSize(raw()->frame_size);
+//        }
+//        if (params->isVideo()) { // TODO 19.03
+//            if (params->isDecoder()) {
+//                std::static_pointer_cast<VideoParameters>(params)->setGopSize(raw()->gop_size);
+//            }
+//        }
         setOpened(true);
     }
 
@@ -80,7 +88,7 @@ namespace fpp {
         const auto separator { ", " };
         if (isVideo()) {
             return utils::to_string(raw()->codec_type) + " "
-                + _stream->params->codecType() + " " + codec()->name        + separator
+                + params->codecType() + " " + codec()->name                 + separator
                 + "width "         + std::to_string(raw()->width)           + separator
                 + "height "        + std::to_string(raw()->height)          + separator
                 + "coded_width "   + std::to_string(raw()->coded_width)     + separator
@@ -90,7 +98,7 @@ namespace fpp {
         }
         if (isAudio()) {
             return utils::to_string(raw()->codec_type) + " "
-                + _stream->params->codecType() + " " + codec()->name        + separator
+                + params->codecType() + " " + codec()->name                 + separator
                 + "sample_rate "   + std::to_string(raw()->sample_rate)     + separator
                 + "sample_fmt "    + utils::to_string(raw()->sample_fmt)    + separator
                 + "ch_layout "     + utils::channel_layout_to_string(
@@ -118,31 +126,6 @@ namespace fpp {
 
     void CodecContext::setOpened(bool value) {
         _opened = value;
-    }
-
-    void CodecContext::initContext() {
-        if (const auto ret {
-            ::avcodec_parameters_to_context(raw(), _stream->codecpar())
-        }; ret < 0) {
-            throw FFmpegException {
-                "Could not initialize stream codec parameters!"
-                , ret
-            };
-        }
-        // TODO raw()->gop_size 18.03
-        raw()->time_base = params->timeBase();
-        raw()->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
-    }
-
-    void CodecContext::initStreamCodecpar() {
-        if (const auto ret {
-            ::avcodec_parameters_from_context(_stream->codecpar(), raw())
-        }; ret < 0) {
-            throw FFmpegException {
-                "Could not initialize stream codec parameters!"
-                , ret
-            };
-        }
     }
 
 } // namespace fpp

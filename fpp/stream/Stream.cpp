@@ -38,7 +38,7 @@ namespace fpp {
 
         setName("Out" + utils::to_string(type()) + "Stream");
         params = parameters;
-        initCodecpar();
+        params->initCodecpar(codecpar());
         if (invalid_int(params->streamIndex())) {
             params->setStreamIndex(index());
         }
@@ -182,42 +182,9 @@ namespace fpp {
         return raw()->codecpar;
     }
 
-    void Stream::initCodecpar() {
-        codecpar()->codec_id = params->codecId();
-        codecpar()->bit_rate = params->bitrate();
-
-        switch (params->type()) {
-        case MediaType::Video: {
-            const auto video_parameters {
-                std::static_pointer_cast<VideoParameters>(params)
-            };
-            codecpar()->codec_type          = AVMediaType::AVMEDIA_TYPE_VIDEO;
-            codecpar()->width               = int(video_parameters->width());
-            codecpar()->height              = int(video_parameters->height());
-            codecpar()->sample_aspect_ratio = video_parameters->aspectRatio();
-            codecpar()->format              = int(video_parameters->pixelFormat());
-            break;
-        }
-        case MediaType::Audio: {
-            const auto audio_parameters {
-                std::static_pointer_cast<AudioParameters>(params)
-            };
-            codecpar()->codec_type          = AVMediaType::AVMEDIA_TYPE_AUDIO;
-            codecpar()->channel_layout      = audio_parameters->channelLayout();
-            codecpar()->channels            = int(audio_parameters->channels());
-            codecpar()->sample_rate         = int(audio_parameters->sampleRate());
-            codecpar()->format              = int(audio_parameters->sampleFormat());
-            break;
-        }
-        default:
-            throw std::invalid_argument {
-                __FUNCTION__ " failed because of bad param's type"
-            };
-        }
-    }
-
     void Stream::checkStampMonotonicity(Packet& packet) {
         if (_prev_dts == AV_NOPTS_VALUE) {
+            _prev_dts = packet.dts();
             return;
         }
         if (packet.dts() <= _prev_dts) {

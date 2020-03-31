@@ -83,6 +83,7 @@ namespace fpp {
                     , dictionary.get()
                 )
             }; ret < 0) { // TODO ret code explanation 26.03
+            // TODO bug on failure: avformat_open_input free context 31.03
             return false;
         }
         setInputFormat(raw()->iformat);
@@ -114,8 +115,10 @@ namespace fpp {
         const auto short_name {
             utils::guess_format_short_name(mediaResourceLocator())
         };
-        if (std::string { short_name } == "dshow") {
-            utils::device_register_all();
+        if (short_name) {
+            if (std::string { short_name } == "dshow") {
+                utils::device_register_all();
+            }
         }
         setInputFormat(::av_find_input_format(short_name));
     }

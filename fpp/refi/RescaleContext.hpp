@@ -1,6 +1,7 @@
 #pragma once
-#include <fpp/base/Frame.hpp>
+#include <fpp/core/wrap/SharedFFmpegObject.hpp>
 #include <fpp/stream/VideoParameters.hpp>
+#include <fpp/base/Frame.hpp>
 
 extern "C" {
     #include <libswscale/swscale.h>

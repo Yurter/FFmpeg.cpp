@@ -9,7 +9,7 @@ namespace fpp {
 
     public:
 
-        EncoderContext(const SharedStream stream, Options options = Options {});
+        EncoderContext(const SharedParameters params, Options options = Options {});
 
         PacketList          encode(const Frame& frame);
         PacketList          flush();
