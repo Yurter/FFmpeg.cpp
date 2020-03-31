@@ -327,13 +327,9 @@ void rtp_video_stream() {
     const std::string ip { "127.0.0.1" };
     const auto rtp_port  { 16700 };
     const auto rtcp_port { rtp_port + 1 };
-//    Important notes:
-//
-//    If rtcpport is not set the RTCP port will be set to the RTP port value plus 1.
-//    If localrtpport (the local RTP port) is not set any available port will be used for the local RTP and RTCP ports.
-//    If localrtcpport (the local RTCP port) is not set it will be set to the local RTP port value plus 1.
+
     fpp::OutputFormatContext rtp_restreamer {
-        "rtp://" + ip + ":" + std::to_string(rtp_port) // TODO add local optional 31.03 (localrtpport, localrtcpport)
+        "rtp://" + ip + ":" + std::to_string(rtp_port) // TODO add local optional 31.03 (localrtpport, localrtcpport) -> https://www.ffmpeg.org/ffmpeg-protocols.html#rtp
             + "?rtcpport=" + std::to_string(rtcp_port)
     };
 
