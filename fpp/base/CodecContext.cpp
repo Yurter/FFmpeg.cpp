@@ -37,7 +37,15 @@ namespace fpp {
             throw std::runtime_error { "Codec already opened" };
         }
         log_debug("Opening");
+//        if (params->isEncoder()) {
+//            params->setExtradata({});
+//        }
         params->initCodecContext(raw());
+//        if (params->isEncoder()) {
+//            if (params->isVideo()) {
+//                raw()->time_base = ::av_inv_q(std::static_pointer_cast<VideoParameters>(params)->frameRate());
+//            }
+//        }
         Dictionary dictionary { options };
         if (const auto ret {
                 ::avcodec_open2(raw(), codec(), dictionary.get())
@@ -50,17 +58,18 @@ namespace fpp {
                 , ret
             };
         }
-        if (params->isEncoder()) {
-            params->parseCodecContext(raw()); // TODO check why original fps 90'000 27.03
-        }
-        if (params->isAudio()) { // TODO 16.03
-            std::static_pointer_cast<AudioParameters>(params)->setFrameSize(raw()->frame_size);
-        }
-        if (params->isVideo()) { // TODO 19.03
-            if (params->isDecoder()) {
-                std::static_pointer_cast<VideoParameters>(params)->setGopSize(raw()->gop_size);
-            }
-        }
+        params->parseCodecContext(raw());
+//        if (params->isEncoder()) {
+//            params->parseCodecContext(raw()); // TODO check why original fps 90'000 27.03
+//        }
+//        if (params->isAudio()) { // TODO 16.03
+//            std::static_pointer_cast<AudioParameters>(params)->setFrameSize(raw()->frame_size);
+//        }
+//        if (params->isVideo()) { // TODO 19.03
+//            if (params->isDecoder()) {
+//                std::static_pointer_cast<VideoParameters>(params)->setGopSize(raw()->gop_size);
+//            }
+//        }
         setOpened(true);
     }
 

@@ -57,8 +57,8 @@ namespace fpp {
 
         void                initCodecpar(AVCodecParameters* codecpar) const;
         void                parseCodecpar(AVCodecParameters* codecpar);
-        void                initCodecContext(AVCodecContext* codec_context) const;
-        void                parseCodecContext(const AVCodecContext* codec_context);
+        virtual void        initCodecContext(AVCodecContext* codec_context) const;
+        virtual void        parseCodecContext(const AVCodecContext* codec_context);
 
     private:
 

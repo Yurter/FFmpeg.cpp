@@ -136,9 +136,9 @@ namespace fpp {
 
     void Parameters::completeFrom(const SharedParameters other) {
         setExtradata(other->extradata());
-        if (not_inited_codec_id(codecId())) { setEncoder(other->codecId());     }
-        if (not_inited_int(bitrate()))      { setBitrate(other->bitrate());     }
-        if (not_inited_q(timeBase()))       { setTimeBase(other->timeBase());   }
+        if (not_inited_codec_id(codecId())) { setEncoder(other->codecId());   }
+        if (not_inited_int(bitrate()))      { setBitrate(other->bitrate());   }
+        if (not_inited_q(timeBase()))       { setTimeBase(other->timeBase()); }
     }
 
     void Parameters::parseStream(const AVStream* avstream) {

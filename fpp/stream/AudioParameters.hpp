@@ -26,9 +26,9 @@ namespace fpp {
 
         std::string         toString() const override;
 
-        virtual void        completeFrom(const SharedParameters other)  override;
-        virtual void        parseStream(const AVStream* avstream)       override;
-        virtual bool        betterThen(const SharedParameters& other)   override;
+        void                completeFrom(const SharedParameters other) override;
+        void                parseStream(const AVStream* avstream)      override;
+        bool                betterThen(const SharedParameters& other)  override;
 
         static SharedAudioParameters make_shared() {
             return std::make_shared<AudioParameters>();

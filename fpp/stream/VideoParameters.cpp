@@ -110,6 +110,18 @@ namespace fpp {
         setSampleAspectRatio(avstream->codecpar->sample_aspect_ratio);
     }
 
+    void VideoParameters::initCodecContext(AVCodecContext* codec_context) const {
+        Parameters::initCodecContext(codec_context);
+//        if (isEncoder()) {
+            codec_context->time_base = ::av_inv_q(frameRate());
+//        }
+    }
+
+    void VideoParameters::parseCodecContext(const AVCodecContext* codec_context) {
+        Parameters::parseCodecContext(codec_context);
+        setGopSize(codec_context->gop_size);
+    }
+
     bool VideoParameters::betterThen(const SharedParameters& other) {
         const auto other_video { std::static_pointer_cast<VideoParameters>(other) };
         const auto this_picture_size { width() * height() };

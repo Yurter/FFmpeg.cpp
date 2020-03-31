@@ -19,17 +19,19 @@ namespace fpp {
         void                setPixelFormat(AVPixelFormat pixel_format);
         void                setGopSize(int gop_size);
 
-        int                 width()         const;
-        int                 height()        const;
-        int                 gopSize()       const;
-        AVRational          frameRate()     const;
-        AVPixelFormat       pixelFormat()   const;
+        int                 width()             const;
+        int                 height()            const;
+        int                 gopSize()           const;
+        AVRational          frameRate()         const;
+        AVPixelFormat       pixelFormat()       const;
         AVRational          sampleAspectRatio() const;
 
-        virtual std::string toString()      const override;
-        virtual void        completeFrom(const SharedParameters other)  override;
-        virtual bool        betterThen(const SharedParameters& other)   override;
-        virtual void        parseStream(const AVStream* avstream)       override;
+        std::string         toString() const override;
+        void                completeFrom(const SharedParameters other) override;
+        bool                betterThen(const SharedParameters& other)  override;
+        void                parseStream(const AVStream* avstream)      override;
+        void                initCodecContext(AVCodecContext* codec_context) const override;
+        void                parseCodecContext(const AVCodecContext* codec_context) override;
 
         static SharedVideoParameters make_shared() {
             return std::make_shared<VideoParameters>();
