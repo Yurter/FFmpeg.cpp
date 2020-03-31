@@ -17,7 +17,6 @@ namespace fpp {
     protected:
 
         const std::string   _error_message;
-        const int           _ret;
 
     };
 

@@ -10,22 +10,57 @@
 #include <fpp/refi/VideoFilters/DrawText.hpp>
 #include <fpp/core/Utils.hpp>
 
-/* USB video
+/*
+
+======================== USB video ========================
+
     video=HP Wide Vision FHD Camera
     video=HP Wide Vision HD
     video=Webcam C170
     video=USB2.0 PC CAMERA
     video=KVYcam Video Driver
-*/
 
-/* USB audio
+======================== USB audio ========================
+
     audio=Набор микрофонов (Realtek High Definition Audio)
-*/
 
-/* RTSP
+========================== RTSP ===========================
+
+private:
+
     rtsp://admin:admin@192.168.10.189:554/ch01.264
     rtsp://admin:Admin2019@192.168.10.12:554
     rtsp://admin:admin@192.168.10.3:554 (1080p + audio)
+
+public:
+
+    (!)Check channels ch01_0, ch02_0 and ch03_0
+    for lower quality but lower latency
+
+    rtsp://80.26.155.227/live/ch00_0    (food store)
+    rtsp://195.46.114.132/live/ch00_0   (building)
+    rtsp://87.197.138.187/live/ch00_0   (sports nutrition store (with audio))
+    rtsp://213.129.131.54/live/ch00_0   (parking place)
+    rtsp://90.80.246.160/live/ch00_0    (lobby)
+    rtsp://186.38.89.5/live/ch00_0      (tree)
+    rtsp://82.79.117.37/live/ch00_0     (auto parts store)
+    rtsp://75.147.239.197/live/ch00_0   (street)
+    rtsp://109.183.182.53/live/ch00_0   (yard)
+    rtsp://205.120.142.79/live/ch00_0   (server room)
+    rtsp://79.101.6.26/live/ch00_0      (tennis tables)
+    rtsp://186.1.213.236/live/ch00_0    (street)
+    rtsp://185.41.129.79/live/ch00_0    (aquapark)
+    rtsp://109.70.190.112/live/ch00_0   (street)
+    rtsp://109.73.212.169/live/ch00_0   (turtles)
+    rtsp://91.197.91.139/live/ch00_0    (park)
+    rtsp://82.150.185.64/live/ch00_0    (field)
+    rtsp://80.76.108.241/live/ch00_0    (yard)
+    rtsp://193.124.147.207/live/ch00_0  (tree)
+    rtsp://163.47.188.104/live/ch00_0
+    rtsp://98.163.61.242/live/ch00_0
+    rtsp://98.163.61.243/live/ch00_0
+    rtsp://38.130.64.34/live/ch00_0
+
 */
 
 void transmuxing_file() {
@@ -113,10 +148,10 @@ void youtube_stream() {
 
     /* create decoders */
     fpp::DecoderContext video_decoder {
-        source.stream(fpp::MediaType::Video)
+        source.stream(fpp::MediaType::Video)->params
     };
     fpp::DecoderContext audio_decoder {
-        source.stream(fpp::MediaType::Audio)
+        source.stream(fpp::MediaType::Audio)->params
     };
 
     /* create encoder's options */
@@ -135,10 +170,10 @@ void youtube_stream() {
 
     /* create encoders */
     fpp::EncoderContext video_encoder {
-        youtube.stream(fpp::MediaType::Video), video_options
+        youtube.stream(fpp::MediaType::Video)->params, video_options
     };
     fpp::EncoderContext audio_encoder {
-        youtube.stream(fpp::MediaType::Audio), audio_options
+        youtube.stream(fpp::MediaType::Audio)->params, audio_options
     };
 
     /* create resampler */
@@ -292,8 +327,13 @@ void rtp_video_stream() {
     const std::string ip { "127.0.0.1" };
     const auto rtp_port  { 16700 };
     const auto rtcp_port { rtp_port + 1 };
+//    Important notes:
+//
+//    If rtcpport is not set the RTCP port will be set to the RTP port value plus 1.
+//    If localrtpport (the local RTP port) is not set any available port will be used for the local RTP and RTCP ports.
+//    If localrtcpport (the local RTCP port) is not set it will be set to the local RTP port value plus 1.
     fpp::OutputFormatContext rtp_restreamer {
-        "rtp://" + ip + ":" + std::to_string(rtp_port)
+        "rtp://" + ip + ":" + std::to_string(rtp_port) // TODO add local optional 31.03 (localrtpport, localrtcpport)
             + "?rtcpport=" + std::to_string(rtcp_port)
     };
 
@@ -412,7 +452,7 @@ void text_on_video() {
 
     /* create decoder */
     fpp::DecoderContext video_decoder {
-        source.stream(fpp::MediaType::Video)
+        source.stream(fpp::MediaType::Video)->params
     };
 
     /* encoder's options */
@@ -427,7 +467,7 @@ void text_on_video() {
 
     /* create encoder */
     fpp::EncoderContext video_encoder {
-        sink.stream(fpp::MediaType::Video), video_options
+        sink.stream(fpp::MediaType::Video)->params, video_options
     };
 
     const auto drow_text {
@@ -509,24 +549,24 @@ void webcam_to_file() {
     };
 
     /* encode video because of camera's rawvideo codec */
-    const auto params { fpp::VideoParameters::make_shared() };
-    params->setEncoder(AVCodecID::AV_CODEC_ID_H264);
-    params->setPixelFormat(AVPixelFormat::AV_PIX_FMT_YUV420P);
-    params->setGopSize(12);
+    const auto out_params { fpp::VideoParameters::make_shared() };
+    out_params->setEncoder(AVCodecID::AV_CODEC_ID_H264);
+    out_params->setPixelFormat(AVPixelFormat::AV_PIX_FMT_YUV420P);
+    out_params->setGopSize(12);
 
     /* copy source's video stream to sink */
     for (const auto& input_stream : webcam.streams()) {
         if (input_stream->isVideo()) {
             video_file.copyStream( /* with predefined params */
                 input_stream
-                , params
+                , out_params
             );
         }
     }
 
     /* create decoder */
     fpp::DecoderContext video_decoder {
-        webcam.stream(fpp::MediaType::Video)
+        webcam.stream(fpp::MediaType::Video)->params
     };
 
     /* create encoder's options */
@@ -541,7 +581,7 @@ void webcam_to_file() {
 
     /* create encoders */
     fpp::EncoderContext video_encoder {
-        video_file.stream(fpp::MediaType::Video), video_options
+        video_file.stream(fpp::MediaType::Video)->params, video_options
     };
 
     /* create rescaler (because of pixel format mismatch) */

@@ -39,6 +39,7 @@ namespace fpp {
         Code                guessOutputFromat();
         void                writeHeader();
         void                writeTrailer();
+        void                initStreamsCodecpar();
         void                parseStreamsTimeBase();
 
     private:

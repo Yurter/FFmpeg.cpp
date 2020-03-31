@@ -13,25 +13,21 @@ namespace fpp {
 
     VideoParameters::VideoParameters()
         : Parameters(MediaType::Video)
-        , _width { 0 }
-        , _height { 0 }
-        , _aspect_ratio { DEFAULT_RATIONAL }
-        , _frame_rate { DEFAULT_RATIONAL }
-        , _pixel_format { DEFAULT_PIXEL_FORMAT }
-        , _gop_size { 0 } {
+        , _gop_size { 0 }
+        , _frame_rate { DEFAULT_RATIONAL } {
         setName("VideoParameters");
     }
 
-    void VideoParameters::setWidth(int64_t width) {
-        _width = width - (width % 2);
+    void VideoParameters::setWidth(int width) {
+        raw().width = width - (width % 2);
     }
 
-    void VideoParameters::setHeight(int64_t height) {
-        _height = height - (height % 2);
+    void VideoParameters::setHeight(int height) {
+        raw().height = height - (height % 2);
     }
 
-    void VideoParameters::setAspectRatio(AVRational aspect_ratio) {
-        _aspect_ratio = aspect_ratio;
+    void VideoParameters::setSampleAspectRatio(AVRational sample_aspect_ratio) {
+        raw().sample_aspect_ratio = sample_aspect_ratio;
     }
 
     void VideoParameters::setFrameRate(AVRational frame_rate) {
@@ -53,23 +49,19 @@ namespace fpp {
                 + codecName()
             };
         }
-        _pixel_format = pixel_format;
+        raw().format = int(pixel_format);
     }
 
-    void VideoParameters::setGopSize(int64_t gop_size) {
+    void VideoParameters::setGopSize(int gop_size) {
         _gop_size = gop_size;
     }
 
-    int64_t VideoParameters::width() const {
-        return _width;
+    int VideoParameters::width() const {
+        return raw().width;
     }
 
-    int64_t VideoParameters::height() const {
-        return _height;
-    }
-
-    AVRational VideoParameters::aspectRatio() const {
-        return _aspect_ratio;
+    int VideoParameters::height() const {
+        return raw().height;
     }
 
     AVRational VideoParameters::frameRate() const {
@@ -77,10 +69,14 @@ namespace fpp {
     }
 
     AVPixelFormat VideoParameters::pixelFormat() const {
-        return _pixel_format;
+        return AVPixelFormat(raw().format);
     }
 
-    int64_t VideoParameters::gopSize() const {
+    AVRational VideoParameters::sampleAspectRatio() const {
+        return raw().sample_aspect_ratio;
+    }
+
+    int VideoParameters::gopSize() const {
         return _gop_size;
     }
 
@@ -94,31 +90,36 @@ namespace fpp {
 
     void VideoParameters::completeFrom(const SharedParameters other) {
         Parameters::completeFrom(other);
-        const auto other_video_parames { std::static_pointer_cast<VideoParameters>(other) };
+        const auto other_video_parames {
+            std::static_pointer_cast<VideoParameters>(other)
+        };
         if (not_inited_int(width()))            { setWidth(other_video_parames->width());               }
         if (not_inited_int(height()))           { setHeight(other_video_parames->height());             }
-        if (not_inited_q(aspectRatio()))        { setAspectRatio(other_video_parames->aspectRatio());   }
         if (not_inited_q(frameRate()))          { setFrameRate(other_video_parames->frameRate());       }
         if (not_inited_pix_fmt(pixelFormat()))  { setPixelFormat(other_video_parames->pixelFormat());   }
         if (not_inited_int(gopSize()))          { setGopSize(other_video_parames->gopSize());           }
+        if (not_inited_q(sampleAspectRatio()))  { setSampleAspectRatio(other_video_parames->sampleAspectRatio()); }
     }
 
     void VideoParameters::parseStream(const AVStream* avstream) {
         Parameters::parseStream(avstream);
         setWidth(avstream->codecpar->width);
         setHeight(avstream->codecpar->height);
-        setAspectRatio(avstream->codecpar->sample_aspect_ratio);
         setFrameRate(avstream->avg_frame_rate);
         setPixelFormat(AVPixelFormat(avstream->codecpar->format));
+        setSampleAspectRatio(avstream->codecpar->sample_aspect_ratio);
     }
 
-    void VideoParameters::initStream(AVStream* avstream) const {
-        Parameters::initStream(avstream);
-        avstream->codecpar->width   = int(width());
-        avstream->codecpar->height  = int(height());
-        avstream->codecpar->format  = pixelFormat();
-        avstream->avg_frame_rate    = frameRate();
-        avstream->codecpar->sample_aspect_ratio = aspectRatio();
+    void VideoParameters::initCodecContext(AVCodecContext* codec_context) const {
+        Parameters::initCodecContext(codec_context);
+//        if (isEncoder()) {
+            codec_context->time_base = ::av_inv_q(frameRate());
+//        }
+    }
+
+    void VideoParameters::parseCodecContext(const AVCodecContext* codec_context) {
+        Parameters::parseCodecContext(codec_context);
+        setGopSize(codec_context->gop_size);
     }
 
     bool VideoParameters::betterThen(const SharedParameters& other) {

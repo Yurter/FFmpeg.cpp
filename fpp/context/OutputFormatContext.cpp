@@ -101,8 +101,11 @@ namespace fpp {
 
     bool OutputFormatContext::openContext(Options options) { // TODO avio_open2 24.03
         if (streamNumber() == 0) {
-            throw std::logic_error { "Can't open context without streams" };
+            throw std::logic_error {
+                "Can't open context without streams"
+            };
         }
+        initStreamsCodecpar();
         if (!(raw()->flags & AVFMT_NOFILE)) {
             if (const auto ret {
                     ::avio_open(
@@ -136,26 +139,23 @@ namespace fpp {
 
     SharedStream OutputFormatContext::copyStream(const SharedStream other, SharedParameters output_params) {
         const auto input_params { other->params };
-        const auto full_stream_copy { !output_params };
-        if (full_stream_copy) {
+        if (!output_params) {
             output_params = utils::make_params(input_params->type());
         }
         output_params->completeFrom(input_params);
         const auto created_stream {
             createStream(output_params)
         };
-        if (full_stream_copy) {
-            if (const auto ret {
-                ::avcodec_parameters_copy(
-                    created_stream->codecpar() /* dst */
-                    , other->codecpar()        /* src */
-                )
-            }; ret < 0) {
-                throw FFmpegException {
-                    "Could not copy stream codec parameters!"
-                    , ret
-                };
-            }
+        if (const auto ret {
+            ::avcodec_parameters_copy(
+                created_stream->codecpar() /* dst */
+                , other->codecpar()        /* src */
+            )
+        }; ret < 0) {
+            throw FFmpegException {
+                "Could not copy stream codec parameters!"
+                , ret
+            };
         }
         return created_stream;
     }
@@ -189,6 +189,12 @@ namespace fpp {
                 "Failed to write stream trailer to " + mediaResourceLocator()
                 , ret
             };
+        }
+    }
+
+    void OutputFormatContext::initStreamsCodecpar() {
+        for (const auto& stream : streams()) {
+            stream->params->initCodecpar(stream->codecpar());
         }
     }
 

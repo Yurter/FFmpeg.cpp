@@ -14,17 +14,12 @@ extern "C" {
 namespace fpp {
 
     AudioParameters::AudioParameters()
-        : Parameters(MediaType::Audio)
-        , _sample_rate { 0 }
-        , _sample_format { DEFAULT_SAMPLE_FORMAT }
-        , _channel_layout { DEFAULT_CHANEL_LAYOUT }
-        , _channels { 0 }
-        , _frame_size { 0 } {
+        : Parameters(MediaType::Audio) {
         setName("AudioParameters");
     }
 
-    void AudioParameters::setSampleRate(int64_t sample_rate) {
-        _sample_rate = sample_rate;
+    void AudioParameters::setSampleRate(int sample_rate) {
+        raw().sample_rate = sample_rate;
     }
 
     void AudioParameters::setSampleFormat(AVSampleFormat sample_format) {
@@ -35,39 +30,39 @@ namespace fpp {
                 + codecName()
             };
         }
-        _sample_format = sample_format;
+        raw().format = int(sample_format);
     }
 
     void AudioParameters::setChannelLayout(uint64_t channel_layout) {
-        _channel_layout = channel_layout;
+        raw().channel_layout = channel_layout;
     }
 
-    void AudioParameters::setChannels(int64_t channels) {
-        _channels = channels;
+    void AudioParameters::setChannels(int channels) {
+        raw().channels = channels;
     }
 
-    void AudioParameters::setFrameSize(int64_t value) {
-        _frame_size = value;
+    void AudioParameters::setFrameSize(int frame_size) {
+        raw().frame_size = frame_size;
     }
 
-    int64_t AudioParameters::sampleRate() const {
-        return _sample_rate;
+    int AudioParameters::sampleRate() const {
+        return raw().sample_rate;
     }
 
     AVSampleFormat AudioParameters::sampleFormat() const {
-        return _sample_format;
+        return AVSampleFormat(raw().format);
     }
 
     uint64_t AudioParameters::channelLayout() const {
-        return _channel_layout;
+        return raw().channel_layout;
     }
 
-    int64_t AudioParameters::channels() const {
-        return _channels;
+    int AudioParameters::channels() const {
+        return raw().channels;
     }
 
-    int64_t AudioParameters::frameSize() const {
-        return _frame_size;
+    int AudioParameters::frameSize() const {
+        return raw().frame_size;
     }
 
     std::string AudioParameters::toString() const {
@@ -80,7 +75,9 @@ namespace fpp {
 
     void AudioParameters::completeFrom(const SharedParameters other) {
         Parameters::completeFrom(other);
-        const auto other_audio { std::static_pointer_cast<AudioParameters>(other) };
+        const auto other_audio {
+            std::static_pointer_cast<AudioParameters>(other)
+        };
         if (not_inited_int(sampleRate()))           { setSampleRate(other_audio->sampleRate());         }
         if (not_inited_smp_fmt(sampleFormat()))     { setSampleFormat(other_audio->sampleFormat());     }
         if (not_inited_ch_layout(channelLayout()))  { setChannelLayout(other_audio->channelLayout());   }

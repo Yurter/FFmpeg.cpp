@@ -27,6 +27,8 @@ namespace fpp {
         bool                opened() const;
         bool                closed() const;
 
+        void                flushContextAfterEachPacket(bool value);
+
         SharedStream        stream(int64_t index);
         SharedStream        stream(MediaType stream_type);
         int64_t             streamNumber() const;
