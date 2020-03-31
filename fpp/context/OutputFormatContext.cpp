@@ -105,7 +105,7 @@ namespace fpp {
                 "Can't open context without streams"
             };
         }
-        initStreamsCodecpar(); // TODO check it 27.03
+        initStreamsCodecpar();
         if (!(raw()->flags & AVFMT_NOFILE)) {
             if (const auto ret {
                     ::avio_open(
@@ -139,26 +139,23 @@ namespace fpp {
 
     SharedStream OutputFormatContext::copyStream(const SharedStream other, SharedParameters output_params) {
         const auto input_params { other->params };
-        const auto full_stream_copy { !output_params };
-        if (full_stream_copy) {
+        if (!output_params) {
             output_params = utils::make_params(input_params->type());
         }
         output_params->completeFrom(input_params);
         const auto created_stream {
             createStream(output_params)
         };
-        if (full_stream_copy) { // TODO this code + initStreamsCodecpar() 27.03
-            if (const auto ret {
-                ::avcodec_parameters_copy(
-                    created_stream->codecpar() /* dst */
-                    , other->codecpar()        /* src */
-                )
-            }; ret < 0) {
-                throw FFmpegException {
-                    "Could not copy stream codec parameters!"
-                    , ret
-                };
-            }
+        if (const auto ret {
+            ::avcodec_parameters_copy(
+                created_stream->codecpar() /* dst */
+                , other->codecpar()        /* src */
+            )
+        }; ret < 0) {
+            throw FFmpegException {
+                "Could not copy stream codec parameters!"
+                , ret
+            };
         }
         return created_stream;
     }

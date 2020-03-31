@@ -83,6 +83,7 @@ namespace fpp {
                     , dictionary.get()
                 )
             }; ret < 0) { // TODO ret code explanation 26.03
+            // TODO bug on failure: avformat_open_input free context 31.03
             return false;
         }
         setInputFormat(raw()->iformat);
