@@ -89,24 +89,24 @@ namespace fpp {
     int FormatContext::interrupt_callback(void* opaque) {
         const auto interrupter { reinterpret_cast<const Interrupter*>(opaque) };
         switch (interrupter->interrupted_process) {
-        case InterruptedProcess::None:
-            return 0;
-        case InterruptedProcess::Opening: {
-            const int64_t opening_timeout_ms = 10'000;
-            if (interrupter->chronometer.elapsed_milliseconds() > opening_timeout_ms) {
-                static_log_error("interrupt_callback", "Opening timed out: " << opening_timeout_ms);
-                return 1;
+            case InterruptedProcess::None:
+                return 0;
+            case InterruptedProcess::Opening: {
+                const int64_t opening_timeout_ms { 20'000 }; // TODO make changeable or use option 'timeout' 01.04
+                if (interrupter->chronometer.elapsed_milliseconds() > opening_timeout_ms) {
+                    static_log_error("interrupt_callback", "Opening timed out: " << opening_timeout_ms);
+                    return 1;
+                }
+                return 0;
             }
-            return 0;
+            #define NOT_IMPLEMENTED_MSG(x) static_log_error("interrupt_callback", #x" is not implemeted");
+            case InterruptedProcess::Closing:
+                NOT_IMPLEMENTED_MSG(InterruptedProcess::Closing);
+            case InterruptedProcess::Reading:
+                NOT_IMPLEMENTED_MSG(InterruptedProcess::Reading);
+            case InterruptedProcess::Writing:
+                NOT_IMPLEMENTED_MSG(InterruptedProcess::Writing);
         }
-        case InterruptedProcess::Closing:
-            throw std::runtime_error { "InterruptedProcess::Closing is not implemeted" };
-        case InterruptedProcess::Reading:
-            throw std::runtime_error { "InterruptedProcess::Reading is not implemeted" };
-        case InterruptedProcess::Writing:
-            throw std::runtime_error { "InterruptedProcess::Writing is not implemeted" };
-        }
-        throw std::invalid_argument { "Bad InterruptedProcess arg" };
     }
 
     void FormatContext::closeContext() {
