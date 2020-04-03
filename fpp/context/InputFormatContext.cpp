@@ -74,7 +74,7 @@ namespace fpp {
     bool InputFormatContext::openContext(Options options) {
         guessInputFromat();
         Dictionary dictionary { options };
-        auto fmt_ctx { raw() }; // TODO 23.03
+        AVFormatContext* fmt_ctx { nullptr };
         if (const auto ret {
                 ::avformat_open_input(
                     &fmt_ctx
@@ -83,9 +83,12 @@ namespace fpp {
                     , dictionary.get()
                 )
             }; ret < 0) { // TODO ret code explanation 26.03
-            // TODO bug on failure: avformat_open_input free context 31.03
             return false;
         }
+        reset(std::shared_ptr<AVFormatContext> {
+            fmt_ctx
+            , [](auto* ctx) { ::avformat_free_context(ctx); }
+        });
         setInputFormat(raw()->iformat);
         if (const auto ret {
                 ::avformat_find_stream_info(raw(), nullptr)
