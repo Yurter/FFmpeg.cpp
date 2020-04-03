@@ -115,6 +115,7 @@ namespace fpp {
 //        if (isEncoder()) {
             codec_context->time_base = ::av_inv_q(frameRate());
 //        }
+        codec_context->gop_size = gopSize();
     }
 
     void VideoParameters::parseCodecContext(const AVCodecContext* codec_context) {
