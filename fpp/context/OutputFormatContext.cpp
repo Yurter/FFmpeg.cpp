@@ -26,14 +26,20 @@ namespace fpp {
             if (const auto ret {
                     ::av_write_frame(raw(), packet.ptr())
                 }; ret < 0) {
-                throw FFmpegException { "av_write_frame failed", ret };
+                throw FFmpegException {
+                    "av_write_frame failed"
+                    , ret
+                };
             }
         }
         else if (write_mode == WriteMode::Interleaved) {
             if (const auto ret {
                     ::av_interleaved_write_frame(raw(), packet.ptr())
                 }; ret < 0) {
-                throw FFmpegException { "av_interleaved_write_frame failed", ret };
+                throw FFmpegException {
+                    "av_interleaved_write_frame failed"
+                    , ret
+                };
             }
         }
     }
@@ -146,17 +152,31 @@ namespace fpp {
         const auto created_stream {
             createStream(output_params)
         };
-        if (const auto ret {
-            ::avcodec_parameters_copy(
-                created_stream->codecpar() /* dst */
-                , other->codecpar()        /* src */
-            )
-        }; ret < 0) {
-            throw FFmpegException {
-                "Could not copy stream codec parameters!"
-                , ret
-            };
-        }
+//        if (const auto ret {
+//            ::avcodec_parameters_copy(
+//                created_stream->codecpar() /* dst */
+//                , other->codecpar()        /* src */
+//            )
+//        }; ret < 0) {
+//            throw FFmpegException {
+//                "Could not copy stream codec parameters!"
+//                , ret
+//            };
+//        }
+
+        //
+//        if (const auto ret {
+//            ::avcodec_parameters_copy(
+//                output_params->ptr()        /* dst */
+//                , created_stream->codecpar() /* src */
+//            )
+//        }; ret < 0) {
+//            throw FFmpegException {
+//                "2222222222Could not copy stream codec parameters!"
+//                , ret
+//            };
+//        }
+        //
         return created_stream;
     }
 
