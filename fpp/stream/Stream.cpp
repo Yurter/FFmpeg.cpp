@@ -65,8 +65,12 @@ namespace fpp {
             );
         }
         else if (raw()->start_time != AV_NOPTS_VALUE) {
-            packet.setDts(packet.dts() - raw()->start_time);
-            packet.setPts(packet.pts() - raw()->start_time);
+            if (packet.dts() != AV_NOPTS_VALUE) {
+                packet.setDts(packet.dts() - raw()->start_time);
+            }
+            if (packet.pts() != AV_NOPTS_VALUE) {
+                packet.setPts(packet.pts() - raw()->start_time);
+            }
         }
 
         if (packet.duration() == 0) {
@@ -183,11 +187,13 @@ namespace fpp {
     }
 
     void Stream::checkStampMonotonicity(Packet& packet) {
+//        if (is("InVideoStream"))
+//        log_error("DTS: " << packet.dts());
         if (_prev_dts == AV_NOPTS_VALUE) {
             _prev_dts = packet.dts();
             return;
         }
-        if (packet.dts() <= _prev_dts) {
+        if (_prev_dts >= packet.dts()) {
             log_warning(
                 "Application provided invalid, "
                 "non monotonically increasing dts to muxer "
@@ -199,6 +205,15 @@ namespace fpp {
     }
 
     void Stream::checkDtsPtsOrder(Packet& packet) {
+//        if (is("InVideoStream"))
+//        log_error("2DTS: " << packet.dts());
+//        if (packet.pts() == AV_NOPTS_VALUE) {
+//            return;
+//        }
+        if (packet.pts() == AV_NOPTS_VALUE) {
+            packet.setPts(packet.dts());
+            return;
+        }
         if (packet.pts() < packet.dts()) {
             log_warning(
                 "pts (" << packet.pts() << ") < dts (" << packet.dts() << ") "

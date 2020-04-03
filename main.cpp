@@ -26,7 +26,7 @@
 
 ========================== RTSP ===========================
 
-private:
+local:
 
     rtsp://admin:admin@192.168.10.189:554/ch01.264
     rtsp://admin:Admin2019@192.168.10.12:554
@@ -67,7 +67,7 @@ void transmuxing_file() {
 
     /* create source */
     fpp::InputFormatContext source {
-        "rtsp://admin:admin@192.168.10.3:554"
+        "rtsp://205.120.142.79/live/ch00_0"
     };
 
     /* open source */
@@ -131,6 +131,7 @@ void youtube_stream() {
     };
 
     /* copy source's streams to sink */
+    //TODO use sink.copyStream(source.stream(fpp::MediaType::Video), out_params); 02.04
     for (const auto& input_stream : source.streams()) {
         if (input_stream->isVideo()) {
             youtube.copyStream( /* with predefined params */
@@ -327,13 +328,9 @@ void rtp_video_stream() {
     const std::string ip { "127.0.0.1" };
     const auto rtp_port  { 16700 };
     const auto rtcp_port { rtp_port + 1 };
-//    Important notes:
-//
-//    If rtcpport is not set the RTCP port will be set to the RTP port value plus 1.
-//    If localrtpport (the local RTP port) is not set any available port will be used for the local RTP and RTCP ports.
-//    If localrtcpport (the local RTCP port) is not set it will be set to the local RTP port value plus 1.
+
     fpp::OutputFormatContext rtp_restreamer {
-        "rtp://" + ip + ":" + std::to_string(rtp_port) // TODO add local optional 31.03 (localrtpport, localrtcpport)
+        "rtp://" + ip + ":" + std::to_string(rtp_port) // TODO add local optional 31.03 (localrtpport, localrtcpport) -> https://www.ffmpeg.org/ffmpeg-protocols.html#rtp
             + "?rtcpport=" + std::to_string(rtcp_port)
     };
 
@@ -623,6 +620,93 @@ void webcam_to_file() {
 
 }
 
+void transcoded_rtp_video_stream() {
+    /* create source */
+    fpp::InputFormatContext source {
+        "rtsp://205.120.142.79/live/ch00_0"
+    };
+
+    /* open source */
+    source.open();
+
+    /* create sink */
+    const std::string ip { "127.0.0.1" };
+    const auto rtp_port  { 16700 };
+    const auto rtcp_port { rtp_port + 1 };
+
+    fpp::OutputFormatContext sink {
+        "rtp://" + ip + ":" + std::to_string(rtp_port)
+                + "?rtcpport=" + std::to_string(rtcp_port)
+    };
+
+    const auto out_params { fpp::VideoParameters::make_shared() };
+    out_params->setEncoder(AVCodecID::AV_CODEC_ID_H264);
+    out_params->setPixelFormat(AVPixelFormat::AV_PIX_FMT_YUV420P);
+    out_params->setGopSize(12);
+
+    /* copy only video stream to sink */
+    sink.copyStream(source.stream(fpp::MediaType::Video), out_params);
+
+    /* create decoder */
+    fpp::DecoderContext video_decoder {
+        source.stream(fpp::MediaType::Video)->params
+    };
+
+    /* create encoder's options */
+    fpp::Options video_options {
+        { "threads",        "1"          }
+        , { "thread_type",  "slice"       }
+        , { "preset",       "ultrafast"   }
+        , { "crf",          "15"          } // 0-51
+        , { "profile",      "main"        }
+        , { "tune",         "zerolatency" }
+    };
+
+    /* create encoders */
+    fpp::EncoderContext video_encoder {
+        sink.stream(fpp::MediaType::Video)->params, video_options
+    };
+
+    fpp::RescaleContext rescaler {{
+        source.stream(fpp::MediaType::Video)->params
+        , sink.stream(fpp::MediaType::Video)->params
+    }};
+
+    /* open sink */
+    sink.open();
+
+    /* create sdp file */
+    std::ofstream sdp_file;
+    sdp_file.open("video.sdp");
+    sdp_file << sink.sdp();
+    sdp_file.close();
+
+    fpp::Packet input_packet {
+        fpp::MediaType::Unknown
+    };
+    const auto read_video_packet {
+        [&input_packet,&source]() {
+            do {
+                input_packet = source.read();
+            } while (!input_packet.isVideo() && !input_packet.isEOF());
+            return !input_packet.isEOF();
+        }
+    };
+
+    /* read and write packet */
+    while (read_video_packet()) {
+        for (const auto& v_frame  : video_decoder.decode(input_packet)) {
+        const auto rv_frame { rescaler.scale(v_frame) };
+        for (const auto& v_packet : video_encoder.encode(rv_frame))      {
+            sink.write(v_packet);
+        }}
+    }
+
+    /* explicitly close contexts */
+    source.close();
+    sink.close();
+}
+
 auto main() -> int {
 
     std::cout << "Started\n";
@@ -636,6 +720,7 @@ auto main() -> int {
 //        rtp_video_and_audio_stream();
 //        text_on_video();
 //        webcam_to_file();
+//        transcoded_rtp_video_stream();
 
     } catch (const fpp::FFmpegException& e) {
         std::cout << "FFmpegException: " << e.what() << "\n";

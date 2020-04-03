@@ -181,7 +181,7 @@ namespace fpp {
             };
         }
 
-        codec_context->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
+//        codec_context->flags |= AV_CODEC_FLAG_GLOBAL_HEADER; // TODO check it 03.04 ломает транскодированный ртп стрим..
 //        codec_context->time_base = timeBase();
 //        codec_context->time_base = AVRational { 1, framerate };
 
