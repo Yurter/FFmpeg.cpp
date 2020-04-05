@@ -83,7 +83,7 @@ namespace fpp {
     std::string Parameters::codecName() const {
         if (not_inited_ptr(_codec)) {
             throw std::runtime_error {
-                __FUNCTION__ "failed: codec is null" };
+                std::string { __FUNCTION__ } + "failed: codec is null" };
         }
         return _codec->name;
     }
@@ -91,7 +91,7 @@ namespace fpp {
     AVCodec* Parameters::codec() const {
         if (not_inited_ptr(_codec)) {
             throw std::runtime_error {
-                __FUNCTION__ "failed: codec is null"
+                std::string { __FUNCTION__ } + "failed: codec is null"
             };
         }
         return _codec;
@@ -154,7 +154,7 @@ namespace fpp {
             ::avcodec_parameters_copy(codecpar, ptr())
         }; ret < 0) {
             throw FFmpegException {
-                __FUNCTION__ ", avcodec_parameters_copy() failed"
+                std::string { __FUNCTION__ } + ", avcodec_parameters_copy() failed"
                 , ret
             };
         }
@@ -165,7 +165,7 @@ namespace fpp {
             ::avcodec_parameters_copy(ptr(), codecpar)
         }; ret < 0) {
             throw FFmpegException {
-                __FUNCTION__ ", avcodec_parameters_copy() failed"
+                std::string { __FUNCTION__ } + ", avcodec_parameters_copy() failed"
                 , ret
             };
         }
@@ -176,7 +176,7 @@ namespace fpp {
             ::avcodec_parameters_to_context(codec_context, ptr())
         }; ret < 0) {
             throw FFmpegException {
-                __FUNCTION__ ", avcodec_parameters_to_context() failed"
+                std::string { __FUNCTION__ } + ", avcodec_parameters_to_context() failed"
                 , ret
             };
         }
@@ -192,7 +192,7 @@ namespace fpp {
             ::avcodec_parameters_from_context(ptr(), codec_context)
         }; ret < 0) {
             throw FFmpegException {
-                __FUNCTION__ ", avcodec_parameters_from_context() failed"
+                std::string { __FUNCTION__ } + ", avcodec_parameters_from_context() failed"
                 , ret
             };
         }

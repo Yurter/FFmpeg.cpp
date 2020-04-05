@@ -98,7 +98,7 @@ namespace fpp {
     if (!logger.ignoreMessage(log_level)) {\
         std::stringstream log_ss;\
         log_ss << message;\
-        logger.print(caller_name, CODE_POS, log_level, log_ss.str());\
+        logger.print(caller_name, "CODE_POS", log_level, log_ss.str());\
     }\
     FPP_END
 
@@ -120,4 +120,4 @@ namespace fpp {
 #define static_log(caller_name, log_level, message) log_message(caller_name, log_level,         message)
 
 /* ? */
-#define CODE_POS std::string(__FUNCTION__) + ", line: " + std::to_string(__LINE__) + " "
+//#define CODE_POS std::string(__FUNCTION__) + ", line: " + std::to_string(__LINE__) + " "

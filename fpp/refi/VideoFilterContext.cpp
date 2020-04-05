@@ -61,7 +61,7 @@ namespace fpp {
                     , _filter_graph.get()
             )}; ret < 0) {
             throw FFmpegException {
-                __FUNCTION__ " avfilter_graph_create_filter() failed"
+                std::string { __FUNCTION__ } + " avfilter_graph_create_filter() failed"
                 , ret
             };
         }
@@ -94,7 +94,7 @@ namespace fpp {
                     , _filter_graph.get()
             )}; ret < 0) {
             throw FFmpegException {
-                __FUNCTION__ " avfilter_graph_create_filter() failed"
+                std::string { __FUNCTION__ } + " avfilter_graph_create_filter() failed"
                 , ret
             };
         }
@@ -129,7 +129,7 @@ namespace fpp {
                 , AV_OPT_SEARCH_CHILDREN
         )}; ret < 0) {
             throw FFmpegException {
-                __FUNCTION__ " av_opt_set_bin failed"
+                std::string { __FUNCTION__ } + " av_opt_set_bin failed"
                 , ret
             };
         }

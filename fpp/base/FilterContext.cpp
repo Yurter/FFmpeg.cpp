@@ -67,27 +67,21 @@ namespace fpp {
         auto raw_inputs  { _inputs.get()  };
         auto raw_outputs { _outputs.get() };
 
-        if (const auto ret {
-                ::avfilter_graph_parse_ptr(
-                    _filter_graph.get()
-                    , _filters_descr.c_str()
-                    , &raw_inputs
-                    , &raw_outputs
-                    , nullptr /* context used for logging */
-        )}; ret < 0) {
-            throw FFmpegException { "avfilter_graph_parse_ptr failed", ret };
-        }
+        ffmpeg_api(avfilter_graph_parse_ptr
+            , _filter_graph.get()
+            , _filters_descr.c_str()
+            , &raw_inputs
+            , &raw_outputs
+            , nullptr /* context used for logging */
+        );
 
         log_info("Filter description: " << _filters_descr);
 
-        if (const auto ret {
-                ::avfilter_graph_config(
-                    _filter_graph.get()
-                    , nullptr /* context used for logging */
-                )
-            }; ret < 0) {
-            throw FFmpegException { "avfilter_graph_config failed", ret };
-        }
+        ffmpeg_api(avfilter_graph_config
+           , _filter_graph.get()
+           , nullptr /* context used for logging */
+        );
+
     }
 
     void FilterContext::initInputs() {
@@ -99,7 +93,7 @@ namespace fpp {
 
         if (!_inputs) {
             throw FFmpegException {
-                __FUNCTION__" failed"
+                std::string { __FUNCTION__ } + " failed"
                 , AVERROR(ENOMEM)
             };
         }
@@ -124,10 +118,9 @@ namespace fpp {
             , [](auto* filter) { /*::avfilter_inout_free(&filter);*/ } // TODO: приходит мусор, падение 04.02
         };
 
-
         if (!_outputs) {
             throw FFmpegException {
-                __FUNCTION__" failed"
+                std::string { __FUNCTION__ } + " failed"
                 , AVERROR(ENOMEM)
             };
         }

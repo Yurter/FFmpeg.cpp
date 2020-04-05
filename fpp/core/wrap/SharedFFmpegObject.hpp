@@ -21,7 +21,7 @@ namespace fpp {
         auto raw() {
             if (!_shared_object) {
                 throw std::runtime_error {
-                    __FUNCTION__ " failed: object is null"
+                    std::string { __FUNCTION__ } + " failed: object is null"
                 };
             }
             return _shared_object.get();
@@ -30,7 +30,7 @@ namespace fpp {
         const T* raw() const {
             if (!_shared_object) {
                 throw std::runtime_error {
-                    __FUNCTION__ " failed: object is null"
+                    std::string { __FUNCTION__ } + " failed: object is null"
                 };
             }
             return _shared_object.get();

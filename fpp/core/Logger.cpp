@@ -1,5 +1,5 @@
 #include "Logger.hpp"
-#include "Utils.hpp"
+#include <fpp/core/Utils.hpp>
 #include <iostream>
 #include <iomanip>
 #include <sstream>
@@ -20,12 +20,12 @@ namespace fpp {
         setName("Logger");
 //        av_log_set_callback(log_callback); //TODO later
 //        setFFmpegLogLevel(LogLevel::Info);
-        print(this->name(), CODE_POS, LogLevel::Info, "Logger opened");
+        print(this->name(), "CODE_POS", LogLevel::Info, "Logger opened");
         openFile(log_dir);
     }
 
     Logger::~Logger() {
-        print(this->name(), CODE_POS, LogLevel::Info, "Logger closed");
+        print(this->name(), "CODE_POS", LogLevel::Info, "Logger closed");
         ::av_log_set_callback(nullptr);
         closeFile();
     }

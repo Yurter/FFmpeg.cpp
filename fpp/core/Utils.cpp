@@ -157,7 +157,7 @@ namespace fpp {
                 return MediaType::Audio;
             default: {
                 throw std::invalid_argument {
-                    __FUNCTION__ " failed, bad type "
+                    std::string { __FUNCTION__ } + " failed, bad type "
                     + std::to_string(int(type))
                 };
             }
@@ -172,7 +172,7 @@ namespace fpp {
                 return AVMediaType::AVMEDIA_TYPE_AUDIO;
             default: {
                 throw std::invalid_argument {
-                    __FUNCTION__ " failed, bad type "
+                    std::string { __FUNCTION__ } + " failed, bad type "
                     + std::to_string(int(type))
                 };
             }
@@ -220,17 +220,17 @@ namespace fpp {
     bool utils::compatible_with_pixel_format(const AVCodec* codec, AVPixelFormat pixel_format) {
         if (!codec) {
             throw std::runtime_error {
-                __FUNCTION__" failed: codec is NULL"
+                std::string { __FUNCTION__ } +" failed: codec is NULL"
             };
         }
         if (!codec->pix_fmts) {
             static_log_warning(
                 "utils"
-                , __FUNCTION__" failed: codec->pix_fmts is NULL"
+                , std::string { __FUNCTION__ } +" failed: codec->pix_fmts is NULL"
             );
             return true;
 //            throw std::runtime_error {
-//               __FUNCTION__" failed: codec->pix_fmts is NULL"
+//               std::string { __FUNCTION__ } +" failed: codec->pix_fmts is NULL"
 //            };
         }
 
@@ -247,17 +247,17 @@ namespace fpp {
     bool utils::compatible_with_sample_format(const AVCodec* codec, AVSampleFormat sample_format) {
         if (!codec) {
             throw std::runtime_error {
-                __FUNCTION__" failed: codec is NULL"
+                std::string { __FUNCTION__ } +" failed: codec is NULL"
             };
         }
         if (!codec->sample_fmts) {
             static_log_warning(
                 "utils"
-                , __FUNCTION__" failed: codec->sample_fmts is NULL"
+                , std::string { __FUNCTION__ } +" failed: codec->sample_fmts is NULL"
             );
             return true;
 //            throw std::runtime_error {
-//                __FUNCTION__" failed: codec->sample_fmts is NULL"
+//                std::string { __FUNCTION__ } +" failed: codec->sample_fmts is NULL"
 //            };
         }
 
