@@ -122,58 +122,31 @@ namespace fpp {
         writeTrailer();
     }
 
-    SharedStream OutputFormatContext::createStream(SharedParameters params) {
+    void OutputFormatContext::createStream(SharedParameters params) {
         const auto avstream  { ::avformat_new_stream(raw(), params->codec()) };
         const auto fppstream { Stream::make_output_stream(avstream, params)  };
         addStream(fppstream);
-        return fppstream;
     }
 
-    SharedStream OutputFormatContext::copyStream(const SharedStream other, SharedParameters output_params) {
-        const auto input_params { other->params };
-        if (!output_params) {
-            output_params = utils::make_params(input_params->type());
-        }
-        output_params->completeFrom(input_params);
-        const auto created_stream {
-            createStream(output_params)
-        };
-//        if (const auto ret {
-//            ::avcodec_parameters_copy(
-//                created_stream->codecpar() /* dst */
-//                , other->codecpar()        /* src */
-//            )
-//        }; ret < 0) {
-//            throw FFmpegException {
-//                "Could not copy stream codec parameters!"
-//                , ret
-//            };
-//        }
-
-        //
-//        if (const auto ret {
-//            ::avcodec_parameters_copy(
-//                output_params->ptr()        /* dst */
-//                , created_stream->codecpar() /* src */
-//            )
-//        }; ret < 0) {
-//            throw FFmpegException {
-//                "2222222222Could not copy stream codec parameters!"
-//                , ret
-//            };
-//        }
-        //
-        return created_stream;
+    void OutputFormatContext::copyStream(const SharedStream other) {
+        const auto output_params { utils::make_params(other->params->type()) };
+        output_params->completeFrom(other->params);
+        createStream(output_params);
     }
 
     Code OutputFormatContext::guessOutputFromat() {
         const auto out_fmt {
             ::av_guess_format(
-                nullptr                             /* short_name */
-                , mediaResourceLocator().c_str()    /* filename   */
-                , nullptr                           /* mime_type  */
+                nullptr                          /* short_name */
+                , mediaResourceLocator().c_str() /* filename   */
+                , nullptr                        /* mime_type  */
             )
         };
+        if (!out_fmt) {
+            throw FFmpegException {
+                "av_guess_format failed"
+            };
+        }
         setOutputFormat(out_fmt);
         return Code::OK;
     }

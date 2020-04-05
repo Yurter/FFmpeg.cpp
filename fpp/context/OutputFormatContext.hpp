@@ -15,11 +15,8 @@ namespace fpp {
         OutputFormatContext(const std::string_view mrl);
         virtual ~OutputFormatContext() override;
 
-        SharedStream        createStream(SharedParameters params);
-        SharedStream        copyStream(
-                                const SharedStream other
-                                , SharedParameters output_params = SharedParameters {}
-                            );
+        void                createStream(SharedParameters params);
+        void                copyStream(const SharedStream other);
 
         void                write(Packet packet, WriteMode write_mode = WriteMode::Instant);
         void                flush();
