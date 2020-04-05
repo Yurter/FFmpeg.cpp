@@ -33,7 +33,7 @@ namespace fpp {
     void VideoParameters::setFrameRate(AVRational frame_rate) {
         if ((frame_rate.num * frame_rate.den) == 0) {
             log_error("setFrameRate failed: " << frame_rate);
-            AVRational default_framerate = { 16, 1 };
+            AVRational default_framerate { 16, 1 };
             log_error("seted default value: " << default_framerate);
             _frame_rate = default_framerate;
             return;
@@ -112,9 +112,7 @@ namespace fpp {
 
     void VideoParameters::initCodecContext(AVCodecContext* codec_context) const {
         Parameters::initCodecContext(codec_context);
-//        if (isEncoder()) {
-            codec_context->time_base = ::av_inv_q(frameRate());
-//        }
+        codec_context->time_base = ::av_inv_q(frameRate());
         codec_context->gop_size = gopSize();
     }
 

@@ -111,12 +111,9 @@ namespace fpp {
 
     void FormatContext::closeContext() {
         beforeCloseContext();
-        if (const auto ret { ::avio_close(raw()->pb) }; ret < 0) {
-            throw FFmpegException {
-                "Failed to close " + mediaResourceLocator()
-                , ret
-            };
-        }
+        ffmpeg_api(avio_close
+            ,raw()->pb
+        );
     }
 
     std::string FormatContext::mediaResourceLocator() const {

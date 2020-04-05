@@ -23,24 +23,16 @@ namespace fpp {
     void OutputFormatContext::write(Packet packet, WriteMode write_mode) {
         processPacket(packet);
         if (write_mode == WriteMode::Instant) {
-            if (const auto ret {
-                    ::av_write_frame(raw(), packet.ptr())
-                }; ret < 0) {
-                throw FFmpegException {
-                    "av_write_frame failed"
-                    , ret
-                };
-            }
+            ffmpeg_api(av_write_frame
+                , raw()
+                , packet.ptr()
+            );
         }
         else if (write_mode == WriteMode::Interleaved) {
-            if (const auto ret {
-                    ::av_interleaved_write_frame(raw(), packet.ptr())
-                }; ret < 0) {
-                throw FFmpegException {
-                    "av_interleaved_write_frame failed"
-                    , ret
-                };
-            }
+            ffmpeg_api(av_interleaved_write_frame
+                , raw()
+                , packet.ptr()
+            );
         }
     }
 
@@ -53,13 +45,12 @@ namespace fpp {
     std::string OutputFormatContext::sdp() {
         char buf[256] {};
         AVFormatContext* ctxs[] { raw() };
-        if (const auto ret {
-                ::av_sdp_create(ctxs, 1, buf, sizeof(buf))
-            }; ret < 0) {
-            throw FFmpegException {
-                "av_sdp_create failed", ret
-            };
-        }
+        ffmpeg_api(av_sdp_create
+            , ctxs
+            , 1
+            , buf
+            , sizeof(buf)
+        );
 
         std::string sdp_str { buf };
         sdp_str.append("\n");
@@ -88,21 +79,16 @@ namespace fpp {
             utils::guess_format_short_name(mediaResourceLocator())
         };
         AVFormatContext* fmt_ctx { nullptr };
-        if (const auto ret {
-                ::avformat_alloc_output_context2(
-                    &fmt_ctx                            /* ctx          */
-                    , nullptr                           /* oformat      */
-                    , format_short_name                 /* format_name  */
-                    , mediaResourceLocator().c_str()    /* filename     */
-                )
-            }; ret < 0) {
-            throw FFmpegException { "avformat_alloc_output_context2 failed", ret };
-        }
-        reset(std::shared_ptr<AVFormatContext> {
-                fmt_ctx
-                , [](auto* ctx) { ::avformat_free_context(ctx); }
-            }
+        ffmpeg_api(avformat_alloc_output_context2
+            , &fmt_ctx                       /* ctx         */
+            , nullptr                        /* oformat     */
+            , format_short_name              /* format_name */
+            , mediaResourceLocator().c_str() /* filename    */
         );
+        reset(std::shared_ptr<AVFormatContext> {
+            fmt_ctx
+            , [](auto* ctx) { ::avformat_free_context(ctx); }
+        });
     }
 
     bool OutputFormatContext::openContext(Options options) { // TODO avio_open2 24.03

@@ -19,15 +19,12 @@ namespace fpp {
     }
 
     FrameList FilterContext::filter(Frame source_frame) {
-        if (const auto ret {
-                ::av_buffersrc_add_frame_flags(
-                    _buffersrc_ctx.get()
-                    , source_frame.ptr()
-                    , AV_BUFFERSRC_FLAG_KEEP_REF
-                )
-            }; ret < 0) {
-            throw FFmpegException { "av_buffersrc_add_frame_flags failed", ret };
-        }
+        ffmpeg_api(av_buffersrc_add_frame_flags
+           , _buffersrc_ctx.get()
+           , source_frame.ptr()
+           , AV_BUFFERSRC_FLAG_KEEP_REF
+        );
+
         FrameList filtered_frames;
         /* pull filtered frames from the filtergraph */
         auto ret { 0 };
