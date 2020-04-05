@@ -74,24 +74,10 @@ namespace fpp {
         }
 
         if (packet.duration() == 0) {
-            if (raw()->cur_dts == AV_NOPTS_VALUE) {
-                const auto fps {
-                    ::av_q2intfloat(
-                        std::static_pointer_cast<VideoParameters>(params)->frameRate()
-                    )
-                };
-                const auto inv_tb {
-                    ::av_q2intfloat(::av_inv_q(params->timeBase()))
-                };
-                const auto avg_pkt_dur {
-                    inv_tb / fps
-                };
-                packet.setDuration(avg_pkt_dur);
-            } else {
-                packet.setDuration(std::abs(packet.dts() - raw()->cur_dts));
-            }
+            calculatePacketDuration(packet);
         }
 
+        avoidNegativeTimestamp(packet);
         checkStampMonotonicity(packet);
         checkDtsPtsOrder(packet);
 
@@ -186,9 +172,35 @@ namespace fpp {
         return raw()->codecpar;
     }
 
+    void Stream::calculatePacketDuration(Packet& packet) {
+        if (raw()->cur_dts == AV_NOPTS_VALUE) {
+            const auto fps {
+                ::av_q2intfloat(
+                    std::static_pointer_cast<VideoParameters>(params)->frameRate()
+                )
+            };
+            const auto inv_tb {
+                ::av_q2intfloat(::av_inv_q(params->timeBase()))
+            };
+            const auto avg_pkt_dur {
+                inv_tb / fps
+            };
+            packet.setDuration(avg_pkt_dur);
+        } else {
+            packet.setDuration(std::abs(packet.dts() - raw()->cur_dts));
+        }
+    }
+
+    void Stream::avoidNegativeTimestamp(Packet& packet) {
+        if (packet.dts() < 0) {
+            packet.setDts(0);
+        }
+        if (packet.pts() < 0) {
+            packet.setPts(0);
+        }
+    }
+
     void Stream::checkStampMonotonicity(Packet& packet) {
-//        if (is("InVideoStream"))
-//        log_error("DTS: " << packet.dts());
         if (_prev_dts == AV_NOPTS_VALUE) {
             _prev_dts = packet.dts();
             return;
@@ -205,11 +217,6 @@ namespace fpp {
     }
 
     void Stream::checkDtsPtsOrder(Packet& packet) {
-//        if (is("InVideoStream"))
-//        log_error("2DTS: " << packet.dts());
-//        if (packet.pts() == AV_NOPTS_VALUE) {
-//            return;
-//        }
         if (packet.pts() == AV_NOPTS_VALUE) {
             packet.setPts(packet.dts());
             return;

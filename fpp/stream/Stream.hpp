@@ -43,6 +43,8 @@ namespace fpp {
 
     private:
 
+        void                calculatePacketDuration(Packet& packet);
+        void                avoidNegativeTimestamp(Packet& packet);
         void                checkStampMonotonicity(Packet& packet);
         void                checkDtsPtsOrder(Packet& packet);
 
