@@ -111,41 +111,103 @@ void transmuxing_file() {
 
 }
 
-void youtube_stream() {
+void youtube_stream_copy() {
 
     /* create source */
     fpp::InputFormatContext source {
-        "rtsp://admin:admin@192.168.10.3:554"
+        "rtsp://87.197.138.187/live/ch00_0"
     };
 
     /* open source */
     source.open();
 
+    /* check input streams */
+    if (!source.stream(fpp::MediaType::Video)) {
+        std::cout << "Youtube require video stream\n";
+    }
+    if (!source.stream(fpp::MediaType::Audio)) {
+        std::cout << "Youtube require video stream\n";
+    }
+
     /* create sink */
     const std::string stream_key {
         "aaaa-bbbb-cccc-dddd"
     };
-    fpp::OutputFormatContext youtube {
+    fpp::OutputFormatContext sink {
         "rtmp://a.rtmp.youtube.com/live2/"
         + stream_key
     };
 
     /* copy source's streams to sink */
-    //TODO use sink.copyStream(source.stream(fpp::MediaType::Video), out_params); 02.04
-    for (const auto& input_stream : source.streams()) {
-        if (input_stream->isVideo()) {
-            youtube.copyStream( /* with predefined params */
-                input_stream
-                , fpp::utils::make_youtube_video_params()
-            );
+    sink.copyStream(source.stream(fpp::MediaType::Video));
+    sink.copyStream(source.stream(fpp::MediaType::Audio));
+
+    /* open sink */
+    sink.open();
+
+    fpp::Packet input_packet {
+        fpp::MediaType::Unknown
+    };
+    const auto read_packet {
+        [&input_packet,&source]() {
+            input_packet = source.read();
+            return !input_packet.isEOF();
         }
-        else if (input_stream->isAudio()) {
-            youtube.copyStream( /* with predefined params */
-                input_stream
-                , fpp::utils::make_youtube_audio_params()
-            );
-        }
+    };
+
+    /* read and write packets */
+    while (read_packet()) {
+        sink.write(input_packet);
     }
+
+    /* explicitly close contexts */
+    source.close();
+    sink.close();
+
+}
+
+void youtube_stream_transcode() {
+
+    /* create source */
+    fpp::InputFormatContext source {
+        "rtsp://87.197.138.187/live/ch00_0"
+    };
+
+    /* open source */
+    source.open();
+
+    /* check input streams */
+    if (!source.stream(fpp::MediaType::Video)) {
+        std::cout << "Youtube require video stream\n";
+    }
+    if (!source.stream(fpp::MediaType::Audio)) {
+        std::cout << "Youtube require video stream\n";
+    }
+
+    /* get input parameters */
+    const auto in_video_params {
+        source.stream(fpp::MediaType::Video)->params
+    };
+    const auto in_audio_params {
+        source.stream(fpp::MediaType::Audio)->params
+    };
+
+    /* create sink */
+    const std::string stream_key {
+        "aaaa-bbbb-cccc-dddd"
+    };
+    fpp::OutputFormatContext sink {
+        "rtmp://a.rtmp.youtube.com/live2/"
+        + stream_key
+    };
+
+    /* create streams with predefined params */
+    const auto out_video_params { fpp::utils::make_youtube_video_params() };
+    const auto out_audio_params { fpp::utils::make_youtube_audio_params() };
+    out_video_params->completeFrom(in_video_params);
+    out_audio_params->completeFrom(in_audio_params);
+    sink.createStream(out_video_params);
+    sink.createStream(out_audio_params);
 
     /* create decoders */
     fpp::DecoderContext video_decoder {
@@ -157,7 +219,7 @@ void youtube_stream() {
 
     /* create encoder's options */
     fpp::Options video_options {
-        { "threads",        "1"          }
+          { "threads",      "1"           }
         , { "thread_type",  "slice"       }
         , { "preset",       "ultrafast"   }
         , { "crf",          "30"          } // 0-51
@@ -165,33 +227,28 @@ void youtube_stream() {
         , { "tune",         "zerolatency" }
     };
 
-    fpp::Options audio_options {
-        { "preset", "low" }
-    };
-
     /* create encoders */
     fpp::EncoderContext video_encoder {
-        youtube.stream(fpp::MediaType::Video)->params, video_options
+        sink.stream(fpp::MediaType::Video)->params, video_options
     };
     fpp::EncoderContext audio_encoder {
-        youtube.stream(fpp::MediaType::Audio)->params, audio_options
+        sink.stream(fpp::MediaType::Audio)->params
     };
+
+    /* create rescaler */
+    fpp::RescaleContext rescaler {{
+        source.stream(fpp::MediaType::Video)->params
+        , sink.stream(fpp::MediaType::Video)->params
+    }};
 
     /* create resampler */
     fpp::ResampleContext resample {{
         source.stream(fpp::MediaType::Audio)->params
-        , youtube.stream(fpp::MediaType::Audio)->params
+        , sink.stream(fpp::MediaType::Audio)->params
     }};
 
     /* open sink */
-    youtube.open();
-
-    const auto video_transcoding_required {
-        fpp::utils::transcoding_required({
-            source.stream(fpp::MediaType::Video)->params
-            , youtube.stream(fpp::MediaType::Video)->params
-        })
-    };
+    sink.open();
 
     fpp::Packet input_packet {
         fpp::MediaType::Unknown
@@ -206,28 +263,24 @@ void youtube_stream() {
     /* read and write packets */
     while (read_packet()) {
         if (input_packet.isVideo()) {
-            if (video_transcoding_required) {
-                for (const auto& v_frame  : video_decoder.decode(input_packet)) {
-                for (const auto& v_packet : video_encoder.encode(v_frame))      {
-                    youtube.write(v_packet);
-                }}
-            }
-            else {
-                youtube.write(input_packet);
-            }
+            for (const auto& v_frame  : video_decoder.decode(input_packet)) {
+            const auto rv_frame { rescaler.scale(v_frame) };
+            for (const auto& v_packet : video_encoder.encode(v_frame))      {
+                sink.write(v_packet);
+            }}
         }
         else if (input_packet.isAudio()) {
             for (const auto& a_frame  : audio_decoder.decode(input_packet)) {
             for (const auto& ra_frame : resample.resample(a_frame))         {
             for (const auto& a_packet : audio_encoder.encode(ra_frame))     {
-                youtube.write(a_packet);
+                sink.write(a_packet);
             }}}
         }
     }
 
     /* explicitly close contexts */
     source.close();
-    youtube.close();
+    sink.close();
 
 }
 
@@ -528,7 +581,7 @@ void text_on_video() {
 void webcam_to_file() {
 
     /* create source */
-    fpp::InputFormatContext webcam {
+    fpp::InputFormatContext source {
         "video=HP Wide Vision HD"
     };
 
@@ -538,10 +591,10 @@ void webcam_to_file() {
     };
 
     /* open source */
-    webcam.open(webcam_options);
+    source.open(webcam_options);
 
     /* create sink */
-    fpp::OutputFormatContext video_file {
+    fpp::OutputFormatContext sink {
         "webcam.flv"
     };
 
@@ -550,25 +603,20 @@ void webcam_to_file() {
     out_params->setEncoder(AVCodecID::AV_CODEC_ID_H264);
     out_params->setPixelFormat(AVPixelFormat::AV_PIX_FMT_YUV420P);
     out_params->setGopSize(12);
+    const auto in_params { source.stream(fpp::MediaType::Video)->params };
+    out_params->completeFrom(in_params);
 
-    /* copy source's video stream to sink */
-    for (const auto& input_stream : webcam.streams()) {
-        if (input_stream->isVideo()) {
-            video_file.copyStream( /* with predefined params */
-                input_stream
-                , out_params
-            );
-        }
-    }
+    /* create stream with predefined params */
+    sink.createStream(out_params);
 
     /* create decoder */
     fpp::DecoderContext video_decoder {
-        webcam.stream(fpp::MediaType::Video)->params
+        source.stream(fpp::MediaType::Video)->params
     };
 
     /* create encoder's options */
     fpp::Options video_options {
-        { "threads",        "1"          }
+          { "threads",      "1"           }
         , { "thread_type",  "slice"       }
         , { "preset",       "ultrafast"   }
         , { "crf",          "15"          } // 0-51
@@ -578,49 +626,52 @@ void webcam_to_file() {
 
     /* create encoders */
     fpp::EncoderContext video_encoder {
-        video_file.stream(fpp::MediaType::Video)->params, video_options
+        sink.stream(fpp::MediaType::Video)->params, video_options
     };
 
     /* create rescaler (because of pixel format mismatch) */
     fpp::RescaleContext rescaler {{
-        webcam.stream(fpp::MediaType::Video)->params
-        , video_file.stream(fpp::MediaType::Video)->params
+        source.stream(fpp::MediaType::Video)->params
+        , sink.stream(fpp::MediaType::Video)->params
     }};
 
     /* open sink */
-    video_file.open();
+    sink.open();
 
     fpp::Packet input_packet {
         fpp::MediaType::Unknown
     };
-    const auto read_packet {
-        [&input_packet,&webcam]() {
-            input_packet = webcam.read();
+    const auto read_video_packet {
+        [&input_packet,&source]() {
+            do {
+                input_packet = source.read();
+            } while (!input_packet.isVideo() && !input_packet.isEOF());
             return !input_packet.isEOF();
         }
     };
 
     /* because of endless webcam's video */
-    webcam.stream(0)->setEndTimePoint(10 * 1000);
+    source.stream(0)->setEndTimePoint(10 * 1000);
 
     /* read and write packets */
-    while (read_packet()) {
+    while (read_video_packet()) {
         if (input_packet.isVideo()) {
             for (const auto& v_frame  : video_decoder.decode(input_packet)) {
             const auto rv_frame { rescaler.scale(v_frame) };
             for (const auto& v_packet : video_encoder.encode(rv_frame))     {
-                video_file.write(v_packet);
+                sink.write(v_packet);
             }}
         }
     }
 
     /* explicitly close contexts */
-    webcam.close();
-    video_file.close();
+    source.close();
+    sink.close();
 
 }
 
 void transcoded_rtp_video_stream() {
+
     /* create source */
     fpp::InputFormatContext source {
         "rtsp://205.120.142.79/live/ch00_0"
@@ -639,13 +690,16 @@ void transcoded_rtp_video_stream() {
                 + "?rtcpport=" + std::to_string(rtcp_port)
     };
 
+    /* create video stream with predefined params */
     const auto out_params { fpp::VideoParameters::make_shared() };
     out_params->setEncoder(AVCodecID::AV_CODEC_ID_H264);
     out_params->setPixelFormat(AVPixelFormat::AV_PIX_FMT_YUV420P);
     out_params->setGopSize(12);
 
-    /* copy only video stream to sink */
-    sink.copyStream(source.stream(fpp::MediaType::Video), out_params);
+    const auto in_params { source.stream(fpp::MediaType::Video)->params };
+    out_params->completeFrom(in_params);
+
+    sink.createStream(out_params);
 
     /* create decoder */
     fpp::DecoderContext video_decoder {
@@ -654,7 +708,7 @@ void transcoded_rtp_video_stream() {
 
     /* create encoder's options */
     fpp::Options video_options {
-        { "threads",        "1"          }
+          { "threads",      "1"           }
         , { "thread_type",  "slice"       }
         , { "preset",       "ultrafast"   }
         , { "crf",          "15"          } // 0-51
@@ -708,6 +762,7 @@ void transcoded_rtp_video_stream() {
 }
 
 void timelapase() {
+
     /* create source */
     fpp::InputFormatContext source {
         "rtsp://91.197.91.139/live/ch00_0"
@@ -726,8 +781,11 @@ void timelapase() {
     out_params->setPixelFormat(AVPixelFormat::AV_PIX_FMT_YUV420P);
     out_params->setGopSize(24);
 
-    /* copy only video stream to sink */
-    sink.copyStream(source.stream(fpp::MediaType::Video), out_params);
+    const auto in_params { source.stream(fpp::MediaType::Video)->params };
+    out_params->completeFrom(in_params);
+
+    /* create video stream with predefined params */
+    sink.createStream(out_params);
 
     /* create decoder */
     fpp::DecoderContext video_decoder {
@@ -736,7 +794,7 @@ void timelapase() {
 
     /* create encoder's options */
     fpp::Options video_options {
-        { "threads",        "1"          }
+          { "threads",      "1"           }
         , { "thread_type",  "slice"       }
         , { "preset",       "ultrafast"   }
         , { "crf",          "15"          } // 0-51
@@ -761,6 +819,7 @@ void timelapase() {
         , filters_descr
     };
 
+    /* create rescaler */
     fpp::RescaleContext rescaler {{
         source.stream(fpp::MediaType::Video)->params
         , sink.stream(fpp::MediaType::Video)->params
