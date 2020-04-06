@@ -64,14 +64,8 @@ namespace fpp {
                 , params->timeBase()
             );
         }
-        else if (raw()->start_time != AV_NOPTS_VALUE) {
-            if (packet.dts() != AV_NOPTS_VALUE) {
-                packet.setDts(packet.dts() - raw()->start_time);
-            }
-            if (packet.pts() != AV_NOPTS_VALUE) {
-                packet.setPts(packet.pts() - raw()->start_time);
-            }
-        }
+
+        shiftStamps(packet);
 
         if (packet.duration() == 0) {
             calculatePacketDuration(packet);
@@ -170,6 +164,18 @@ namespace fpp {
             throw std::runtime_error { "stream is null" };
         }
         return raw()->codecpar;
+    }
+
+    void Stream::shiftStamps(Packet& packet) {
+        if (raw()->start_time == AV_NOPTS_VALUE) {
+            raw()->start_time = packet.pts();
+        }
+        if (packet.dts() != AV_NOPTS_VALUE) {
+            packet.setDts(packet.dts() - raw()->start_time);
+        }
+        if (packet.pts() != AV_NOPTS_VALUE) {
+            packet.setPts(packet.pts() - raw()->start_time);
+        }
     }
 
     void Stream::calculatePacketDuration(Packet& packet) {
