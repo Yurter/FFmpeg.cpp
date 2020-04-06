@@ -15,19 +15,17 @@
 
 namespace fpp {
 
-    Logger::Logger(std::string log_dir)
+    Logger::Logger()
         : _log_level(LogLevel::Info) {
         setName("Logger");
 //        av_log_set_callback(log_callback); //TODO later
 //        setFFmpegLogLevel(LogLevel::Info);
         print(this->name(), "CODE_POS", LogLevel::Info, "Logger opened");
-        openFile(log_dir);
     }
 
     Logger::~Logger() {
         print(this->name(), "CODE_POS", LogLevel::Info, "Logger closed");
         ::av_log_set_callback(nullptr);
-        closeFile();
     }
 
     Code Logger::print(const LogLevel log_level, const std::string& log_text) {
@@ -56,23 +54,12 @@ namespace fpp {
         }
 #endif
 
-//        _file << log_text << std::endl;
-//        std::cout << log_text << std::endl;
-        _file << log_text << '\n';
         std::cout << log_text << '\n';
+
 #ifdef _WIN32
         SetConsoleTextAttribute(hStdout, FOREGROUND_RED|FOREGROUND_GREEN|FOREGROUND_BLUE);
 #endif
         return Code::OK;
-    }
-
-    void Logger::openFile(const std::string &log_dir) {
-        std::filesystem::create_directory(log_dir);
-        _file.open(log_dir + "/" + genFileName());
-    }
-
-    void Logger::closeFile() {
-        _file.close();
     }
 
     std::string Logger::genFileName() const {
@@ -224,8 +211,8 @@ namespace fpp {
         return result;
     }
 
-    Logger& Logger::instance(std::string log_dir) {
-        static Logger _logger(log_dir);
+    Logger& Logger::instance() {
+        static Logger _logger;
         return _logger;
     }
 
