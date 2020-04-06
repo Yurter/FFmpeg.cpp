@@ -94,6 +94,7 @@ namespace fpp {
                 + "coded_width "   + std::to_string(raw()->coded_width)     + separator
                 + "coded_height "  + std::to_string(raw()->coded_height)    + separator
                 + "time_base "     + utils::to_string(raw()->time_base)     + separator
+                + "gop "           + std::to_string(raw()->gop_size)        + separator
                 + "pix_fmt "       + utils::to_string(raw()->pix_fmt);
         }
         if (isAudio()) {
