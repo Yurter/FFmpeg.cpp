@@ -16,8 +16,8 @@ namespace fpp {
 
         std::string         toString() const override final;
 
-        bool                opened() const;
-        bool                closed() const;
+        bool                opened() const; // TODO remove 06.04
+        bool                closed() const; // TODO remove 06.04
 
         const AVCodec*      codec() const;
 
@@ -35,7 +35,7 @@ namespace fpp {
 
     private:
 
-        bool                _opened;
+        bool                _opened; // TODO remove 06.04
 
     };
 

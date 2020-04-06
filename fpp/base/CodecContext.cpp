@@ -89,6 +89,7 @@ namespace fpp {
         if (isVideo()) {
             return utils::to_string(raw()->codec_type) + " "
                 + params->codecType() + " " + codec()->name                 + separator
+                + std::to_string(raw()->bit_rate) + " bit/s"                + separator
                 + "width "         + std::to_string(raw()->width)           + separator
                 + "height "        + std::to_string(raw()->height)          + separator
                 + "coded_width "   + std::to_string(raw()->coded_width)     + separator
@@ -100,6 +101,7 @@ namespace fpp {
         if (isAudio()) {
             return utils::to_string(raw()->codec_type) + " "
                 + params->codecType() + " " + codec()->name                 + separator
+                + std::to_string(raw()->bit_rate) + " bit/s"                + separator
                 + "sample_rate "   + std::to_string(raw()->sample_rate)     + separator
                 + "sample_fmt "    + utils::to_string(raw()->sample_fmt)    + separator
                 + "ch_layout "     + utils::channel_layout_to_string(
