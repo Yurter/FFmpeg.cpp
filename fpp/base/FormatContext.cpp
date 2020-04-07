@@ -33,6 +33,10 @@ namespace fpp {
         return !_opened;
     }
 
+    void FormatContext::reconnectOnFailure(bool reconnect) {
+        _reconnect_on_failure = reconnect;
+    }
+
     void FormatContext::flushContextAfterEachPacket(bool value) {
         raw()->flush_packets = int(value);
     }
