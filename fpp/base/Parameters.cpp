@@ -150,28 +150,15 @@ namespace fpp {
     }
 
     void Parameters::initCodecpar(AVCodecParameters* codecpar) const {
-        if (const auto ret {
-            ::avcodec_parameters_copy(codecpar, ptr())
-        }; ret < 0) {
-            throw FFmpegException {
-                std::string { __FUNCTION__ } + ", avcodec_parameters_copy() failed"
-                , ret
-            };
-        }
+        ffmpeg_api(avcodec_parameters_copy, codecpar, ptr());
     }
 
     void Parameters::parseCodecpar(AVCodecParameters* codecpar) {
-        ffmpeg_api(avcodec_parameters_copy
-            , ptr()
-            , codecpar
-        );
+        ffmpeg_api(avcodec_parameters_copy, ptr(), codecpar);
     }
 
     void Parameters::initCodecContext(AVCodecContext* codec_context) const {
-        ffmpeg_api(avcodec_parameters_to_context
-           , codec_context
-           , ptr()
-        );
+        ffmpeg_api(avcodec_parameters_to_context, codec_context, ptr());
 
 //        codec_context->flags |= AV_CODEC_FLAG_GLOBAL_HEADER; // TODO check it 03.04 ломает транскодированный ртп стрим..
 //        codec_context->time_base = timeBase();
@@ -180,10 +167,7 @@ namespace fpp {
     }
 
     void Parameters::parseCodecContext(const AVCodecContext* codec_context) {
-        ffmpeg_api(avcodec_parameters_from_context
-           , ptr()
-           , codec_context
-        );
+        ffmpeg_api(avcodec_parameters_from_context, ptr(), codec_context);
     }
 
     void Parameters::reset() {
