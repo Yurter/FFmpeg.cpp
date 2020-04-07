@@ -39,7 +39,7 @@ namespace fpp {
 
         virtual std::string toString() const override final;
 
-//    private:
+    protected:
 
         /* Операции над формат контестом, ход выполнения
          * которых, отслеживается колбеком                  */
@@ -63,7 +63,8 @@ namespace fpp {
 
         };
 
-    protected:
+        void                setInteruptCallback(AVFormatContext* ctx, InterruptedProcess process, int64_t timeout_ms);
+        void                resetInteruptCallback(AVFormatContext* ctx);
 
         virtual void        createContext() = 0;
         virtual bool        openContext(Options options) = 0;
@@ -78,8 +79,6 @@ namespace fpp {
     private:
 
         void                setOpened(bool opened);
-        void                setInteruptCallback(AVFormatContext* ctx, InterruptedProcess process, int64_t timeout_ms);
-        void                resetInteruptCallback(AVFormatContext* ctx);
         static int          interrupt_callback(void* opaque);
         void                closeContext();
 

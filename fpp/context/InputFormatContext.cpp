@@ -23,17 +23,17 @@ namespace fpp {
     void InputFormatContext::seek(int64_t stream_index, int64_t timestamp, SeekPrecision seek_precision) {
         auto flags { 0 };
         switch (seek_precision) {
-        case SeekPrecision::Forward:
-            flags = 0;
-            break;
-        case SeekPrecision::Backward:
-            flags = AVSEEK_FLAG_BACKWARD;
-            break;
-        case SeekPrecision::Any:
-            flags = AVSEEK_FLAG_ANY;
-            break;
-        case SeekPrecision::Precisely:
-            throw std::runtime_error { "NOT_IMPLEMENTED" };
+            case SeekPrecision::Forward:
+                flags = 0;
+                break;
+            case SeekPrecision::Backward:
+                flags = AVSEEK_FLAG_BACKWARD;
+                break;
+            case SeekPrecision::Any:
+                flags = AVSEEK_FLAG_ANY;
+                break;
+            case SeekPrecision::Precisely:
+                throw std::runtime_error { "NOT_IMPLEMENTED" };
         }
         if (const auto ret {
                 ::av_seek_frame(raw(), int(stream_index), timestamp, flags)
@@ -74,7 +74,8 @@ namespace fpp {
     bool InputFormatContext::openContext(Options options) {
         guessInputFromat();
         Dictionary dictionary { options };
-        AVFormatContext* fmt_ctx { nullptr };
+        AVFormatContext* fmt_ctx { ::avformat_alloc_context() };
+        setInteruptCallback(fmt_ctx, InterruptedProcess::Opening, 20'000); // TODO magic number 07.04
         if (const auto ret {
                 ::avformat_open_input(
                     &fmt_ctx
@@ -82,7 +83,7 @@ namespace fpp {
                     , inputFormat()
                     , dictionary.get()
                 )
-            }; ret < 0) { // TODO ret code explanation 26.03
+            }; ret < 0) {
             return false;
         }
         reset(std::shared_ptr<AVFormatContext> {
@@ -108,7 +109,7 @@ namespace fpp {
 
     StreamVector InputFormatContext::parseFormatContext() {
         StreamVector result;
-        for (unsigned i { 0 }; i < raw()->nb_streams; ++i) {
+        for (auto i { 0u }; i < raw()->nb_streams; ++i) {
             result.push_back(Stream::make_input_stream(raw()->streams[i]));
         }
         return result;
