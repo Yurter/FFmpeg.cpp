@@ -8,24 +8,24 @@ namespace fpp {
     public:
 
         Chronometer() {
-            reset_timepoint();
+            reset();
         }
 
-        void reset_timepoint() {
+        void reset() {
             _start_point = std::chrono::system_clock::now();
         }
 
         int64_t elapsed_milliseconds() const {
-            auto end_point = std::chrono::system_clock::now();
+            const auto end_point { std::chrono::system_clock::now() };
             return std::chrono::duration_cast<std::chrono::milliseconds>
                     (end_point - _start_point).count();
         }
 
     private:
 
-        using StartPoint = std::chrono::time_point<std::chrono::system_clock>;
+        using TimePoint = std::chrono::time_point<std::chrono::system_clock>;
 
-        StartPoint          _start_point;
+        TimePoint           _start_point;
 
     };
 
