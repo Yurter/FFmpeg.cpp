@@ -42,7 +42,7 @@ namespace fpp {
     }
 
     void VideoParameters::setPixelFormat(AVPixelFormat pixel_format) {
-        if (!utils::compatible_with_pixel_format(codec(), pixel_format)) {
+        if (!utils::compatible_with_pixel_format(codec(), pixel_format)) { // TODO remove ? let ffmpeg check it 06.04
             throw std::invalid_argument {
                 utils::to_string(pixel_format)
                 + " doesn't compatible with "

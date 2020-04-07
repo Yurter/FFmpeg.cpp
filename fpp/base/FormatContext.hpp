@@ -32,7 +32,7 @@ namespace fpp {
         SharedStream        stream(int64_t index);
         SharedStream        stream(MediaType stream_type);
         int64_t             streamNumber() const;
-        void                setStreams(StreamVector stream_list);
+        void                setStreams(StreamVector stream_list); // TODO remove 06.04
 
         void                processPacket(Packet& packet);
 

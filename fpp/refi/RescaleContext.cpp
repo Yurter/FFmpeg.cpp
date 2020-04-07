@@ -39,10 +39,10 @@ namespace fpp {
             ::sws_getContext(
                 int(in_param->width()), int(in_param->height()), in_param->pixelFormat()
                 , int(out_param->width()), int(out_param->height()), out_param->pixelFormat()
-                , SWS_BICUBIC   /* flags     */
-                , nullptr       /* srcFilter */
-                , nullptr       /* dstFilter */
-                , nullptr       /* param     */
+                , SWS_BICUBIC /* flags     */
+                , nullptr     /* srcFilter */
+                , nullptr     /* dstFilter */
+                , nullptr     /* param     */
             )
             , [](auto* ctx) { ::sws_freeContext(ctx); }
         });

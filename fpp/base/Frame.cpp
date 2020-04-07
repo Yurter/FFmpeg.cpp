@@ -51,8 +51,8 @@ namespace fpp {
         return _time_base;
     }
 
-    bool Frame::keyFrame() const {
-        return raw().key_frame == 1;
+    bool Frame::keyFrame() const { // TODO check: frame->pict_type is AV_PICTURE_TYPE_I 06.04
+        return raw().key_frame == 1; // TODO av_get_picture_type_char
     }
 
     int Frame::nbSamples() const {
