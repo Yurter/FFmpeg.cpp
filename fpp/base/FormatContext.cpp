@@ -12,7 +12,8 @@ namespace fpp {
     FormatContext::FormatContext(const std::string_view mrl)
         : _media_resource_locator { mrl }
         , _opened { false }
-        , _current_interrupter { Interrupter { InterruptedProcess::None } } {
+        , _current_interrupter { Interrupter { InterruptedProcess::None } }
+        , _reconnect_on_failure { false } {
         setName("FormatContext");
     }
 
@@ -60,60 +61,53 @@ namespace fpp {
         if (opened()) {
             throw std::runtime_error { "Context already opened" };
         }
-        setInteruptCallback(InterruptedProcess::Opening);
+        setInteruptCallback(raw(), InterruptedProcess::Opening, 20'000); // TODO magic number 07.04
         if (!openContext(options)) {
             log_error("Could not open output: " + mediaResourceLocator());
             return false;
         }
-        resetInteruptCallback();
+        resetInteruptCallback(raw());
         setOpened(true);
         log_info(toString());
         return true;
     }
 
-    void FormatContext::setInteruptCallback(InterruptedProcess process) {
+    void FormatContext::setInteruptCallback(AVFormatContext* ctx, InterruptedProcess process, int64_t timeout_ms) {
         _current_interrupter.interrupted_process = process;
-        _current_interrupter.chronometer.reset_timepoint();
-        raw()->interrupt_callback.callback =
-            &FormatContext::interrupt_callback;
-        raw()->interrupt_callback.opaque =
-            &_current_interrupter;
+        _current_interrupter.chronometer.reset();
+        _current_interrupter.timeout_ms = timeout_ms;
+
+        ctx->interrupt_callback.callback = &FormatContext::interrupt_callback;
+        ctx->interrupt_callback.opaque   = &_current_interrupter;
     }
 
-    void FormatContext::resetInteruptCallback() {
+    void FormatContext::resetInteruptCallback(AVFormatContext* ctx) {
         _current_interrupter.interrupted_process = InterruptedProcess::None;
-        raw()->interrupt_callback.callback = nullptr; /* Бессмысленно :( */
-        raw()->interrupt_callback.opaque   = nullptr; /* Бессмысленно :( */
+        ctx->interrupt_callback.callback = nullptr; /* Бессмысленно :( */
+        ctx->interrupt_callback.opaque   = nullptr; /* Бессмысленно :( */
     }
 
     int FormatContext::interrupt_callback(void* opaque) {
-        const auto interrupter { reinterpret_cast<const Interrupter*>(opaque) };
-        switch (interrupter->interrupted_process) {
-            case InterruptedProcess::None:
-                return 0;
-            case InterruptedProcess::Opening: {
-                const int64_t opening_timeout_ms { 20'000 }; // TODO make changeable or use option 'timeout' 01.04
-                if (interrupter->chronometer.elapsed_milliseconds() > opening_timeout_ms) {
-                    static_log_error("interrupt_callback", "Opening timed out: " << opening_timeout_ms);
-                    return 1;
-                }
-                return 0;
-            }
-            #define NOT_IMPLEMENTED_MSG(x) static_log_error("interrupt_callback", #x" is not implemeted");
-            case InterruptedProcess::Closing:
-                NOT_IMPLEMENTED_MSG(InterruptedProcess::Closing);
-            case InterruptedProcess::Reading:
-                NOT_IMPLEMENTED_MSG(InterruptedProcess::Reading);
-            case InterruptedProcess::Writing:
-                NOT_IMPLEMENTED_MSG(InterruptedProcess::Writing);
+        constexpr auto OK   { 0 };
+        constexpr auto FAIL { 1 };
+        const auto interrupter {
+            reinterpret_cast<const Interrupter*>(opaque)
+        };
+        if (interrupter->isTimeout()) {
+            static_log_error(
+                "interrupt_callback"
+                , interrupter->interrupted_process
+                    << " timed out: "
+                    << interrupter->timeout_ms
+            );
+            return FAIL;
         }
+        return OK;
     }
 
     void FormatContext::closeContext() {
         beforeCloseContext();
-        ffmpeg_api(avio_close
-            ,raw()->pb
-        );
+        ffmpeg_api(avio_close, raw()->pb);
     }
 
     std::string FormatContext::mediaResourceLocator() const {

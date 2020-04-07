@@ -27,6 +27,7 @@ namespace fpp {
         bool                opened() const;
         bool                closed() const;
 
+        void                reconnectOnFailure(bool reconnect);
         void                flushContextAfterEachPacket(bool value);
 
         SharedStream        stream(int64_t index);
@@ -38,7 +39,7 @@ namespace fpp {
 
         virtual std::string toString() const override final;
 
-    private:
+//    private:
 
         /* Операции над формат контестом, ход выполнения
          * которых, отслеживается колбеком                  */
@@ -50,16 +51,15 @@ namespace fpp {
             Writing,
         };
 
-        class Interrupter {
-
-        public:
-
-            Interrupter(InterruptedProcess process)
-                : interrupted_process(process) {
-            }
+        struct Interrupter {
 
             InterruptedProcess  interrupted_process;
             Chronometer         chronometer;
+            int64_t             timeout_ms;
+
+            bool isTimeout() const {
+                return chronometer.elapsed_milliseconds() > timeout_ms;
+            }
 
         };
 
@@ -78,8 +78,8 @@ namespace fpp {
     private:
 
         void                setOpened(bool opened);
-        void                setInteruptCallback(InterruptedProcess process);
-        void                resetInteruptCallback();
+        void                setInteruptCallback(AVFormatContext* ctx, InterruptedProcess process, int64_t timeout_ms);
+        void                resetInteruptCallback(AVFormatContext* ctx);
         static int          interrupt_callback(void* opaque);
         void                closeContext();
 
@@ -89,6 +89,7 @@ namespace fpp {
         bool                _opened;
         StreamVector        _streams;
         Interrupter         _current_interrupter;
+        bool                _reconnect_on_failure;
 
     };
 
