@@ -86,6 +86,7 @@ namespace fpp {
             }; ret < 0) {
             return false;
         }
+        resetInteruptCallback(fmt_ctx);
         reset(std::shared_ptr<AVFormatContext> {
             fmt_ctx
             , [](auto* ctx) { ::avformat_free_context(ctx); }

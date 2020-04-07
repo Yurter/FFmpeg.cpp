@@ -97,6 +97,9 @@ namespace fpp {
         const auto interrupter {
             reinterpret_cast<const Interrupter*>(opaque)
         };
+        if (interrupter->isNone()) {
+            return OK;
+        }
         if (interrupter->isTimeout()) {
             static_log_error(
                 "interrupt_callback"

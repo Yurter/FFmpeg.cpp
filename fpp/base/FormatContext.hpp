@@ -57,6 +57,10 @@ namespace fpp {
             Chronometer         chronometer;
             int64_t             timeout_ms;
 
+            bool isNone() const {
+                return interrupted_process == InterruptedProcess::None;
+            }
+
             bool isTimeout() const {
                 return chronometer.elapsed_milliseconds() > timeout_ms;
             }
