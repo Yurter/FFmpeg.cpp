@@ -111,7 +111,13 @@ namespace fpp {
     StreamVector InputFormatContext::parseFormatContext() {
         StreamVector result;
         for (auto i { 0u }; i < raw()->nb_streams; ++i) {
-            result.push_back(Stream::make_input_stream(raw()->streams[i]));
+            const auto stream_type { // TODO do not ignore not AV streams 09.04
+                raw()->streams[i]->codecpar->codec_type
+            };
+            if ((stream_type == AVMEDIA_TYPE_VIDEO)
+                    || (stream_type == AVMEDIA_TYPE_AUDIO)) {
+                result.push_back(Stream::make_input_stream(raw()->streams[i]));
+            }
         }
         return result;
     }
