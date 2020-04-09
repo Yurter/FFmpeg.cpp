@@ -12,7 +12,6 @@ namespace fpp {
     FormatContext::FormatContext(const std::string_view mrl)
         : _media_resource_locator { mrl }
         , _opened { false }
-        , _current_interrupter { Interrupter { InterruptedProcess::None } }
         , _reconnect_on_failure { false } {
         setName("FormatContext");
     }
@@ -21,7 +20,7 @@ namespace fpp {
         if (closed()) {
             return;
         }
-        closeContext();
+        closeContext(); // TODO make func virtual again, do not use beforeCloseContext() 09.04
         setOpened(false);
     }
 
@@ -67,7 +66,7 @@ namespace fpp {
         }
         setInteruptCallback(raw(), InterruptedProcess::Opening, 20'000); // TODO magic number 07.04
         if (!openContext(options)) {
-            log_error("Could not open output: " + mediaResourceLocator());
+            log_error("Could not open " + mediaResourceLocator());
             return false;
         }
         resetInteruptCallback(raw());
