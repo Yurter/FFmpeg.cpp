@@ -108,6 +108,7 @@ namespace fpp {
         setFrameRate(avstream->avg_frame_rate);
         setPixelFormat(AVPixelFormat(avstream->codecpar->format));
         setSampleAspectRatio(avstream->codecpar->sample_aspect_ratio);
+        setGopSize(avstream->codec->gop_size);
     }
 
     void VideoParameters::initCodecContext(AVCodecContext* codec_context) const {
