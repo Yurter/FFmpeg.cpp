@@ -130,6 +130,9 @@ namespace fpp {
             if (std::string { short_name } == "dshow") {
                 utils::device_register_all();
             }
+            else if (std::string { short_name } == "gdigrab") {
+                utils::device_register_all();
+            }
         }
         setInputFormat(::av_find_input_format(short_name));
     }
