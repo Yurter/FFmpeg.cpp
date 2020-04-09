@@ -3,14 +3,17 @@ CONFIG += console c++17
 CONFIG -= app_bundle
 CONFIG -= qt
 
-INCLUDEPATH += ../00_ffmpeg/ffmpeg-4.1.3-win64-dev/include
-LIBS += -L../../00_ffmpeg/ffmpeg-4.1.3-win64-dev/lib
+#INCLUDEPATH += ../00_ffmpeg/ffmpeg-4.1.3-win64-dev/include
+#LIBS += -L../../00_ffmpeg/ffmpeg-4.1.3-win64-dev/lib
 
-INCLUDEPATH += G:\dev\00_ffmpeg\ffmpeg-4.1.1-win64-dev\include
-LIBS += -LG:\dev\00_ffmpeg\ffmpeg-4.1.1-win64-dev\lib
+#INCLUDEPATH += G:\dev\00_ffmpeg\ffmpeg-4.1.1-win64-dev\include
+#LIBS += -LG:\dev\00_ffmpeg\ffmpeg-4.1.1-win64-dev\lib
 
-INCLUDEPATH += D:\dev\00_ffmpeg\ffmpeg-4.1.3-win64-dev\include
-LIBS += -LD:\dev\00_ffmpeg\ffmpeg-4.1.3-win64-dev\lib
+#INCLUDEPATH += D:\dev\00_ffmpeg\ffmpeg-4.1.3-win64-dev\include
+#LIBS += -LD:\dev\00_ffmpeg\ffmpeg-4.1.3-win64-dev\lib
+
+INCLUDEPATH += G:\dev\00_ffmpeg\ffmpeg-4.2.2-win64-dev\include
+LIBS += -LG:\dev\00_ffmpeg\ffmpeg-4.2.2-win64-dev\lib
 
 LIBS += -lavcodec -lavdevice -lavfilter -lavformat -lavutil
 LIBS += -lpostproc -lswresample -lswscale
@@ -34,7 +37,6 @@ SOURCES += \
     fpp/core/FFmpegException.cpp \
     fpp/core/Logger.cpp \
     fpp/core/Object.cpp \
-    fpp/core/Thread.cpp \
     fpp/core/Utils.cpp \
     fpp/refi/AudioFilterContext.cpp \
     fpp/base/FilterContext.cpp \
@@ -59,7 +61,6 @@ HEADERS += \
     fpp/core/FFmpegException.hpp \
     fpp/core/Logger.hpp \
     fpp/core/Object.hpp \
-    fpp/core/Thread.hpp \
     fpp/core/Utils.hpp \
     fpp/core/async/AsyncList.hpp \
     fpp/core/async/AsyncObject.hpp \
