@@ -285,11 +285,9 @@ namespace fpp {
     }
 
     void utils::device_register_all() {
-        static auto register_flag { false };
-        if (!register_flag) {
-            ::avdevice_register_all();
-            register_flag = true;
-        }
+        static struct CallOnce {
+            CallOnce() { ::avdevice_register_all(); }
+        }_;
     }
 
     const char* utils::guess_format_short_name(const std::string_view media_resurs_locator) {
@@ -305,17 +303,20 @@ namespace fpp {
         if (media_resurs_locator.find("aevalsrc=") != std::string_view::npos) {
             return "lavfi";
         }
-        if (media_resurs_locator.find("anullsrc=") != std::string_view::npos) { /* Silence              */
+        if (media_resurs_locator.find("anullsrc=") != std::string_view::npos) { /* Silence */
             return "lavfi";
         }
-        if (media_resurs_locator.find("sine=") != std::string_view::npos) {     /* Hum/squeak           */
+        if (media_resurs_locator.find("sine=") != std::string_view::npos) {     /* Hum/squeak */
             return "lavfi";
         }
-        if (media_resurs_locator.find("video=") != std::string_view::npos) {    /* USB camera's video   */
+        if (media_resurs_locator.find("video=") != std::string_view::npos) {    /* USB camera's video */
             return "dshow";
         }
-        if (media_resurs_locator.find("audio=") != std::string_view::npos) {    /* USB micro's audio    */
+        if (media_resurs_locator.find("audio=") != std::string_view::npos) {    /* USB micro's audio */
             return "TODO 13.01";
+        }
+        if (media_resurs_locator.find("desktop") != std::string_view::npos) {   /* Screen recoder */
+            return "gdigrab";
         }
         return nullptr;
     }
