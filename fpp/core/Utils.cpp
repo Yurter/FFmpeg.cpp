@@ -315,7 +315,7 @@ namespace fpp {
         if (media_resurs_locator.find("audio=") != std::string_view::npos) {    /* USB micro's audio */
             return "TODO 13.01";
         }
-        if (media_resurs_locator.find("desktop") != std::string_view::npos) {   /* Screen recoder */
+        if (media_resurs_locator == "desktop") {                                /* Screen recoder */
             return "gdigrab";
         }
         return nullptr;
