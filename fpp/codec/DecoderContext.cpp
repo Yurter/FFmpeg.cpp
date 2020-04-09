@@ -58,6 +58,7 @@ namespace fpp {
                 };
             }
             output_frame.setTimeBase(params->timeBase());
+            output_frame.raw().pict_type = AV_PICTURE_TYPE_NONE; // TODO check it 09.04
             decoded_frames.push_back(output_frame);
         }
         return decoded_frames;
