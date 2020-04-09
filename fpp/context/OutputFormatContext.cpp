@@ -23,28 +23,22 @@ namespace fpp {
     void OutputFormatContext::write(Packet packet, WriteMode write_mode) {
         processPacket(packet);
         if (write_mode == WriteMode::Instant) {
-            ffmpeg_api(av_write_frame
-                , raw()
-                , packet.ptr()
-            );
+            ffmpeg_api(av_write_frame, raw(), packet.ptr());
         }
         else if (write_mode == WriteMode::Interleaved) {
-            ffmpeg_api(av_interleaved_write_frame
-                , raw()
-                , packet.ptr()
-            );
+            ffmpeg_api(av_interleaved_write_frame, raw(), packet.ptr());
         }
     }
 
     void OutputFormatContext::flush() {
-        if (const auto ret { ::av_write_frame(raw(), nullptr) }; ret != 1) {
+        if (const auto ret { ::av_write_frame(raw(), nullptr) }; ret != 1) { // TODO check ret value meaning and use ffmpeg_api macro 09.04
             throw FFmpegException { "OutputFormatContext flush failed", ret };
         }
     }
 
     std::string OutputFormatContext::sdp() {
         char buf[256] {};
-        AVFormatContext* ctxs[] { raw() };
+        AVFormatContext* ctxs[] { raw() }; // TODO do not use utils::merge_sdp_files(), instead use ctxs array 09.04
         ffmpeg_api(av_sdp_create
             , ctxs
             , 1
@@ -111,6 +105,7 @@ namespace fpp {
         }
         writeHeader();
         parseStreamsTimeBase();
+        setOutputFormat(raw()->oformat);
         return true;
     }
 
@@ -155,7 +150,7 @@ namespace fpp {
         throw std::logic_error { "OutputFormatContext::parseFormatContext()" };
     }
 
-    void OutputFormatContext::writeHeader() {
+    void OutputFormatContext::writeHeader() { // TODO use options 09.04
         ::avformat_write_header(
             raw()
             , nullptr /* options */
@@ -163,12 +158,7 @@ namespace fpp {
     }
 
     void OutputFormatContext::writeTrailer() {
-        if (const auto ret { ::av_write_trailer(raw()) }; ret < 0) {
-            throw FFmpegException {
-                "Failed to write stream trailer to " + mediaResourceLocator()
-                , ret
-            };
-        }
+        ffmpeg_api(av_write_trailer, raw());
     }
 
     void OutputFormatContext::initStreamsCodecpar() {
