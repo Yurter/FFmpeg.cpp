@@ -58,7 +58,8 @@ namespace fpp {
 
     bool FormatContext::open(Options options) {
         if (opened()) {
-            throw std::runtime_error { "Context already opened" };
+            log_error("Context already opened");
+            return false;
         }
         setInteruptCallback(raw(), InterruptedProcess::Opening, 20'000); // TODO magic number 07.04
         if (!openContext(options)) {
