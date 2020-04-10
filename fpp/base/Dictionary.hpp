@@ -28,8 +28,8 @@ namespace fpp {
         AVDictionary*   alloc(const Options&) const;
         void            free();
 
-        static void setString(AVDictionary** dict, const std::string_view key, const std::string_view value);
-        static void setInt   (AVDictionary** dict, const std::string_view key,                int64_t value);
+        void setString(AVDictionary** dict, const std::string_view key, const std::string_view value) const;
+        void setInt   (AVDictionary** dict, const std::string_view key,                int64_t value) const;
 
     private:
 
