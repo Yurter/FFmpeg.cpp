@@ -37,40 +37,42 @@ namespace fpp {
 
         void                processPacket(Packet& packet);
 
-        virtual std::string toString() const override final;
+        std::string         toString() const override final;
 
     protected:
 
-        /* Операции над формат контестом, ход выполнения
-         * которых, отслеживается колбеком                  */
-        enum InterruptedProcess {
-            None,
-            Opening,
-            Closing,
-            Reading,
-            Writing,
-        };
-
         struct Interrupter {
 
-            InterruptedProcess  interrupted_process;
-            Chronometer         chronometer;
-            int64_t             timeout_ms;
+            enum Process {
+                None,
+                Opening,
+                Closing,
+                Reading,
+                Writing,
+            };
+
+            Process         interrupted_process { Process::None };
+            Chronometer     chronometer;
+            int64_t         timeout_ms { 0 };
 
             bool isNone() const {
-                return interrupted_process == InterruptedProcess::None;
+                return interrupted_process == Process::None;
             }
 
             bool isTimeout() const {
                 return chronometer.elapsed_milliseconds() > timeout_ms;
             }
 
+            void reset() {
+                interrupted_process = Process::None;
+            }
+
         };
 
-        void                setInteruptCallback(AVFormatContext* ctx, InterruptedProcess process, int64_t timeout_ms);
-        void                resetInteruptCallback(AVFormatContext* ctx);
+        void                setInteruptCallback(AVFormatContext* ctx, Interrupter::Process process, int64_t timeout_ms);
+        void                resetInteruptCallback();
 
-        virtual void        createContext() = 0;
+        virtual void        createContext();
         virtual bool        openContext(Options options) = 0;
         virtual void        closeContext() = 0;
         virtual std::string formatName() const = 0;

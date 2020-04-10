@@ -21,6 +21,7 @@ namespace fpp {
             return;
         }
         closeContext();
+        reset(nullptr);
         setOpened(false);
     }
 
@@ -41,7 +42,7 @@ namespace fpp {
     }
 
     std::string FormatContext::toString() const {
-         auto context_info {
+        auto context_info {
             '\n'
             + formatName() + ',' + ' '
             + mediaResourceLocator() + ':'
@@ -61,18 +62,16 @@ namespace fpp {
             log_error("Context already opened");
             return false;
         }
-        setInteruptCallback(raw(), InterruptedProcess::Opening, 20'000); // TODO magic number 07.04
         if (!openContext(options)) {
             log_error("Could not open " + mediaResourceLocator());
             return false;
         }
-        resetInteruptCallback(raw());
         setOpened(true);
         log_info(toString());
         return true;
     }
 
-    void FormatContext::setInteruptCallback(AVFormatContext* ctx, InterruptedProcess process, int64_t timeout_ms) {
+    void FormatContext::setInteruptCallback(AVFormatContext* ctx, Interrupter::Process process, int64_t timeout_ms) {
         _current_interrupter.interrupted_process = process;
         _current_interrupter.chronometer.reset();
         _current_interrupter.timeout_ms = timeout_ms;
@@ -81,10 +80,15 @@ namespace fpp {
         ctx->interrupt_callback.opaque   = &_current_interrupter;
     }
 
-    void FormatContext::resetInteruptCallback(AVFormatContext* ctx) {
-        _current_interrupter.interrupted_process = InterruptedProcess::None;
-        ctx->interrupt_callback.callback = nullptr; /* Бессмысленно :( */
-        ctx->interrupt_callback.opaque   = nullptr; /* Бессмысленно :( */
+    void FormatContext::resetInteruptCallback() {
+        _current_interrupter.interrupted_process = Interrupter::Process::None;
+    }
+
+    void FormatContext::createContext() {
+        reset(std::shared_ptr<AVFormatContext> {
+            ::avformat_alloc_context()
+            , [](auto* ctx) { ::avformat_free_context(ctx); }
+        });
     }
 
     int FormatContext::interrupt_callback(void* opaque) {

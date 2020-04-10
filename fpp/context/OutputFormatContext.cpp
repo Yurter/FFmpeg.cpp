@@ -74,10 +74,10 @@ namespace fpp {
         };
         AVFormatContext* fmt_ctx { nullptr };
         ffmpeg_api(avformat_alloc_output_context2
-            , &fmt_ctx                       /* ctx         */
-            , nullptr                        /* oformat     */
-            , format_short_name              /* format_name */
-            , mediaResourceLocator().c_str() /* filename    */
+            , &fmt_ctx
+            , outputFormat()
+            , format_short_name
+            , mediaResourceLocator().c_str()
         );
         reset(std::shared_ptr<AVFormatContext> {
             fmt_ctx
@@ -118,6 +118,7 @@ namespace fpp {
         if (!(outputFormat()->flags & AVFMT_NOFILE)) {
             ffmpeg_api(avio_close, raw()->pb);
         }
+        _output_format = nullptr;
     }
 
     void OutputFormatContext::createStream(SharedParameters params) {

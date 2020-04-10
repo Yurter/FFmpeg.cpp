@@ -64,18 +64,11 @@ namespace fpp {
         return packet;
     }
 
-    void InputFormatContext::createContext() {
-        reset(std::shared_ptr<AVFormatContext> {
-            ::avformat_alloc_context()
-            , [](auto* ctx) { ::avformat_free_context(ctx); }
-        });
-    }
-
     bool InputFormatContext::openContext(Options options) {
         guessInputFromat();
         Dictionary dictionary { options };
         AVFormatContext* fmt_ctx { ::avformat_alloc_context() };
-        setInteruptCallback(fmt_ctx, InterruptedProcess::Opening, 20'000); // TODO magic number 07.04
+        setInteruptCallback(fmt_ctx, Interrupter::Process::Opening, 20'000); // TODO magic number 07.04
         if (const auto ret {
                 ::avformat_open_input(
                     &fmt_ctx
@@ -86,7 +79,7 @@ namespace fpp {
             }; ret < 0) {
             return false;
         }
-        resetInteruptCallback(fmt_ctx);
+        resetInteruptCallback();
         reset(std::shared_ptr<AVFormatContext> {
             fmt_ctx
             , [](auto* ctx) { /*::avformat_free_context(ctx);*/ }
@@ -109,8 +102,9 @@ namespace fpp {
     }
 
     void InputFormatContext::closeContext() {
-        auto ctx { raw() };
+        auto ctx { raw() }; // TODO 10.04
         ::avformat_close_input(&ctx);
+        _input_format = nullptr;
     }
 
     StreamVector InputFormatContext::parseFormatContext() {
