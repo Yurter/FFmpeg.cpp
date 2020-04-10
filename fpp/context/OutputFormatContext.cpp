@@ -113,8 +113,11 @@ namespace fpp {
         return raw()->oformat->name;
     }
 
-    void OutputFormatContext::beforeCloseContext() {
+    void OutputFormatContext::closeContext() {
         writeTrailer();
+        if (!(outputFormat()->flags & AVFMT_NOFILE)) {
+            ffmpeg_api(avio_close, raw()->pb);
+        }
     }
 
     void OutputFormatContext::createStream(SharedParameters params) {

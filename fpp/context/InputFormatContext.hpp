@@ -16,7 +16,7 @@ namespace fpp {
     public:
 
         InputFormatContext(const std::string_view mrl);
-        virtual ~InputFormatContext() override;
+        ~InputFormatContext() override;
 
         void                seek(int64_t stream_index, int64_t timestamp, SeekPrecision seek_precision = SeekPrecision::Forward);
         Packet              read();
@@ -33,12 +33,13 @@ namespace fpp {
 
     private:
 
-        virtual void        createContext() override;
-        virtual bool        openContext(Options options) override;
-        virtual std::string formatName() const override;
+        void                createContext() override;
+        bool                openContext(Options options) override;
+        std::string         formatName() const override;
+        void                closeContext() override;
 
         [[nodiscard]]
-        virtual StreamVector parseFormatContext() override;
+        StreamVector        parseFormatContext() override;
 
         void                guessInputFromat();
 

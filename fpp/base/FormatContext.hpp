@@ -72,7 +72,7 @@ namespace fpp {
 
         virtual void        createContext() = 0;
         virtual bool        openContext(Options options) = 0;
-        virtual void        beforeCloseContext();
+        virtual void        closeContext() = 0;
         virtual std::string formatName() const = 0;
 
         [[nodiscard]]
@@ -84,7 +84,6 @@ namespace fpp {
 
         void                setOpened(bool opened);
         static int          interrupt_callback(void* opaque);
-        void                closeContext();
 
     private:
 

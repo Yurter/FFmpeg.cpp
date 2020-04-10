@@ -20,7 +20,7 @@ namespace fpp {
         if (closed()) {
             return;
         }
-        closeContext(); // TODO make func virtual again, do not use beforeCloseContext() 09.04
+        closeContext();
         setOpened(false);
     }
 
@@ -50,10 +50,6 @@ namespace fpp {
             context_info += '\n' + stream->toString();
         }
         return context_info;
-    }
-
-    void FormatContext::beforeCloseContext() {
-        //
     }
 
     void FormatContext::setOpened(bool opened) {
@@ -96,6 +92,7 @@ namespace fpp {
         const auto interrupter {
             reinterpret_cast<const Interrupter*>(opaque)
         };
+        static_log_warning("inter", "--------" << interrupter->interrupted_process);
         if (interrupter->isNone()) {
             return OK;
         }
@@ -109,11 +106,6 @@ namespace fpp {
             return FAIL;
         }
         return OK;
-    }
-
-    void FormatContext::closeContext() {
-        beforeCloseContext();
-        ffmpeg_api(avio_close, raw()->pb);
     }
 
     std::string FormatContext::mediaResourceLocator() const {

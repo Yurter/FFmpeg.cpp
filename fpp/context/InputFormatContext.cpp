@@ -89,7 +89,7 @@ namespace fpp {
         resetInteruptCallback(fmt_ctx);
         reset(std::shared_ptr<AVFormatContext> {
             fmt_ctx
-            , [](auto* ctx) { ::avformat_close_input(&ctx); }
+            , [](auto* ctx) { /*::avformat_free_context(ctx);*/ }
         });
         setInputFormat(raw()->iformat);
         if (const auto ret {
@@ -106,6 +106,11 @@ namespace fpp {
 
     std::string InputFormatContext::formatName() const {
         return raw()->iformat->name;
+    }
+
+    void InputFormatContext::closeContext() {
+        auto ctx { raw() };
+        ::avformat_close_input(&ctx);
     }
 
     StreamVector InputFormatContext::parseFormatContext() {
