@@ -89,7 +89,7 @@ namespace fpp {
         resetInteruptCallback(fmt_ctx);
         reset(std::shared_ptr<AVFormatContext> {
             fmt_ctx
-            , [](auto* ctx) { avformat_close_input(&ctx); }
+            , [](auto* ctx) { ::avformat_close_input(&ctx); }
         });
         setInputFormat(raw()->iformat);
         if (const auto ret {
