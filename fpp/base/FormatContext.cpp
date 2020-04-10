@@ -12,7 +12,10 @@ namespace fpp {
     FormatContext::FormatContext(const std::string_view mrl)
         : _media_resource_locator { mrl }
         , _opened { false }
-        , _reconnect_on_failure { false } {
+        , _timeout_opening { 20'000 }
+        , _timeout_closing { 5'000 }
+        , _timeout_reading { 5'000 }
+        , _timeout_writing { 1'000 } {
         setName("FormatContext");
     }
 
@@ -31,10 +34,6 @@ namespace fpp {
 
     bool FormatContext::closed() const {
         return !_opened;
-    }
-
-    void FormatContext::reconnectOnFailure(bool reconnect) {
-        _reconnect_on_failure = reconnect;
     }
 
     void FormatContext::flushContextAfterEachPacket(bool value) {
@@ -144,6 +143,38 @@ namespace fpp {
 
     StreamVector FormatContext::streams() {
         return _streams;
+    }
+
+    void FormatContext::setTimeoutOpening(int64_t ms) {
+        _timeout_opening = ms;
+    }
+
+    void FormatContext::setTimeoutClosing(int64_t ms) {
+        _timeout_closing = ms;
+    }
+
+    void FormatContext::setTimeoutReading(int64_t ms) {
+        _timeout_reading = ms;
+    }
+
+    void FormatContext::setTimeoutWriting(int64_t ms) {
+        _timeout_writing = ms;
+    }
+
+    int64_t FormatContext::timeoutOpening() const {
+        return _timeout_opening;
+    }
+
+    int64_t FormatContext::timeoutClosing() const {
+        return _timeout_closing;
+    }
+
+    int64_t FormatContext::timeoutReading() const {
+        return _timeout_reading;
+    }
+
+    int64_t FormatContext::timeoutWriting() const {
+        return _timeout_writing;
     }
 
     const StreamVector FormatContext::streams() const {

@@ -21,6 +21,16 @@ namespace fpp {
         const StreamVector  streams()               const;
         StreamVector        streams();
 
+        void                setTimeoutOpening(int64_t ms);
+        void                setTimeoutClosing(int64_t ms);
+        void                setTimeoutReading(int64_t ms);
+        void                setTimeoutWriting(int64_t ms);
+
+        int64_t             timeoutOpening() const;
+        int64_t             timeoutClosing() const;
+        int64_t             timeoutReading() const;
+        int64_t             timeoutWriting() const;
+
         bool                open(Options options = {});
         void                close();
 
@@ -93,7 +103,11 @@ namespace fpp {
         bool                _opened;
         StreamVector        _streams;
         Interrupter         _current_interrupter;
-        bool                _reconnect_on_failure;
+
+        int64_t             _timeout_opening;
+        int64_t             _timeout_closing; // TODO not used 10.04
+        int64_t             _timeout_reading; // TODO not used 10.04
+        int64_t             _timeout_writing; // TODO not used 10.04
 
     };
 

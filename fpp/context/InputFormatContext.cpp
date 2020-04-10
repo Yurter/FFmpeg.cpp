@@ -67,7 +67,7 @@ namespace fpp {
         guessInputFromat();
         Dictionary dictionary { options };
         AVFormatContext* fmt_ctx { ::avformat_alloc_context() };
-        setInteruptCallback(fmt_ctx, Interrupter::Process::Opening, 20'000); // TODO magic number 07.04
+        setInteruptCallback(fmt_ctx, Interrupter::Process::Opening, timeoutOpening());
         if (const auto ret {
                 ::avformat_open_input(
                     &fmt_ctx
@@ -81,7 +81,7 @@ namespace fpp {
         resetInteruptCallback();
         reset(std::shared_ptr<AVFormatContext> {
             fmt_ctx
-            , [](auto* ctx) { /*::avformat_free_context(ctx);*/ }
+            , [](auto* ctx) { /*::avformat_free_context(ctx);*/ } // TODO avformat_close_input free context 10.04
         });
         setInputFormat(raw()->iformat);
         if (const auto ret {
