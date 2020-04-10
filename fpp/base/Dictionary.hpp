@@ -8,7 +8,8 @@ struct AVDictionary;
 
 namespace fpp {
 
-    using Options = std::vector<std::pair<std::string,std::string>>;
+    using Entry = std::pair<std::string,std::string>;
+    using Options = std::vector<Entry>;
 
     class Dictionary : public Object {
 
