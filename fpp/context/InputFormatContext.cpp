@@ -13,7 +13,6 @@ namespace fpp {
         : FormatContext(mrl)
         , _input_format { nullptr } {
         setName("InFmtCtx");
-        createContext();
     }
 
     InputFormatContext::~InputFormatContext() {
