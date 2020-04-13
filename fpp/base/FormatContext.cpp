@@ -70,6 +70,11 @@ namespace fpp {
         return true;
     }
 
+    bool FormatContext::open(const std::string_view mrl, Options options) {
+        setMediaResourceLocator(mrl);
+        return open(options);
+    }
+
     void FormatContext::setInteruptCallback(AVFormatContext* ctx, Interrupter::Process process, int64_t timeout_ms) {
         _current_interrupter.interrupted_process = process;
         _current_interrupter.chronometer.reset();
@@ -96,7 +101,6 @@ namespace fpp {
         const auto interrupter {
             reinterpret_cast<const Interrupter*>(opaque)
         };
-        static_log_warning("inter", "--------" << interrupter->interrupted_process);
         if (interrupter->isNone()) {
             return OK;
         }
@@ -135,6 +139,10 @@ namespace fpp {
 
     void FormatContext::addStream(SharedStream stream) {
         _streams.push_back(stream);
+    }
+
+    void FormatContext::setMediaResourceLocator(const std::string_view mrl) {
+        _media_resource_locator = mrl;
     }
 
     int64_t FormatContext::streamNumber() const {

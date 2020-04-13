@@ -15,7 +15,7 @@ namespace fpp {
 
     public:
 
-        FormatContext(const std::string_view mrl);
+        FormatContext(const std::string_view mrl = {});
 
         std::string         mediaResourceLocator()  const;
         const StreamVector  streams()               const;
@@ -32,6 +32,7 @@ namespace fpp {
         int64_t             timeoutWriting() const;
 
         bool                open(Options options = {});
+        bool                open(const std::string_view mrl, Options options = {});
         void                close();
 
         bool                opened() const;
@@ -54,7 +55,7 @@ namespace fpp {
         struct Interrupter {
 
             enum Process {
-                None,
+                None, // TODO remove 13.04
                 Opening,
                 Closing,
                 Reading,
@@ -94,12 +95,13 @@ namespace fpp {
 
     private:
 
+        void                setMediaResourceLocator(const std::string_view mrl);
         void                setOpened(bool opened);
         static int          interrupt_callback(void* opaque);
 
     private:
 
-        const std::string   _media_resource_locator;
+        std::string         _media_resource_locator;
         bool                _opened;
         StreamVector        _streams;
         Interrupter         _current_interrupter;

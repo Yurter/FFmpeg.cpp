@@ -3,7 +3,6 @@
 
 namespace fpp {
 
-    /* Точность поиска фрейма методом seek() */
     enum class SeekPrecision : uint8_t {
         Forward,
         Backward,
@@ -15,7 +14,7 @@ namespace fpp {
 
     public:
 
-        InputFormatContext(const std::string_view mrl);
+        InputFormatContext(const std::string_view mrl = {});
         ~InputFormatContext() override;
 
         void                seek(int64_t stream_index, int64_t timestamp, SeekPrecision seek_precision = SeekPrecision::Forward);
