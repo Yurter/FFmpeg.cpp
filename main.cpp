@@ -10,22 +10,22 @@ auto main() -> int {
 
         // Common
 //        void transmuxing_file();
-//        void webcam_to_file();
-//        void record_screen_win();
+//        webcam_to_file();
+//        record_screen_win();
 
         // YouTube stream
-//        void youtube_stream_copy();
-//        void youtube_stream_transcode();
+//        youtube_stream_copy();
+//        youtube_stream_transcode();
 
         // RTP stream
-//        void rtp_video_stream();
-//        void rtp_audio_stream();
-//        void rtp_video_and_audio_stream();
-//        void rtp_video_stream_transcoded();
+//        rtp_video_stream();
+//        rtp_audio_stream();
+//        rtp_video_and_audio_stream();
+//        rtp_video_stream_transcoded();
 
         // Filters
-//        void text_on_video();
-//        void timelapase();
+//        text_on_video();
+//        timelapase();
 
     } catch (const fpp::FFmpegException& e) {
         std::cout << "FFmpegException: " << e.what() << "\n";
