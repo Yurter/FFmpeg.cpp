@@ -54,34 +54,22 @@ namespace fpp {
 
         struct Interrupter {
 
-            enum Process {
-                None, // TODO remove 13.04
-                Opening,
-                Closing,
-                Reading,
-                Writing,
-            };
-
-            Process         interrupted_process { Process::None };
             Chronometer     chronometer;
             int64_t         timeout_ms { 0 };
-
-            bool isNone() const {
-                return interrupted_process == Process::None;
-            }
 
             bool isTimeout() const {
                 return chronometer.elapsed_milliseconds() > timeout_ms;
             }
 
-            void reset() {
-                interrupted_process = Process::None;
+            void set(int64_t timeout) {
+                timeout_ms = timeout;
+                chronometer.reset();
             }
 
         };
 
-        void                setInteruptCallback(AVFormatContext* ctx, Interrupter::Process process, int64_t timeout_ms);
-        void                resetInteruptCallback();
+        void                setInterruptCallback(AVFormatContext* ctx);
+        void                setInterrupter(int64_t timeout_ms);
 
         virtual void        createContext();
         virtual bool        openContext(Options options) = 0;
@@ -104,7 +92,7 @@ namespace fpp {
         std::string         _media_resource_locator;
         bool                _opened;
         StreamVector        _streams;
-        Interrupter         _current_interrupter;
+        Interrupter         _interrupter;
 
         int64_t             _timeout_opening;
         int64_t             _timeout_closing; // TODO not used 10.04

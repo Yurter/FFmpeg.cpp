@@ -23,6 +23,7 @@ namespace fpp {
         if (closed()) {
             return;
         }
+        setInterrupter(timeoutClosing());
         closeContext();
         reset(nullptr);
         setOpened(false);
@@ -75,17 +76,13 @@ namespace fpp {
         return open(options);
     }
 
-    void FormatContext::setInteruptCallback(AVFormatContext* ctx, Interrupter::Process process, int64_t timeout_ms) {
-        _current_interrupter.interrupted_process = process;
-        _current_interrupter.chronometer.reset();
-        _current_interrupter.timeout_ms = timeout_ms;
-
+    void FormatContext::setInterruptCallback(AVFormatContext* ctx) {
         ctx->interrupt_callback.callback = &FormatContext::interrupt_callback;
-        ctx->interrupt_callback.opaque   = &_current_interrupter;
+        ctx->interrupt_callback.opaque   = &_interrupter;
     }
 
-    void FormatContext::resetInteruptCallback() {
-        _current_interrupter.interrupted_process = Interrupter::Process::None;
+    void FormatContext::setInterrupter(int64_t timeout_ms) {
+        _interrupter.set(timeout_ms);
     }
 
     void FormatContext::createContext() {
@@ -101,15 +98,10 @@ namespace fpp {
         const auto interrupter {
             reinterpret_cast<const Interrupter*>(opaque)
         };
-        if (interrupter->isNone()) {
-            return OK;
-        }
         if (interrupter->isTimeout()) {
             static_log_error(
                 "interrupt_callback"
-                , interrupter->interrupted_process
-                    << " timed out: "
-                    << interrupter->timeout_ms
+                , "Timed out: " << interrupter->timeout_ms
             );
             return FAIL;
         }

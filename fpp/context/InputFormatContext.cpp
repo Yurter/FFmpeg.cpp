@@ -48,6 +48,7 @@ namespace fpp {
     }
 
     Packet InputFormatContext::read() {
+        setInterrupter(timeoutReading());
         Packet packet { MediaType::Unknown };
         if (const auto ret { ::av_read_frame(raw(), packet.ptr()) }; ret < 0) {
             if (ret == AVERROR_EOF) {
@@ -67,7 +68,8 @@ namespace fpp {
         guessInputFromat();
         Dictionary dictionary { options };
         AVFormatContext* fmt_ctx { ::avformat_alloc_context() };
-        setInteruptCallback(fmt_ctx, Interrupter::Process::Opening, timeoutOpening());
+        setInterruptCallback(fmt_ctx);
+        setInterrupter(timeoutOpening());
         if (const auto ret {
                 ::avformat_open_input(
                     &fmt_ctx
@@ -78,7 +80,6 @@ namespace fpp {
             }; ret < 0) {
             return false;
         }
-        resetInteruptCallback();
         reset(std::shared_ptr<AVFormatContext> {
             fmt_ctx
             , [](auto* ctx) { /*::avformat_free_context(ctx);*/ } // TODO avformat_close_input free context 10.04
