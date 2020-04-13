@@ -26,6 +26,7 @@ namespace fpp {
         setInterrupter(timeoutClosing());
         closeContext();
         reset(nullptr);
+        setStreams({});
         setOpened(false);
     }
 
