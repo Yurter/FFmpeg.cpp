@@ -14,7 +14,7 @@ namespace fpp {
 
     public:
 
-        InputFormatContext(const std::string_view mrl = {});
+        InputFormatContext(const std::string_view mrl = {}, const std::string_view format_short_name = {});
         ~InputFormatContext() override;
 
         void                seek(int64_t stream_index, int64_t timestamp, SeekPrecision seek_precision = SeekPrecision::Forward);
@@ -40,6 +40,7 @@ namespace fpp {
         StreamVector        parseFormatContext() override;
 
         void                guessInputFromat();
+        AVInputFormat*      findInputFormat(const std::string_view short_name) const;
 
         AVInputFormat*      inputFormat();
         void                setInputFormat(AVInputFormat* in_fmt);

@@ -9,9 +9,9 @@ extern "C" {
 
 namespace fpp {
 
-    InputFormatContext::InputFormatContext(const std::string_view mrl)
+    InputFormatContext::InputFormatContext(const std::string_view mrl, const std::string_view format_short_name)
         : FormatContext(mrl)
-        , _input_format { nullptr } {
+        , _input_format { findInputFormat(format_short_name) } {
         setName("InFmtCtx");
     }
 
@@ -65,7 +65,9 @@ namespace fpp {
     }
 
     bool InputFormatContext::openContext(Options options) {
-        guessInputFromat();
+        if (!inputFormat()) {
+            guessInputFromat();
+        }
         Dictionary dictionary { options };
         AVFormatContext* fmt_ctx { ::avformat_alloc_context() };
         setInterruptCallback(fmt_ctx);
@@ -125,7 +127,11 @@ namespace fpp {
         const auto short_name {
             utils::guess_format_short_name(mediaResourceLocator())
         };
-        if (short_name) {
+        setInputFormat(findInputFormat(short_name));
+    }
+
+    AVInputFormat* InputFormatContext::findInputFormat(const std::string_view short_name) const {
+        if (short_name.data()) {
             if (std::string { short_name } == "dshow") {
                 utils::device_register_all();
             }
@@ -133,7 +139,7 @@ namespace fpp {
                 utils::device_register_all();
             }
         }
-        setInputFormat(::av_find_input_format(short_name));
+        return ::av_find_input_format(short_name.data());
     }
 
     AVInputFormat* InputFormatContext::inputFormat() {
