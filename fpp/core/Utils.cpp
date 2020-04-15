@@ -356,6 +356,10 @@ namespace fpp {
                     to internal queue, or similar other errors: \
                     legitimate decoding errors";
         }
+        if (AVERROR_INVALIDDATA == ret) {
+            return "avcodec_send_packet failed: Invalid data found "
+                   "when processing input";
+        }
         return "avcodec_send_packet failed: unknown code: " + std::to_string(ret);
     }
 
