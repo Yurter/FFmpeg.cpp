@@ -27,6 +27,8 @@ auto main() -> int {
 //        text_on_video();
 //        timelapase();
 
+//        concatenate();
+
     } catch (const fpp::FFmpegException& e) {
         std::cout << "FFmpegException: " << e.what() << "\n";
     } catch (const std::exception& e) {

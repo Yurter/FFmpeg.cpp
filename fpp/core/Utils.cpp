@@ -303,20 +303,23 @@ namespace fpp {
         if (media_resurs_locator.find("aevalsrc=") != std::string_view::npos) {
             return "lavfi";
         }
-        if (media_resurs_locator.find("anullsrc=") != std::string_view::npos) { /* Silence */
+        if (media_resurs_locator.find("anullsrc=") != std::string_view::npos) {
             return "lavfi";
         }
-        if (media_resurs_locator.find("sine=") != std::string_view::npos) {     /* Hum/squeak */
+        if (media_resurs_locator.find("sine=") != std::string_view::npos) {
             return "lavfi";
         }
-        if (media_resurs_locator.find("video=") != std::string_view::npos) {    /* USB camera's video */
+        if (media_resurs_locator.find("video=") != std::string_view::npos) {
             return "dshow";
         }
-        if (media_resurs_locator.find("audio=") != std::string_view::npos) {    /* USB micro's audio */
+        if (media_resurs_locator.find("audio=") != std::string_view::npos) {
             return "TODO 13.01";
         }
-        if (media_resurs_locator == "desktop") {                                /* Screen recoder */
+        if (media_resurs_locator == "desktop") {
             return "gdigrab";
+        }
+        if (media_resurs_locator.find("concat") != std::string_view::npos) {
+            return "concat";
         }
         return nullptr;
     }

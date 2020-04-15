@@ -22,6 +22,7 @@ INCLUDEPATH += include
 
 SOURCES += \
     examples/adaptive_streaming.cpp \
+    examples/concatenate.cpp \
     examples/filter_text_on_video.cpp \
     examples/filter_timelapase.cpp \
     examples/record_screen_win.cpp \

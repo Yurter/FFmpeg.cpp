@@ -17,3 +17,5 @@ void rtp_video_stream_transcoded();
 // Filters
 void text_on_video();
 void timelapase();
+
+void concatenate();
