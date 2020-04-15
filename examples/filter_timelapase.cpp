@@ -78,12 +78,6 @@ void timelapase() {
     /* open sink */
     sink.open();
 
-    /* create sdp file */
-    std::ofstream sdp_file;
-    sdp_file.open("video.sdp");
-    sdp_file << sink.sdp();
-    sdp_file.close();
-
     fpp::Packet input_packet {
         fpp::MediaType::Unknown
     };
