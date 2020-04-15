@@ -61,6 +61,8 @@ namespace fpp {
             return "Video";
         case MediaType::Audio:
             return "Audio";
+        case MediaType::Subtitle:
+            return "Subtitle";
         case MediaType::EndOF:
             return "EOF";
         }
@@ -155,10 +157,12 @@ namespace fpp {
                 return MediaType::Video;
             case AVMediaType::AVMEDIA_TYPE_AUDIO:
                 return MediaType::Audio;
+            case AVMediaType::AVMEDIA_TYPE_SUBTITLE:
+                return MediaType::Subtitle;
             default: {
                 throw std::invalid_argument {
                     std::string { __FUNCTION__ } + " failed, bad type "
-                    + std::to_string(int(type))
+                        + std::to_string(int(type))
                 };
             }
         }
@@ -170,10 +174,12 @@ namespace fpp {
                 return AVMediaType::AVMEDIA_TYPE_VIDEO;
             case MediaType::Audio:
                 return AVMediaType::AVMEDIA_TYPE_AUDIO;
+            case MediaType::Subtitle:
+                return AVMediaType::AVMEDIA_TYPE_SUBTITLE;
             default: {
                 throw std::invalid_argument {
                     std::string { __FUNCTION__ } + " failed, bad type "
-                    + std::to_string(int(type))
+                        + std::to_string(int(type))
                 };
             }
         }
@@ -471,6 +477,8 @@ namespace fpp {
                 return VideoParameters::make_shared();
             case MediaType::Audio:
                 return AudioParameters::make_shared();
+            case MediaType::Subtitle:
+                return Parameters::make_shared(MediaType::Subtitle);
             default:
                 throw std::invalid_argument {
                     "make_params failed: invalid media type"
@@ -484,6 +492,8 @@ namespace fpp {
                 return VideoParameters::make_shared();
             case AVMediaType::AVMEDIA_TYPE_AUDIO:
                 return AudioParameters::make_shared();
+            case AVMediaType::AVMEDIA_TYPE_SUBTITLE:
+                return Parameters::make_shared(MediaType::Subtitle);
             default:
                 throw std::invalid_argument {
                     "make_params failed: invalid media type"

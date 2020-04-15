@@ -50,8 +50,14 @@ namespace fpp {
     }
 
     std::string Stream::toString() const {
+        const auto tag {
+            ::av_dict_get(raw()->metadata, "language", nullptr, AV_DICT_MATCH_CASE)
+        };
+        const auto lang {
+            tag ? '(' + std::string { tag->value } + ')' : ""
+        };
         return "[" + std::to_string(index()) + "] "
-                + utils::to_string(type()) + " stream: "
+                + utils::to_string(type()) + " stream" + lang + ": "
                 + params->toString();
     }
 
@@ -65,15 +71,15 @@ namespace fpp {
             );
         }
 
-        shiftStamps(packet);
+        shiftStamps(packet);  // TODO remove & fix duration in MediaInfo 15.04
 
         if (packet.duration() == 0) {
             calculatePacketDuration(packet);
         }
 
-        avoidNegativeTimestamp(packet);
-        checkStampMonotonicity(packet);
-        checkDtsPtsOrder(packet);
+        avoidNegativeTimestamp(packet); // TODO remove 15.04
+        checkStampMonotonicity(packet); // TODO remove 15.04
+        checkDtsPtsOrder(packet);       // TODO remove 15.04
 
         packet.setPos(-1);
         packet.setTimeBase(params->timeBase());

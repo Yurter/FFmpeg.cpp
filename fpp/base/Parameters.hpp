@@ -60,6 +60,10 @@ namespace fpp {
         virtual void        initCodecContext(AVCodecContext* codec_context) const;
         virtual void        parseCodecContext(const AVCodecContext* codec_context);
 
+        static SharedParameters make_shared(MediaType media_type) {
+            return std::make_shared<Parameters>(media_type);
+        }
+
     private:
 
         void                reset();
