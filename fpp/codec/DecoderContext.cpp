@@ -31,7 +31,8 @@ namespace fpp {
         if (const auto ret {
                 ::avcodec_send_packet(raw(), &packet.raw())
             }; ret != 0) {
-            throw FFmpegException { utils::send_packet_error_to_string(ret), ret };
+            log_error(utils::send_packet_error_to_string(ret));
+//            throw FFmpegException { utils::send_packet_error_to_string(ret), ret };
         }
     }
 
