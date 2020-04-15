@@ -15,11 +15,12 @@ void webcam_to_file() {
 
     /* change default image size (480x360) */
     fpp::Options webcam_options {
-        { "video_size", "1280x720" }
+        { "video_size", "1024x768" }
+        , { "framerate", "30" }
     };
 
     /* open source */
-    source.open(/*webcam_options*/);
+    source.open(webcam_options);
 
     /* create sink */
     fpp::OutputFormatContext sink {
@@ -84,6 +85,8 @@ void webcam_to_file() {
 
     /* because of endless webcam's video */
 //    source.stream(0)->setEndTimePoint(10 * 1000);
+
+    fpp::Chronometer chronometer;
 
     /* read and write packets */
     while (read_packet()) {
