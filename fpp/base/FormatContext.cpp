@@ -44,8 +44,7 @@ namespace fpp {
 
     std::string FormatContext::toString() const {
         auto context_info {
-            '\n'
-            + formatName() + ',' + ' '
+            formatName() + ',' + ' '
             + mediaResourceLocator() + ':'
         };
         for (const auto& stream : streams()) {
