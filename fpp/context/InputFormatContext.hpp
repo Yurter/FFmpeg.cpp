@@ -40,7 +40,7 @@ namespace fpp {
         StreamVector        parseFormatContext() override;
 
         void                guessInputFromat();
-        AVInputFormat*      findInputFormat(const std::string_view short_name) const;
+        AVInputFormat*      findInputFormat(const char* short_name) const;
 
         AVInputFormat*      inputFormat();
         void                setInputFormat(AVInputFormat* in_fmt);
