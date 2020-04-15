@@ -86,23 +86,19 @@ void webcam_to_file() {
 //    source.stream(0)->setEndTimePoint(10 * 1000);
 
     /* read and write packets */
-//    while (read_packet()) {
-//        if (input_packet.isVideo()) {
-//            for (const auto& v_frame  : video_decoder.decode(input_packet)) {
-//            for (const auto& fv_frame : filter.filter(v_frame))             {
-//            auto rv_frame { rescaler.scale(fv_frame) };
-//            for (const auto& v_packet : video_encoder.encode(rv_frame))     {
-//                sink.write(v_packet);
-//            }}}
-//        }
-//    }
+    while (read_packet()) {
+        if (input_packet.isVideo()) {
+            for (const auto& v_frame  : video_decoder.decode(input_packet)) {
+            for (const auto& fv_frame : filter.filter(v_frame))             {
+            auto rv_frame { rescaler.scale(fv_frame) };
+            for (const auto& v_packet : video_encoder.encode(rv_frame))     {
+                sink.write(v_packet);
+            }}}
+        }
+    }
 
     /* explicitly close contexts */
     source.close();
     sink.close();
-//    if( remove( "webcam.flv" ) != 0 )
-//        perror( "Error deleting file\n" );
-//    else
-//        puts( "File successfully deleted\n" );
 
 }
