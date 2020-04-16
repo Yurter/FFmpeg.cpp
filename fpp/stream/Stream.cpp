@@ -71,15 +71,15 @@ namespace fpp {
             );
         }
 
-        shiftStamps(packet);  // TODO remove & fix duration in MediaInfo 15.04
+//        shiftStamps(packet);  // TODO remove & fix duration in MediaInfo 15.04
 
         if (packet.duration() == 0) {
             calculatePacketDuration(packet);
         }
 
-        avoidNegativeTimestamp(packet); // TODO remove 15.04
-        checkStampMonotonicity(packet); // TODO remove 15.04
-        checkDtsPtsOrder(packet);       // TODO remove 15.04
+//        avoidNegativeTimestamp(packet); // TODO remove 15.04
+//        checkStampMonotonicity(packet); // TODO remove 15.04
+//        checkDtsPtsOrder(packet);       // TODO remove 15.04
 
         packet.setPos(-1);
         packet.setTimeBase(params->timeBase());
