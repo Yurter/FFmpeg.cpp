@@ -119,6 +119,7 @@ namespace fpp {
                     || (stream_type == AVMEDIA_TYPE_AUDIO)
                     || (stream_type == AVMEDIA_TYPE_SUBTITLE)) {
                 result.push_back(Stream::make_input_stream(raw()->streams[i]));
+                result.back()->params->setFormatFlags(inputFormat()->flags);
             } else {
                 log_warning("Input " << utils::to_string(stream_type) << "stream ignored (TODO 15.04)");
             }
