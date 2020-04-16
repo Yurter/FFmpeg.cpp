@@ -80,6 +80,7 @@ namespace fpp {
             , format_short_name
             , mediaResourceLocator().c_str()
         );
+        setOutputFormat(fmt_ctx->oformat);
         reset(std::shared_ptr<AVFormatContext> {
             fmt_ctx
             , [](auto* ctx) { ::avformat_free_context(ctx); }
@@ -123,6 +124,7 @@ namespace fpp {
     }
 
     void OutputFormatContext::createStream(SharedParameters params) {
+        params->setFormatFlags(outputFormat()->flags);
         const auto avstream  { ::avformat_new_stream(raw(), params->codec()) };
         const auto fppstream { Stream::make_output_stream(avstream, params)  };
         addStream(fppstream);
@@ -166,7 +168,7 @@ namespace fpp {
         ffmpeg_api(av_write_trailer, raw());
     }
 
-    void OutputFormatContext::initStreamsCodecpar() {
+    void OutputFormatContext::initStreamsCodecpar() { // TODO refactor 16.04
         for (const auto& stream : streams()) {
             stream->params->initCodecpar(stream->codecpar());
         }

@@ -36,6 +36,7 @@ namespace fpp {
         void                setStreamIndex(uid_t stream_index);
         void                setTimeBase(AVRational time_base);
         void                setExtradata(Extradata extradata);
+        void                setFormatFlags(int flags);
 
         AVCodecID           codecId()       const;
         std::string         codecName()     const;
@@ -68,6 +69,7 @@ namespace fpp {
 
         void                reset();
         void                setCodec(AVCodec* codec);
+        bool                testFormatFlag(int flag) const;
 
     private:
 
@@ -75,6 +77,7 @@ namespace fpp {
         int64_t             _duration;
         uid_t               _stream_index;
         AVRational          _time_base;
+        int                 _format_flags;
 
     };
 
