@@ -69,7 +69,7 @@ namespace fpp {
         frame.raw().format = output_params->pixelFormat();
         frame.raw().width  = int(output_params->width());
         frame.raw().height = int(output_params->height());
-        ffmpeg_api(av_frame_get_buffer, frame.ptr(), 32);
+        ffmpeg_api_strict(av_frame_get_buffer, frame.ptr(), 32);
         return frame;
     }
 

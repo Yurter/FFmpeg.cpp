@@ -41,7 +41,7 @@ namespace fpp {
             , [](auto* ctx) { ::swr_free(&ctx); }
         });
 
-        ffmpeg_api(swr_init, raw());
+        ffmpeg_api_strict(swr_init, raw());
 
         log_info("Inited "
             << "from ["

@@ -20,7 +20,7 @@ namespace fpp {
         close();
     }
 
-    void OutputFormatContext::write(Packet packet, WriteMode write_mode) {
+    bool OutputFormatContext::write(Packet packet, WriteMode write_mode) {
         processPacket(packet);
         setInterrupter(timeoutWriting());
         if (write_mode == WriteMode::Instant) {
@@ -32,7 +32,7 @@ namespace fpp {
     }
 
     void OutputFormatContext::flush() {
-        if (const auto ret { ::av_write_frame(raw(), nullptr) }; ret != 1) { // TODO check ret value meaning and use ffmpeg_api macro 09.04
+        if (const auto ret { ::av_write_frame(raw(), nullptr) }; ret != 1) { // TODO check ret value meaning and use ffmpeg_api_strict macro 09.04
             throw FFmpegException { "OutputFormatContext flush failed", ret };
         }
     }
@@ -40,7 +40,7 @@ namespace fpp {
     std::string OutputFormatContext::sdp() {
         char buf[256] {};
         AVFormatContext* ctxs[] { raw() }; // TODO do not use utils::merge_sdp_files(), instead use ctxs array 09.04
-        ffmpeg_api(av_sdp_create
+        ffmpeg_api_strict(av_sdp_create
             , ctxs
             , 1
             , buf
@@ -74,7 +74,7 @@ namespace fpp {
             utils::guess_format_short_name(mediaResourceLocator())
         };
         AVFormatContext* fmt_ctx { nullptr };
-        ffmpeg_api(avformat_alloc_output_context2
+        ffmpeg_api_strict(avformat_alloc_output_context2
             , &fmt_ctx
             , outputFormat()
             , format_short_name
@@ -118,7 +118,7 @@ namespace fpp {
     void OutputFormatContext::closeContext() {
         writeTrailer();
         if (!(outputFormat()->flags & AVFMT_NOFILE)) {
-            ffmpeg_api(avio_close, raw()->pb);
+            ffmpeg_api_strict(avio_close, raw()->pb);
         }
         _output_format = nullptr;
     }
@@ -165,7 +165,7 @@ namespace fpp {
     }
 
     void OutputFormatContext::writeTrailer() {
-        ffmpeg_api(av_write_trailer, raw());
+        ffmpeg_api_strict(av_write_trailer, raw());
     }
 
     void OutputFormatContext::initStreamsCodecpar() { // TODO refactor 16.04

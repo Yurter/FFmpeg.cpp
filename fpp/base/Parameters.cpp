@@ -159,15 +159,15 @@ namespace fpp {
     }
 
     void Parameters::initCodecpar(AVCodecParameters* codecpar) const {
-        ffmpeg_api(avcodec_parameters_copy, codecpar, ptr());
+        ffmpeg_api_strict(avcodec_parameters_copy, codecpar, ptr());
     }
 
     void Parameters::parseCodecpar(AVCodecParameters* codecpar) {
-        ffmpeg_api(avcodec_parameters_copy, ptr(), codecpar);
+        ffmpeg_api_strict(avcodec_parameters_copy, ptr(), codecpar);
     }
 
     void Parameters::initCodecContext(AVCodecContext* codec_context) const {
-        ffmpeg_api(avcodec_parameters_to_context, codec_context, ptr());
+        ffmpeg_api_strict(avcodec_parameters_to_context, codec_context, ptr());
 
         if (testFormatFlag(AVFMT_GLOBALHEADER)) {
             codec_context->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
@@ -178,7 +178,7 @@ namespace fpp {
     }
 
     void Parameters::parseCodecContext(const AVCodecContext* codec_context) {
-        ffmpeg_api(avcodec_parameters_from_context, ptr(), codec_context);
+        ffmpeg_api_strict(avcodec_parameters_from_context, ptr(), codec_context);
     }
 
     void Parameters::reset() {

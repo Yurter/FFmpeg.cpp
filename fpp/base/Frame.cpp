@@ -120,12 +120,12 @@ namespace fpp {
     }
 
     void Frame::ref(const Frame& other) {
-        ffmpeg_api(av_frame_ref, ptr(), other.ptr());
+        ffmpeg_api_strict(av_frame_ref, ptr(), other.ptr());
         setTimeBase(other.timeBase());
     }
 
     void Frame::ref(const AVFrame& other, AVRational time_base) {
-        ffmpeg_api(av_frame_ref, ptr(), &other);
+        ffmpeg_api_strict(av_frame_ref, ptr(), &other);
         setTimeBase(time_base);
     }
 

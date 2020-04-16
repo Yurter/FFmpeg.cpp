@@ -19,7 +19,7 @@ namespace fpp {
     }
 
     FrameList FilterContext::filter(Frame source_frame) {
-        ffmpeg_api(av_buffersrc_add_frame_flags
+        ffmpeg_api_strict(av_buffersrc_add_frame_flags
            , _buffersrc_ctx.get()
            , source_frame.ptr()
            , AV_BUFFERSRC_FLAG_KEEP_REF
@@ -64,7 +64,7 @@ namespace fpp {
         auto raw_inputs  { _inputs.get()  };
         auto raw_outputs { _outputs.get() };
 
-        ffmpeg_api(avfilter_graph_parse_ptr
+        ffmpeg_api_strict(avfilter_graph_parse_ptr
             , _filter_graph.get()
             , _filters_descr.c_str()
             , &raw_inputs
@@ -74,7 +74,7 @@ namespace fpp {
 
         log_info("Filter description: " << _filters_descr);
 
-        ffmpeg_api(avfilter_graph_config
+        ffmpeg_api_strict(avfilter_graph_config
            , _filter_graph.get()
            , nullptr /* context used for logging */
         );
