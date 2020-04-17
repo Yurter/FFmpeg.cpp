@@ -3,11 +3,13 @@
 
 namespace fpp {
 
-    /* Медиа тип потока/пакета/фрейма */
     enum class MediaType : uint8_t {
         Unknown,
         Video,
         Audio,
+        Data,       ///< Opaque data information usually continuous
+        Subtitle,
+        Attachment, ///< Opaque data information usually sparse
         EndOF,
     };
 

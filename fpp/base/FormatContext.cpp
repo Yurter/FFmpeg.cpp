@@ -12,7 +12,10 @@ namespace fpp {
     FormatContext::FormatContext(const std::string_view mrl)
         : _media_resource_locator { mrl }
         , _opened { false }
-        , _current_interrupter { Interrupter { InterruptedProcess::None } } {
+        , _timeout_opening { 20'000 }
+        , _timeout_closing { 5'000 }
+        , _timeout_reading { 5'000 }
+        , _timeout_writing { 1'000 } {
         setName("FormatContext");
     }
 
@@ -20,7 +23,10 @@ namespace fpp {
         if (closed()) {
             return;
         }
+        setInterrupter(timeoutClosing());
         closeContext();
+        reset(nullptr);
+        setStreams({});
         setOpened(false);
     }
 
@@ -37,9 +43,8 @@ namespace fpp {
     }
 
     std::string FormatContext::toString() const {
-         auto context_info {
-            '\n'
-            + formatName() + ',' + ' '
+        auto context_info {
+            formatName() + ',' + ' '
             + mediaResourceLocator() + ':'
         };
         for (const auto& stream : streams()) {
@@ -48,72 +53,59 @@ namespace fpp {
         return context_info;
     }
 
-    void FormatContext::beforeCloseContext() {
-        //
-    }
-
     void FormatContext::setOpened(bool opened) {
         _opened = opened;
     }
 
     bool FormatContext::open(Options options) {
         if (opened()) {
-            throw std::runtime_error { "Context already opened" };
-        }
-        setInteruptCallback(InterruptedProcess::Opening);
-        if (!openContext(options)) {
-            log_error("Could not open output: " + mediaResourceLocator());
+            log_error("Context already opened");
             return false;
         }
-        resetInteruptCallback();
+        if (!openContext(options)) {
+            log_error("Could not open " + mediaResourceLocator());
+            return false;
+        }
         setOpened(true);
         log_info(toString());
         return true;
     }
 
-    void FormatContext::setInteruptCallback(InterruptedProcess process) {
-        _current_interrupter.interrupted_process = process;
-        _current_interrupter.chronometer.reset_timepoint();
-        raw()->interrupt_callback.callback =
-            &FormatContext::interrupt_callback;
-        raw()->interrupt_callback.opaque =
-            &_current_interrupter;
+    bool FormatContext::open(const std::string_view mrl, Options options) {
+        setMediaResourceLocator(mrl);
+        return open(options);
     }
 
-    void FormatContext::resetInteruptCallback() {
-        _current_interrupter.interrupted_process = InterruptedProcess::None;
-        raw()->interrupt_callback.callback = nullptr; /* Бессмысленно :( */
-        raw()->interrupt_callback.opaque   = nullptr; /* Бессмысленно :( */
+    void FormatContext::setInterruptCallback(AVFormatContext* ctx) {
+        ctx->interrupt_callback.callback = &FormatContext::interrupt_callback;
+        ctx->interrupt_callback.opaque   = &_interrupter;
+    }
+
+    void FormatContext::setInterrupter(int64_t timeout_ms) {
+        _interrupter.set(timeout_ms);
+    }
+
+    void FormatContext::createContext() {
+        reset(std::shared_ptr<AVFormatContext> {
+            ::avformat_alloc_context()
+            , [](auto* ctx) { ::avformat_free_context(ctx); }
+        });
     }
 
     int FormatContext::interrupt_callback(void* opaque) {
-        const auto interrupter { reinterpret_cast<const Interrupter*>(opaque) };
-        switch (interrupter->interrupted_process) {
-            case InterruptedProcess::None:
-                return 0;
-            case InterruptedProcess::Opening: {
-                const int64_t opening_timeout_ms { 20'000 }; // TODO make changeable or use option 'timeout' 01.04
-                if (interrupter->chronometer.elapsed_milliseconds() > opening_timeout_ms) {
-                    static_log_error("interrupt_callback", "Opening timed out: " << opening_timeout_ms);
-                    return 1;
-                }
-                return 0;
-            }
-            #define NOT_IMPLEMENTED_MSG(x) static_log_error("interrupt_callback", #x" is not implemeted");
-            case InterruptedProcess::Closing:
-                NOT_IMPLEMENTED_MSG(InterruptedProcess::Closing);
-            case InterruptedProcess::Reading:
-                NOT_IMPLEMENTED_MSG(InterruptedProcess::Reading);
-            case InterruptedProcess::Writing:
-                NOT_IMPLEMENTED_MSG(InterruptedProcess::Writing);
+        constexpr auto OK   { 0 };
+        constexpr auto FAIL { 1 };
+        const auto interrupter {
+            reinterpret_cast<const Interrupter*>(opaque)
+        };
+        if (interrupter->isTimeout()) {
+            static_log_error(
+                "interrupt_callback"
+                , "Timed out: " << interrupter->timeout_ms
+            );
+            return FAIL;
         }
-    }
-
-    void FormatContext::closeContext() {
-        beforeCloseContext();
-        ffmpeg_api(avio_close
-            ,raw()->pb
-        );
+        return OK;
     }
 
     std::string FormatContext::mediaResourceLocator() const {
@@ -141,12 +133,48 @@ namespace fpp {
         _streams.push_back(stream);
     }
 
+    void FormatContext::setMediaResourceLocator(const std::string_view mrl) {
+        _media_resource_locator = mrl;
+    }
+
     int64_t FormatContext::streamNumber() const {
         return int64_t(raw()->nb_streams);
     }
 
     StreamVector FormatContext::streams() {
         return _streams;
+    }
+
+    void FormatContext::setTimeoutOpening(int64_t ms) {
+        _timeout_opening = ms;
+    }
+
+    void FormatContext::setTimeoutClosing(int64_t ms) {
+        _timeout_closing = ms;
+    }
+
+    void FormatContext::setTimeoutReading(int64_t ms) {
+        _timeout_reading = ms;
+    }
+
+    void FormatContext::setTimeoutWriting(int64_t ms) {
+        _timeout_writing = ms;
+    }
+
+    int64_t FormatContext::timeoutOpening() const {
+        return _timeout_opening;
+    }
+
+    int64_t FormatContext::timeoutClosing() const {
+        return _timeout_closing;
+    }
+
+    int64_t FormatContext::timeoutReading() const {
+        return _timeout_reading;
+    }
+
+    int64_t FormatContext::timeoutWriting() const {
+        return _timeout_writing;
     }
 
     const StreamVector FormatContext::streams() const {

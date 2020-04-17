@@ -29,7 +29,7 @@ namespace fpp {
 
     public:
 
-        static Logger&      instance(std::string log_dir = "fpp_log");
+        static Logger&      instance();
 
         void                setLogLevel(LogLevel log_level);
         void                setFFmpegLogLevel(LogLevel log_level);
@@ -38,13 +38,13 @@ namespace fpp {
         void                print(const std::string& caller_name, const std::string& code_position, const LogLevel log_level, const std::string& message);
 
     private:
-                                        // TODO дирректория создается безусловно 03.02
-        Logger(std::string log_dir);    // TODO fix log dir 23.01
-        virtual ~Logger() override;
 
-        Logger(Logger const&)               = delete;
-        Logger(Logger const&&)              = delete;
-        Logger& operator=(Logger const&)    = delete;
+        Logger();
+        ~Logger() override;
+
+        Logger(Logger const&)            = delete;
+        Logger(Logger const&&)           = delete;
+        Logger& operator=(Logger const&) = delete;
 
     private:
 
@@ -64,7 +64,6 @@ namespace fpp {
     private:
 
         LogLevel            _log_level;
-        std::ofstream       _file;
         std::mutex          _print_mutex;
 
     };

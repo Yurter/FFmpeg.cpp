@@ -50,8 +50,14 @@ namespace fpp {
     }
 
     std::string Stream::toString() const {
+        const auto tag {
+            ::av_dict_get(raw()->metadata, "language", nullptr, AV_DICT_MATCH_CASE)
+        };
+        const auto lang {
+            tag ? '(' + std::string { tag->value } + ')' : ""
+        };
         return "[" + std::to_string(index()) + "] "
-                + utils::to_string(type()) + " stream: "
+                + utils::to_string(type()) + " stream" + lang + ": "
                 + params->toString();
     }
 
@@ -64,22 +70,16 @@ namespace fpp {
                 , params->timeBase()
             );
         }
-        else if (raw()->start_time != AV_NOPTS_VALUE) {
-            if (packet.dts() != AV_NOPTS_VALUE) {
-                packet.setDts(packet.dts() - raw()->start_time);
-            }
-            if (packet.pts() != AV_NOPTS_VALUE) {
-                packet.setPts(packet.pts() - raw()->start_time);
-            }
-        }
+
+//        shiftStamps(packet);  // TODO remove & fix duration in MediaInfo 15.04
 
         if (packet.duration() == 0) {
             calculatePacketDuration(packet);
         }
 
-        avoidNegativeTimestamp(packet);
-        checkStampMonotonicity(packet);
-        checkDtsPtsOrder(packet);
+//        avoidNegativeTimestamp(packet); // TODO remove 15.04
+//        checkStampMonotonicity(packet); // TODO remove 15.04
+//        checkDtsPtsOrder(packet);       // TODO remove 15.04
 
         packet.setPos(-1);
         packet.setTimeBase(params->timeBase());
@@ -170,6 +170,18 @@ namespace fpp {
             throw std::runtime_error { "stream is null" };
         }
         return raw()->codecpar;
+    }
+
+    void Stream::shiftStamps(Packet& packet) {
+        if (raw()->start_time == AV_NOPTS_VALUE) {
+            raw()->start_time = packet.pts();
+        }
+        if (packet.dts() != AV_NOPTS_VALUE) {
+            packet.setDts(packet.dts() - raw()->start_time);
+        }
+        if (packet.pts() != AV_NOPTS_VALUE) {
+            packet.setPts(packet.pts() - raw()->start_time);
+        }
     }
 
     void Stream::calculatePacketDuration(Packet& packet) {

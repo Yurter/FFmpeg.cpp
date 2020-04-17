@@ -15,59 +15,65 @@ namespace fpp {
 
     public:
 
-        FormatContext(const std::string_view mrl);
+        FormatContext(const std::string_view mrl = {});
 
         std::string         mediaResourceLocator()  const;
         const StreamVector  streams()               const;
         StreamVector        streams();
 
+        void                setTimeoutOpening(int64_t ms);
+        void                setTimeoutClosing(int64_t ms);
+        void                setTimeoutReading(int64_t ms);
+        void                setTimeoutWriting(int64_t ms);
+
+        int64_t             timeoutOpening() const;
+        int64_t             timeoutClosing() const;
+        int64_t             timeoutReading() const;
+        int64_t             timeoutWriting() const;
+
         bool                open(Options options = {});
+        bool                open(const std::string_view mrl, Options options = {});
         void                close();
 
         bool                opened() const;
         bool                closed() const;
 
+        void                reconnectOnFailure(bool reconnect);
         void                flushContextAfterEachPacket(bool value);
 
         SharedStream        stream(int64_t index);
         SharedStream        stream(MediaType stream_type);
         int64_t             streamNumber() const;
-        void                setStreams(StreamVector stream_list);
+        void                setStreams(StreamVector stream_list); // TODO remove 06.04
 
         void                processPacket(Packet& packet);
 
-        virtual std::string toString() const override final;
-
-    private:
-
-        /* Операции над формат контестом, ход выполнения
-         * которых, отслеживается колбеком                  */
-        enum InterruptedProcess {
-            None,
-            Opening,
-            Closing,
-            Reading,
-            Writing,
-        };
-
-        class Interrupter {
-
-        public:
-
-            Interrupter(InterruptedProcess process)
-                : interrupted_process(process) {
-            }
-
-            InterruptedProcess  interrupted_process;
-            Chronometer         chronometer;
-
-        };
+        std::string         toString() const override final;
 
     protected:
 
-        virtual void        createContext() = 0;
+        struct Interrupter {
+
+            Chronometer     chronometer;
+            int64_t         timeout_ms { 0 };
+
+            bool isTimeout() const {
+                return chronometer.elapsed_milliseconds() > timeout_ms;
+            }
+
+            void set(int64_t timeout) {
+                timeout_ms = timeout;
+                chronometer.reset();
+            }
+
+        };
+
+        void                setInterruptCallback(AVFormatContext* ctx);
+        void                setInterrupter(int64_t timeout_ms);
+
+        virtual void        createContext();
         virtual bool        openContext(Options options) = 0;
-        virtual void        beforeCloseContext();
+        virtual void        closeContext() = 0;
         virtual std::string formatName() const = 0;
 
         [[nodiscard]]
@@ -77,18 +83,21 @@ namespace fpp {
 
     private:
 
+        void                setMediaResourceLocator(const std::string_view mrl);
         void                setOpened(bool opened);
-        void                setInteruptCallback(InterruptedProcess process);
-        void                resetInteruptCallback();
         static int          interrupt_callback(void* opaque);
-        void                closeContext();
 
     private:
 
-        const std::string   _media_resource_locator;
+        std::string         _media_resource_locator;
         bool                _opened;
         StreamVector        _streams;
-        Interrupter         _current_interrupter;
+        Interrupter         _interrupter;
+
+        int64_t             _timeout_opening;
+        int64_t             _timeout_closing; // TODO not used 10.04
+        int64_t             _timeout_reading; // TODO not used 10.04
+        int64_t             _timeout_writing; // TODO not used 10.04
 
     };
 

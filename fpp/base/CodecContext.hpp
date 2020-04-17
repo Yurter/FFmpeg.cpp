@@ -12,14 +12,11 @@ namespace fpp {
     public:
 
         CodecContext(const SharedParameters params);
-        virtual ~CodecContext() override;
 
         std::string         toString() const override final;
 
-        bool                opened() const;
-        bool                closed() const;
-
-        const AVCodec*      codec() const;
+        const AVCodec*      codec()  const;
+        bool                opened();
 
         const SharedParameters params;
 
@@ -30,12 +27,6 @@ namespace fpp {
     private:
 
         void                open(Options options);
-        void                close();
-        void                setOpened(bool value);
-
-    private:
-
-        bool                _opened;
 
     };
 

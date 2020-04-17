@@ -51,7 +51,7 @@ namespace fpp {
         );
 
         AVFilterContext* raw_ptr { nullptr };
-        ffmpeg_api(avfilter_graph_create_filter
+        ffmpeg_api_strict(avfilter_graph_create_filter
             , &raw_ptr
             , buffersrc
             , "in"      /* name   */
@@ -78,7 +78,7 @@ namespace fpp {
 
         /* buffer video sink: to terminate the filter chain */
         AVFilterContext* raw_ptr { nullptr };
-        ffmpeg_api(avfilter_graph_create_filter
+        ffmpeg_api_strict(avfilter_graph_create_filter
             , &raw_ptr
             , buffersink
             , "out"     /* name   */
@@ -108,7 +108,7 @@ namespace fpp {
             )
         };
 
-        ffmpeg_api(av_opt_set_bin
+        ffmpeg_api_strict(av_opt_set_bin
             , _buffersink_ctx.get()
             , "pix_fmts"
             ,  reinterpret_cast<const uint8_t*>(pix_fmts)

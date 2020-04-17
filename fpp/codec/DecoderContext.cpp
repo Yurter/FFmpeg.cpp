@@ -31,7 +31,8 @@ namespace fpp {
         if (const auto ret {
                 ::avcodec_send_packet(raw(), &packet.raw())
             }; ret != 0) {
-            throw FFmpegException { utils::send_packet_error_to_string(ret), ret };
+            log_error(utils::send_packet_error_to_string(ret));
+//            throw FFmpegException { utils::send_packet_error_to_string(ret), ret };
         }
     }
 
@@ -58,6 +59,7 @@ namespace fpp {
                 };
             }
             output_frame.setTimeBase(params->timeBase());
+            output_frame.raw().pict_type = AV_PICTURE_TYPE_NONE; // TODO check it 0904
             decoded_frames.push_back(output_frame);
         }
         return decoded_frames;
