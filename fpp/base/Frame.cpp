@@ -51,8 +51,8 @@ namespace fpp {
         return _time_base;
     }
 
-    bool Frame::keyFrame() const { // TODO check: frame->pict_type is AV_PICTURE_TYPE_I 06.04
-        return raw().key_frame == 1; // TODO av_get_picture_type_char
+    bool Frame::keyFrame() const {
+        return raw().key_frame == 1;
     }
 
     int Frame::nbSamples() const {
@@ -93,7 +93,8 @@ namespace fpp {
         std::string str = utils::to_string(type()) + " frame: ";
         if (isVideo()) {
             str += std::to_string(size()) + " bytes, "
-                    + (keyFrame() ? "[I]" : "[_]") + ", "
+//                    + (keyFrame() ? "[I]" : "[_]") + ", "
+                    + '[' + ::av_get_picture_type_char(raw().pict_type) +']' + ", "
                     + "pts " + utils::pts_to_string(raw().pts) + ", "
                     + "width " + std::to_string(raw().width) + ", "
                     + "height " + std::to_string(raw().height) + ", "
