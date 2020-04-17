@@ -144,7 +144,7 @@ namespace fpp {
     }
 
     void Parameters::completeFrom(const SharedParameters other) {
-        if (extradata().second == 0)        { setExtradata(other->extradata()); }
+//        if (extradata().second == 0)        { setExtradata(other->extradata()); }
         if (not_inited_codec_id(codecId())) { setEncoder(other->codecId());     }
         if (not_inited_int(bitrate()))      { setBitrate(other->bitrate());     }
         if (not_inited_q(timeBase()))       { setTimeBase(other->timeBase());   }
