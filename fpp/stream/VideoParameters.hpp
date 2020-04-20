@@ -4,7 +4,7 @@
 namespace fpp {
 
     class VideoParameters;
-    using SharedVideoParameters = std::shared_ptr<VideoParameters>;
+    using SpVideoParameters = std::shared_ptr<VideoParameters>;
 
     class VideoParameters : public Parameters {
 
@@ -33,7 +33,7 @@ namespace fpp {
         void                initCodecContext(AVCodecContext* codec_context) const override;
         void                parseCodecContext(const AVCodecContext* codec_context) override;
 
-        static SharedVideoParameters make_shared() {
+        static SpVideoParameters make_shared() {
             return std::make_shared<VideoParameters>();
         }
 
