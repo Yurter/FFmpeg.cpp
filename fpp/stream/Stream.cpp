@@ -33,7 +33,7 @@ namespace fpp {
     }
 
     // output stream
-    Stream::Stream(AVStream* avstream, const SharedParameters parameters)
+    Stream::Stream(AVStream* avstream, const SpParameters parameters)
         : Stream(avstream, parameters->type()) {
 
         setName("Out" + utils::to_string(type()) + "Stream");
@@ -77,9 +77,9 @@ namespace fpp {
             calculatePacketDuration(packet);
         }
 
-//        avoidNegativeTimestamp(packet); // TODO remove 15.04
-//        checkStampMonotonicity(packet); // TODO remove 15.04
-//        checkDtsPtsOrder(packet);       // TODO remove 15.04
+//        avoidNegativeTimestamp(packet);
+//        checkStampMonotonicity(packet);
+//        checkDtsPtsOrder(packet);
 
         packet.setPos(-1);
         packet.setTimeBase(params->timeBase());
@@ -203,43 +203,43 @@ namespace fpp {
         }
     }
 
-    void Stream::avoidNegativeTimestamp(Packet& packet) {
-        if (packet.dts() < 0) {
-            packet.setDts(0);
-        }
-        if (packet.pts() < 0) {
-            packet.setPts(0);
-        }
-    }
+//    void Stream::avoidNegativeTimestamp(Packet& packet) {
+//        if (packet.dts() < 0) {
+//            packet.setDts(0);
+//        }
+//        if (packet.pts() < 0) {
+//            packet.setPts(0);
+//        }
+//    }
 
-    void Stream::checkStampMonotonicity(Packet& packet) {
-        if (_prev_dts == AV_NOPTS_VALUE) {
-            _prev_dts = packet.dts();
-            return;
-        }
-        if (_prev_dts >= packet.dts()) {
-            log_warning(
-                "Application provided invalid, "
-                "non monotonically increasing dts to muxer "
-                "in stream " << packet.streamIndex() << ": "
-                << _prev_dts << " >= " << packet.dts()
-            );
-            packet.setDts(_prev_dts + 1);
-        }
-    }
+//    void Stream::checkStampMonotonicity(Packet& packet) {
+//        if (_prev_dts == AV_NOPTS_VALUE) {
+//            _prev_dts = packet.dts();
+//            return;
+//        }
+//        if (_prev_dts >= packet.dts()) {
+//            log_warning(
+//                "Application provided invalid, "
+//                "non monotonically increasing dts to muxer "
+//                "in stream " << packet.streamIndex() << ": "
+//                << _prev_dts << " >= " << packet.dts()
+//            );
+//            packet.setDts(_prev_dts + 1);
+//        }
+//    }
 
-    void Stream::checkDtsPtsOrder(Packet& packet) {
-        if (packet.pts() == AV_NOPTS_VALUE) {
-            packet.setPts(packet.dts());
-            return;
-        }
-        if (packet.pts() < packet.dts()) {
-            log_warning(
-                "pts (" << packet.pts() << ") < dts (" << packet.dts() << ") "
-                << "in stream " << packet.streamIndex()
-            );
-            packet.setPts(packet.dts());
-        }
-    }
+//    void Stream::checkDtsPtsOrder(Packet& packet) {
+//        if (packet.pts() == AV_NOPTS_VALUE) {
+//            packet.setPts(packet.dts());
+//            return;
+//        }
+//        if (packet.pts() < packet.dts()) {
+//            log_warning(
+//                "pts (" << packet.pts() << ") < dts (" << packet.dts() << ") "
+//                << "in stream " << packet.streamIndex()
+//            );
+//            packet.setPts(packet.dts());
+//        }
+//    }
 
 } // namespace fpp

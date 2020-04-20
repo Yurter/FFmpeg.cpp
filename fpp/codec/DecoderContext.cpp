@@ -5,7 +5,7 @@
 
 namespace fpp {
 
-    DecoderContext::DecoderContext(const SharedParameters params, Options options)
+    DecoderContext::DecoderContext(const SpParameters params, Options options)
         : CodecContext(params) {
         setName("DecCtx");
         if (!params->isDecoder()) {

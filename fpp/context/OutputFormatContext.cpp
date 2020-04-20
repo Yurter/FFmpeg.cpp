@@ -123,7 +123,7 @@ namespace fpp {
         _output_format = nullptr;
     }
 
-    void OutputFormatContext::createStream(SharedParameters params) {
+    void OutputFormatContext::createStream(SpParameters params) {
         params->setFormatFlags(outputFormat()->flags);
         const auto avstream  { ::avformat_new_stream(raw(), params->codec()) };
         const auto fppstream { Stream::make_output_stream(avstream, params)  };

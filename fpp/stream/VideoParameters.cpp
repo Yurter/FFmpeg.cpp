@@ -42,13 +42,6 @@ namespace fpp {
     }
 
     void VideoParameters::setPixelFormat(AVPixelFormat pixel_format) {
-        if (!utils::compatible_with_pixel_format(codec(), pixel_format)) { // TODO remove ? let ffmpeg check it 06.04
-            throw std::invalid_argument {
-                utils::to_string(pixel_format)
-                + " doesn't compatible with "
-                + codecName()
-            };
-        }
         raw().format = int(pixel_format);
     }
 
@@ -88,7 +81,7 @@ namespace fpp {
             + utils::to_string(pixelFormat());
     }
 
-    void VideoParameters::completeFrom(const SharedParameters other) {
+    void VideoParameters::completeFrom(const SpParameters other) {
         Parameters::completeFrom(other);
         const auto other_video_parames {
             std::static_pointer_cast<VideoParameters>(other)
@@ -122,7 +115,7 @@ namespace fpp {
         setGopSize(codec_context->gop_size);
     }
 
-    bool VideoParameters::betterThen(const SharedParameters& other) {
+    bool VideoParameters::betterThen(const SpParameters& other) {
         const auto other_video { std::static_pointer_cast<VideoParameters>(other) };
         const auto this_picture_size { width() * height() };
         const auto other_picture_size { other_video->width() * other_video->height() };

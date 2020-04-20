@@ -7,7 +7,7 @@ extern "C" {
     #include <libavformat/avformat.h>
 }
 
-#define not_inited_codec_id(x) ((x) == AVCodecID::AV_CODEC_ID_NONE)
+constexpr auto not_inited_codec_id { [](auto x) { return x == AVCodecID::AV_CODEC_ID_NONE; } };
 
 namespace fpp {
 
@@ -130,6 +130,10 @@ namespace fpp {
         return isDecoder() ? "decoder" : "encoder";
     }
 
+    int Parameters::formatFlags() const {
+        return _format_flags;
+    }
+
     void Parameters::increaseDuration(const int64_t value) {
         _duration += value;
     }
@@ -143,7 +147,7 @@ namespace fpp {
             + "tb " + utils::to_string(timeBase());
     }
 
-    void Parameters::completeFrom(const SharedParameters other) {
+    void Parameters::completeFrom(const SpParameters other) {
 //        if (extradata().second == 0)        { setExtradata(other->extradata()); }
         if (not_inited_codec_id(codecId())) { setEncoder(other->codecId());     }
         if (not_inited_int(bitrate()))      { setBitrate(other->bitrate());     }
@@ -203,7 +207,7 @@ namespace fpp {
         raw().level               = FF_LEVEL_UNKNOWN;
     }
 
-    bool Parameters::betterThen(const SharedParameters& other) {
+    bool Parameters::betterThen(const SpParameters& other) {
         return this->bitrate() > other->bitrate();
     }
 

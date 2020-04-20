@@ -12,7 +12,7 @@ extern "C" {
 
 namespace fpp {
 
-    FilterContext::FilterContext(SharedParameters parameters, const std::string& filters_descr)
+    FilterContext::FilterContext(SpParameters parameters, const std::string& filters_descr)
         : params(parameters)
         , _filters_descr(filters_descr) {
         setName("FilterContext");

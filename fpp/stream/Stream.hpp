@@ -21,11 +21,9 @@ namespace fpp {
     public:
 
         Stream(AVStream* avstream);
-        Stream(AVStream* avstream, const SharedParameters parameters);
+        Stream(AVStream* avstream, const SpParameters parameters);
 
-        virtual ~Stream() override = default;
-
-        virtual std::string toString() const override final;
+        std::string         toString() const override final;
 
         void                stampPacket(Packet& packet);
         bool                timeIsOver() const;
@@ -45,13 +43,13 @@ namespace fpp {
 
         void                shiftStamps(Packet& packet);
         void                calculatePacketDuration(Packet& packet);
-        void                avoidNegativeTimestamp(Packet& packet);
-        void                checkStampMonotonicity(Packet& packet);
-        void                checkDtsPtsOrder(Packet& packet);
+//        void                avoidNegativeTimestamp(Packet& packet);
+//        void                checkStampMonotonicity(Packet& packet);
+//        void                checkDtsPtsOrder(Packet& packet);
 
     public:
 
-        SharedParameters    params;
+        SpParameters    params;
 
     private:
 
@@ -68,7 +66,7 @@ namespace fpp {
             return std::make_shared<Stream>(avstream);
         }
 
-        static inline SharedStream make_output_stream(AVStream* avstream, const SharedParameters parameters) {
+        static inline SharedStream make_output_stream(AVStream* avstream, const SpParameters parameters) {
             return std::make_shared<Stream>(avstream, parameters);
         }
 

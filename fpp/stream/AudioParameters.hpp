@@ -4,7 +4,7 @@
 namespace fpp {
 
     class AudioParameters;
-    using SharedAudioParameters = std::shared_ptr<AudioParameters>;
+    using SpAudioParameters = std::shared_ptr<AudioParameters>;
 
     class AudioParameters : public Parameters {
 
@@ -26,16 +26,14 @@ namespace fpp {
 
         std::string         toString() const override;
 
-        void                completeFrom(const SharedParameters other) override;
-        void                parseStream(const AVStream* avstream)      override;
-        bool                betterThen(const SharedParameters& other)  override;
+        void                completeFrom(const SpParameters other) override;
+        void                parseStream(const AVStream* avstream)  override;
+        bool                betterThen(const SpParameters& other)  override;
 
-        static SharedAudioParameters make_shared() {
+        static SpAudioParameters make_shared() {
             return std::make_shared<AudioParameters>();
         }
 
     };
-
-    using SharedAudioParameters = std::shared_ptr<AudioParameters>;
 
 } // namespace fpp

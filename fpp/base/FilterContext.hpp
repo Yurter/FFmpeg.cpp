@@ -13,13 +13,13 @@ namespace fpp {
 
     public:
 
-        FilterContext(SharedParameters parameters, const std::string& filters_descr);
+        FilterContext(SpParameters parameters, const std::string& filters_descr);
         virtual ~FilterContext() override = default;
 
         FrameList           filter(Frame source_frame);
         std::string         description() const;
 
-        const SharedParameters params;
+        const SpParameters params;
 
     public:
 

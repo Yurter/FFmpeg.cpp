@@ -116,8 +116,8 @@ namespace fpp {
                 raw()->streams[i]->codecpar->codec_type
             };
             if ((stream_type == AVMEDIA_TYPE_VIDEO)
-                    || (stream_type == AVMEDIA_TYPE_AUDIO)
-                    || (stream_type == AVMEDIA_TYPE_SUBTITLE)) {
+                || (stream_type == AVMEDIA_TYPE_AUDIO)
+                || (stream_type == AVMEDIA_TYPE_SUBTITLE)) {
                 result.push_back(Stream::make_input_stream(raw()->streams[i]));
                 result.back()->params->setFormatFlags(inputFormat()->flags);
             } else {

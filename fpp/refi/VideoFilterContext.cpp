@@ -10,7 +10,7 @@ extern "C" {
 
 namespace fpp {
 
-    VideoFilterContext::VideoFilterContext(SharedParameters parameters, const std::string/*_view*/ filters_descr)
+    VideoFilterContext::VideoFilterContext(SpParameters parameters, const std::string/*_view*/ filters_descr)
         : FilterContext(parameters, filters_descr) {
         setName("VideoFltCtx");
         init();
