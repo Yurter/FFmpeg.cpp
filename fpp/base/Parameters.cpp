@@ -130,6 +130,10 @@ namespace fpp {
         return isDecoder() ? "decoder" : "encoder";
     }
 
+    int Parameters::formatFlags() const {
+        return _format_flags;
+    }
+
     void Parameters::increaseDuration(const int64_t value) {
         _duration += value;
     }

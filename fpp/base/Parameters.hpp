@@ -47,6 +47,7 @@ namespace fpp {
         AVRational          timeBase()      const;
         Extradata           extradata()     const;
         std::string         codecType()     const;
+        int                 formatFlags()   const;
 
         void                increaseDuration(const int64_t value);
 
