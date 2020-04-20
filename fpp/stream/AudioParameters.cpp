@@ -23,13 +23,6 @@ namespace fpp {
     }
 
     void AudioParameters::setSampleFormat(AVSampleFormat sample_format) {
-        if (!utils::compatible_with_sample_format(codec(), sample_format)) {
-            throw std::invalid_argument {
-                utils::to_string(sample_format)
-                + " doesn't compatible with "
-                + codecName()
-            };
-        }
         raw().format = int(sample_format);
     }
 
