@@ -6,10 +6,10 @@ extern "C" {
     #include <libavformat/avformat.h>
 }
 
-#define DEFAULT_SAMPLE_FORMAT   AV_SAMPLE_FMT_NONE
-#define DEFAULT_CHANEL_LAYOUT   0
-#define not_inited_smp_fmt(x)   ((x) == DEFAULT_SAMPLE_FORMAT)
-#define not_inited_ch_layout(x) ((x) == DEFAULT_CHANEL_LAYOUT)
+constexpr auto DEFAULT_SAMPLE_FORMAT { AV_SAMPLE_FMT_NONE };
+constexpr auto DEFAULT_CHANEL_LAYOUT { 0 };
+constexpr auto not_inited_smp_fmt    { [](auto x) { return x == DEFAULT_SAMPLE_FORMAT; } };
+constexpr auto not_inited_ch_layout  { [](auto x) { return x == DEFAULT_CHANEL_LAYOUT; } };
 
 namespace fpp {
 
