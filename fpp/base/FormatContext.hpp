@@ -95,9 +95,9 @@ namespace fpp {
         Interrupter         _interrupter;
 
         int64_t             _timeout_opening;
-        int64_t             _timeout_closing; // TODO not used 10.04
-        int64_t             _timeout_reading; // TODO not used 10.04
-        int64_t             _timeout_writing; // TODO not used 10.04
+        int64_t             _timeout_closing;
+        int64_t             _timeout_reading;
+        int64_t             _timeout_writing;
 
     };
 
