@@ -12,22 +12,19 @@ extern "C" {
 
 namespace fpp {
 
-    FilterContext::FilterContext(SharedParameters parameters, const std::string& filters_descr)
+    FilterContext::FilterContext(SpParameters parameters, const std::string& filters_descr)
         : params(parameters)
         , _filters_descr(filters_descr) {
         setName("FilterContext");
     }
 
     FrameList FilterContext::filter(Frame source_frame) {
-        if (const auto ret {
-                ::av_buffersrc_add_frame_flags(
-                    _buffersrc_ctx.get()
-                    , source_frame.ptr()
-                    , AV_BUFFERSRC_FLAG_KEEP_REF
-                )
-            }; ret < 0) {
-            throw FFmpegException { "av_buffersrc_add_frame_flags failed", ret };
-        }
+        ffmpeg_api_strict(av_buffersrc_add_frame_flags
+           , _buffersrc_ctx.get()
+           , source_frame.ptr()
+           , AV_BUFFERSRC_FLAG_KEEP_REF
+        );
+
         FrameList filtered_frames;
         /* pull filtered frames from the filtergraph */
         auto ret { 0 };
@@ -67,27 +64,21 @@ namespace fpp {
         auto raw_inputs  { _inputs.get()  };
         auto raw_outputs { _outputs.get() };
 
-        if (const auto ret {
-                ::avfilter_graph_parse_ptr(
-                    _filter_graph.get()
-                    , _filters_descr.c_str()
-                    , &raw_inputs
-                    , &raw_outputs
-                    , nullptr /* context used for logging */
-        )}; ret < 0) {
-            throw FFmpegException { "avfilter_graph_parse_ptr failed", ret };
-        }
+        ffmpeg_api_strict(avfilter_graph_parse_ptr
+            , _filter_graph.get()
+            , _filters_descr.c_str()
+            , &raw_inputs
+            , &raw_outputs
+            , nullptr /* context used for logging */
+        );
 
         log_info("Filter description: " << _filters_descr);
 
-        if (const auto ret {
-                ::avfilter_graph_config(
-                    _filter_graph.get()
-                    , nullptr /* context used for logging */
-                )
-            }; ret < 0) {
-            throw FFmpegException { "avfilter_graph_config failed", ret };
-        }
+        ffmpeg_api_strict(avfilter_graph_config
+           , _filter_graph.get()
+           , nullptr /* context used for logging */
+        );
+
     }
 
     void FilterContext::initInputs() {
@@ -99,7 +90,7 @@ namespace fpp {
 
         if (!_inputs) {
             throw FFmpegException {
-                __FUNCTION__" failed"
+                std::string { __FUNCTION__ } + " failed"
                 , AVERROR(ENOMEM)
             };
         }
@@ -124,10 +115,9 @@ namespace fpp {
             , [](auto* filter) { /*::avfilter_inout_free(&filter);*/ } // TODO: приходит мусор, падение 04.02
         };
 
-
         if (!_outputs) {
             throw FFmpegException {
-                __FUNCTION__" failed"
+                std::string { __FUNCTION__ } + " failed"
                 , AVERROR(ENOMEM)
             };
         }

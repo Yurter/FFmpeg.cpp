@@ -20,46 +20,32 @@ namespace fpp {
         close();
     }
 
-    void OutputFormatContext::write(Packet packet, WriteMode write_mode) {
+    bool OutputFormatContext::write(Packet packet, WriteMode write_mode) {
         processPacket(packet);
+        setInterrupter(timeoutWriting());
         if (write_mode == WriteMode::Instant) {
-            if (const auto ret {
-                    ::av_write_frame(raw(), packet.ptr())
-                }; ret < 0) {
-                throw FFmpegException {
-                    "av_write_frame failed"
-                    , ret
-                };
-            }
+            ffmpeg_api(av_write_frame, raw(), packet.ptr());
         }
         else if (write_mode == WriteMode::Interleaved) {
-            if (const auto ret {
-                    ::av_interleaved_write_frame(raw(), packet.ptr())
-                }; ret < 0) {
-                throw FFmpegException {
-                    "av_interleaved_write_frame failed"
-                    , ret
-                };
-            }
+            ffmpeg_api(av_interleaved_write_frame, raw(), packet.ptr());
         }
     }
 
     void OutputFormatContext::flush() {
-        if (const auto ret { ::av_write_frame(raw(), nullptr) }; ret != 1) {
+        if (const auto ret { ::av_write_frame(raw(), nullptr) }; ret != 1) { // TODO check ret value meaning and use ffmpeg_api_strict macro 09.04
             throw FFmpegException { "OutputFormatContext flush failed", ret };
         }
     }
 
     std::string OutputFormatContext::sdp() {
         char buf[256] {};
-        AVFormatContext* ctxs[] { raw() };
-        if (const auto ret {
-                ::av_sdp_create(ctxs, 1, buf, sizeof(buf))
-            }; ret < 0) {
-            throw FFmpegException {
-                "av_sdp_create failed", ret
-            };
-        }
+        AVFormatContext* ctxs[] { raw() }; // TODO do not use utils::merge_sdp_files(), instead use ctxs array 09.04
+        ffmpeg_api_strict(av_sdp_create
+            , ctxs
+            , 1
+            , buf
+            , sizeof(buf)
+        );
 
         std::string sdp_str { buf };
         sdp_str.append("\n");
@@ -88,21 +74,17 @@ namespace fpp {
             utils::guess_format_short_name(mediaResourceLocator())
         };
         AVFormatContext* fmt_ctx { nullptr };
-        if (const auto ret {
-                ::avformat_alloc_output_context2(
-                    &fmt_ctx                            /* ctx          */
-                    , nullptr                           /* oformat      */
-                    , format_short_name                 /* format_name  */
-                    , mediaResourceLocator().c_str()    /* filename     */
-                )
-            }; ret < 0) {
-            throw FFmpegException { "avformat_alloc_output_context2 failed", ret };
-        }
-        reset(std::shared_ptr<AVFormatContext> {
-                fmt_ctx
-                , [](auto* ctx) { ::avformat_free_context(ctx); }
-            }
+        ffmpeg_api_strict(avformat_alloc_output_context2
+            , &fmt_ctx
+            , outputFormat()
+            , format_short_name
+            , mediaResourceLocator().c_str()
         );
+        setOutputFormat(fmt_ctx->oformat);
+        reset(std::shared_ptr<AVFormatContext> {
+            fmt_ctx
+            , [](auto* ctx) { ::avformat_free_context(ctx); }
+        });
     }
 
     bool OutputFormatContext::openContext(Options options) { // TODO avio_open2 24.03
@@ -125,6 +107,7 @@ namespace fpp {
         }
         writeHeader();
         parseStreamsTimeBase();
+        setOutputFormat(raw()->oformat);
         return true;
     }
 
@@ -132,62 +115,40 @@ namespace fpp {
         return raw()->oformat->name;
     }
 
-    void OutputFormatContext::beforeCloseContext() {
+    void OutputFormatContext::closeContext() {
         writeTrailer();
+        if (!(outputFormat()->flags & AVFMT_NOFILE)) {
+            ffmpeg_api_strict(avio_close, raw()->pb);
+        }
+        _output_format = nullptr;
     }
 
-    SharedStream OutputFormatContext::createStream(SharedParameters params) {
+    void OutputFormatContext::createStream(SpParameters params) {
+        params->setFormatFlags(outputFormat()->flags);
         const auto avstream  { ::avformat_new_stream(raw(), params->codec()) };
         const auto fppstream { Stream::make_output_stream(avstream, params)  };
         addStream(fppstream);
-        return fppstream;
     }
 
-    SharedStream OutputFormatContext::copyStream(const SharedStream other, SharedParameters output_params) {
-        const auto input_params { other->params };
-        if (!output_params) {
-            output_params = utils::make_params(input_params->type());
-        }
-        output_params->completeFrom(input_params);
-        const auto created_stream {
-            createStream(output_params)
-        };
-//        if (const auto ret {
-//            ::avcodec_parameters_copy(
-//                created_stream->codecpar() /* dst */
-//                , other->codecpar()        /* src */
-//            )
-//        }; ret < 0) {
-//            throw FFmpegException {
-//                "Could not copy stream codec parameters!"
-//                , ret
-//            };
-//        }
-
-        //
-//        if (const auto ret {
-//            ::avcodec_parameters_copy(
-//                output_params->ptr()        /* dst */
-//                , created_stream->codecpar() /* src */
-//            )
-//        }; ret < 0) {
-//            throw FFmpegException {
-//                "2222222222Could not copy stream codec parameters!"
-//                , ret
-//            };
-//        }
-        //
-        return created_stream;
+    void OutputFormatContext::copyStream(const SharedStream other) {
+        const auto output_params { utils::make_params(other->params->type()) };
+        output_params->completeFrom(other->params);
+        createStream(output_params);
     }
 
     Code OutputFormatContext::guessOutputFromat() {
         const auto out_fmt {
             ::av_guess_format(
-                nullptr                             /* short_name */
-                , mediaResourceLocator().c_str()    /* filename   */
-                , nullptr                           /* mime_type  */
+                nullptr                          /* short_name */
+                , mediaResourceLocator().c_str() /* filename   */
+                , nullptr                        /* mime_type  */
             )
         };
+        if (!out_fmt) {
+            throw FFmpegException {
+                "av_guess_format failed"
+            };
+        }
         setOutputFormat(out_fmt);
         return Code::OK;
     }
@@ -196,7 +157,7 @@ namespace fpp {
         throw std::logic_error { "OutputFormatContext::parseFormatContext()" };
     }
 
-    void OutputFormatContext::writeHeader() {
+    void OutputFormatContext::writeHeader() { // TODO use options 09.04
         ::avformat_write_header(
             raw()
             , nullptr /* options */
@@ -204,15 +165,10 @@ namespace fpp {
     }
 
     void OutputFormatContext::writeTrailer() {
-        if (const auto ret { ::av_write_trailer(raw()) }; ret < 0) {
-            throw FFmpegException {
-                "Failed to write stream trailer to " + mediaResourceLocator()
-                , ret
-            };
-        }
+        ffmpeg_api_strict(av_write_trailer, raw());
     }
 
-    void OutputFormatContext::initStreamsCodecpar() {
+    void OutputFormatContext::initStreamsCodecpar() { // TODO refactor 16.04
         for (const auto& stream : streams()) {
             stream->params->initCodecpar(stream->codecpar());
         }

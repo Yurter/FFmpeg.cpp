@@ -33,7 +33,7 @@ namespace fpp {
     void VideoParameters::setFrameRate(AVRational frame_rate) {
         if ((frame_rate.num * frame_rate.den) == 0) {
             log_error("setFrameRate failed: " << frame_rate);
-            AVRational default_framerate = { 16, 1 };
+            AVRational default_framerate { 16, 1 };
             log_error("seted default value: " << default_framerate);
             _frame_rate = default_framerate;
             return;
@@ -42,13 +42,6 @@ namespace fpp {
     }
 
     void VideoParameters::setPixelFormat(AVPixelFormat pixel_format) {
-        if (!utils::compatible_with_pixel_format(codec(), pixel_format)) {
-            throw std::invalid_argument {
-                utils::to_string(pixel_format)
-                + " doesn't compatible with "
-                + codecName()
-            };
-        }
         raw().format = int(pixel_format);
     }
 
@@ -88,7 +81,7 @@ namespace fpp {
             + utils::to_string(pixelFormat());
     }
 
-    void VideoParameters::completeFrom(const SharedParameters other) {
+    void VideoParameters::completeFrom(const SpParameters other) {
         Parameters::completeFrom(other);
         const auto other_video_parames {
             std::static_pointer_cast<VideoParameters>(other)
@@ -108,13 +101,12 @@ namespace fpp {
         setFrameRate(avstream->avg_frame_rate);
         setPixelFormat(AVPixelFormat(avstream->codecpar->format));
         setSampleAspectRatio(avstream->codecpar->sample_aspect_ratio);
+        setGopSize(avstream->codec->gop_size);
     }
 
     void VideoParameters::initCodecContext(AVCodecContext* codec_context) const {
         Parameters::initCodecContext(codec_context);
-//        if (isEncoder()) {
-            codec_context->time_base = ::av_inv_q(frameRate());
-//        }
+        codec_context->time_base = ::av_inv_q(frameRate());
         codec_context->gop_size = gopSize();
     }
 
@@ -123,7 +115,7 @@ namespace fpp {
         setGopSize(codec_context->gop_size);
     }
 
-    bool VideoParameters::betterThen(const SharedParameters& other) {
+    bool VideoParameters::betterThen(const SpParameters& other) {
         const auto other_video { std::static_pointer_cast<VideoParameters>(other) };
         const auto this_picture_size { width() * height() };
         const auto other_picture_size { other_video->width() * other_video->height() };

@@ -29,7 +29,7 @@ namespace fpp {
 
     public:
 
-        static Logger&      instance(std::string log_dir = "fpp_log");
+        static Logger&      instance();
 
         void                setLogLevel(LogLevel log_level);
         void                setFFmpegLogLevel(LogLevel log_level);
@@ -38,13 +38,13 @@ namespace fpp {
         void                print(const std::string& caller_name, const std::string& code_position, const LogLevel log_level, const std::string& message);
 
     private:
-                                        // TODO дирректория создается безусловно 03.02
-        Logger(std::string log_dir);    // TODO fix log dir 23.01
-        virtual ~Logger() override;
 
-        Logger(Logger const&)               = delete;
-        Logger(Logger const&&)              = delete;
-        Logger& operator=(Logger const&)    = delete;
+        Logger();
+        ~Logger() override;
+
+        Logger(Logger const&)            = delete;
+        Logger(Logger const&&)           = delete;
+        Logger& operator=(Logger const&) = delete;
 
     private:
 
@@ -64,7 +64,6 @@ namespace fpp {
     private:
 
         LogLevel            _log_level;
-        std::ofstream       _file;
         std::mutex          _print_mutex;
 
     };
@@ -98,7 +97,7 @@ namespace fpp {
     if (!logger.ignoreMessage(log_level)) {\
         std::stringstream log_ss;\
         log_ss << message;\
-        logger.print(caller_name, CODE_POS, log_level, log_ss.str());\
+        logger.print(caller_name, "CODE_POS", log_level, log_ss.str());\
     }\
     FPP_END
 
@@ -120,4 +119,4 @@ namespace fpp {
 #define static_log(caller_name, log_level, message) log_message(caller_name, log_level,         message)
 
 /* ? */
-#define CODE_POS std::string(__FUNCTION__) + ", line: " + std::to_string(__LINE__) + " "
+//#define CODE_POS std::string(__FUNCTION__) + ", line: " + std::to_string(__LINE__) + " "

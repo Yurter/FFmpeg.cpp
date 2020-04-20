@@ -7,18 +7,18 @@ namespace fpp {
 
     public:
 
-        VideoFilterContext(SharedParameters parameters, const std::string/*_view*/ filters_descr);
+        VideoFilterContext(SpParameters parameters, const std::string/*_view*/ filters_descr);
 
         static std::string  set_pts(float coef);
         static std::string  keep_every_frame(int n);
 
 
-        virtual std::string toString() const override;
+        std::string         toString() const override;
 
     protected:
 
-        virtual void        initBufferSource()  override;
-        virtual void        initBufferSink()    override;
+        void                initBufferSource()  override;
+        void                initBufferSink()    override;
 
     };
 

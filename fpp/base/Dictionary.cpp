@@ -51,7 +51,7 @@ namespace fpp {
         }
     }
 
-    void Dictionary::setString(AVDictionary** dict, const std::string_view key, const std::string_view value) {
+    void Dictionary::setString(AVDictionary** dict, const std::string_view key, const std::string_view value) const {
         if (const auto ret {
                 ::av_dict_set(
                     dict
@@ -69,7 +69,7 @@ namespace fpp {
         }
     }
 
-    void Dictionary::setInt(AVDictionary** dict, const std::string_view key, int64_t value) {
+    void Dictionary::setInt(AVDictionary** dict, const std::string_view key, int64_t value) const {
         if (const auto ret {
                 ::av_dict_set_int(
                     dict

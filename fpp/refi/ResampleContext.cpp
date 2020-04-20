@@ -41,9 +41,7 @@ namespace fpp {
             , [](auto* ctx) { ::swr_free(&ctx); }
         });
 
-        if (const auto ret { ::swr_init(raw()) }; ret < 0) {
-            throw FFmpegException { "swr_init failed", ret };
-        }
+        ffmpeg_api_strict(swr_init, raw());
 
         log_info("Inited "
             << "from ["
@@ -134,7 +132,7 @@ namespace fpp {
         return resampled_frames;
     }
 
-    void ResampleContext::stampFrame(Frame &output_frame) {
+    void ResampleContext::stampFrame(Frame& output_frame) {
         if (_source_pts != AV_NOPTS_VALUE) {
             const auto in_param {
                 std::static_pointer_cast<const AudioParameters>(params.in)

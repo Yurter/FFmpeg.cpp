@@ -3,20 +3,20 @@
 #include <fpp/base/MediaData.hpp>
 #include <vector>
 
-#define DEFAULT_TIME_BASE AVRational { 1, 1000 }
+extern "C" {
+    #include <libavcodec/avcodec.h> // TODO: move to cpp file 20.04
+}
+
+constexpr auto DEFAULT_TIME_BASE { AVRational { 1, 1000 } };
 
 struct AVStream;
 struct AVCodecParams;
 
-extern "C" {
-    #include <libavcodec/avcodec.h>
-}
-
 namespace fpp {
 
     class Parameters;
-    using SharedParameters = std::shared_ptr<Parameters>;
-    using IOParams = struct { SharedParameters in; SharedParameters out; };
+    using SpParameters = std::shared_ptr<Parameters>;
+    using IOParams = struct { SpParameters in; SpParameters out; };
     using Extradata = std::pair<uint8_t*,size_t>;
 
     class Parameters : public FFmpegObject<AVCodecParameters>, public MediaData {
@@ -36,6 +36,7 @@ namespace fpp {
         void                setStreamIndex(uid_t stream_index);
         void                setTimeBase(AVRational time_base);
         void                setExtradata(Extradata extradata);
+        void                setFormatFlags(int flags);
 
         AVCodecID           codecId()       const;
         std::string         codecName()     const;
@@ -46,12 +47,13 @@ namespace fpp {
         AVRational          timeBase()      const;
         Extradata           extradata()     const;
         std::string         codecType()     const;
+        int                 formatFlags()   const;
 
         void                increaseDuration(const int64_t value);
 
         virtual std::string toString() const override;
-        virtual bool        betterThen(const SharedParameters& other);
-        virtual void        completeFrom(const SharedParameters other);
+        virtual bool        betterThen(const SpParameters& other);
+        virtual void        completeFrom(const SpParameters other);
 
         virtual void        parseStream(const AVStream* avstream);
 
@@ -60,10 +62,15 @@ namespace fpp {
         virtual void        initCodecContext(AVCodecContext* codec_context) const;
         virtual void        parseCodecContext(const AVCodecContext* codec_context);
 
+        static SpParameters make_shared(MediaType media_type) {
+            return std::make_shared<Parameters>(media_type);
+        }
+
     private:
 
         void                reset();
         void                setCodec(AVCodec* codec);
+        bool                testFormatFlag(int flag) const;
 
     private:
 
@@ -71,6 +78,7 @@ namespace fpp {
         int64_t             _duration;
         uid_t               _stream_index;
         AVRational          _time_base;
+        int                 _format_flags;
 
     };
 

@@ -16,7 +16,7 @@ namespace fpp {
         Frame(MediaType type);
         Frame(const Frame& other);
         Frame(const AVFrame& frame, AVRational time_base, MediaType type);
-        virtual ~Frame() override;
+        ~Frame() override;
 
         Frame& operator=(const Frame& other);
 
@@ -29,7 +29,7 @@ namespace fpp {
         int                 nbSamples() const;
 
         size_t              size()      const;
-        virtual std::string toString()  const override;
+        std::string         toString()  const override;
 
     private:
 

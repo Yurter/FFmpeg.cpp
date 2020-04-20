@@ -14,7 +14,6 @@ namespace fpp {
     public:
 
         RescaleContext(IOParams parameters);
-        virtual ~RescaleContext() override = default;
 
         Frame               scale(const Frame source_frame);
 

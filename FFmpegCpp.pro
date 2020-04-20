@@ -3,14 +3,17 @@ CONFIG += console c++17
 CONFIG -= app_bundle
 CONFIG -= qt
 
-INCLUDEPATH += ../00_ffmpeg/ffmpeg-4.1.3-win64-dev/include
-LIBS += -L../../00_ffmpeg/ffmpeg-4.1.3-win64-dev/lib
+#INCLUDEPATH += ../00_ffmpeg/ffmpeg-4.1.3-win64-dev/include
+#LIBS += -L../../00_ffmpeg/ffmpeg-4.1.3-win64-dev/lib
 
-INCLUDEPATH += G:\dev\00_ffmpeg\ffmpeg-4.1.1-win64-dev\include
-LIBS += -LG:\dev\00_ffmpeg\ffmpeg-4.1.1-win64-dev\lib
+#INCLUDEPATH += G:\dev\00_ffmpeg\ffmpeg-4.1.1-win64-dev\include
+#LIBS += -LG:\dev\00_ffmpeg\ffmpeg-4.1.1-win64-dev\lib
 
-INCLUDEPATH += D:\dev\00_ffmpeg\ffmpeg-4.1.3-win64-dev\include
-LIBS += -LD:\dev\00_ffmpeg\ffmpeg-4.1.3-win64-dev\lib
+#INCLUDEPATH += D:\dev\00_ffmpeg\ffmpeg-4.1.3-win64-dev\include
+#LIBS += -LD:\dev\00_ffmpeg\ffmpeg-4.1.3-win64-dev\lib
+
+INCLUDEPATH += G:\dev\00_ffmpeg\ffmpeg-4.2.2-win64-dev\include
+LIBS += -LG:\dev\00_ffmpeg\ffmpeg-4.2.2-win64-dev\lib
 
 LIBS += -lavcodec -lavdevice -lavfilter -lavformat -lavutil
 LIBS += -lpostproc -lswresample -lswscale
@@ -18,6 +21,21 @@ LIBS += -lpostproc -lswresample -lswscale
 INCLUDEPATH += include
 
 SOURCES += \
+    examples/adaptive_streaming.cpp \
+    examples/concatenate.cpp \
+    examples/filter_text_on_video.cpp \
+    examples/filter_timelapase.cpp \
+    examples/record_screen_win.cpp \
+    examples/rtp_audio_stream.cpp \
+    examples/rtp_video_and_audio_stream.cpp \
+    examples/rtp_video_stream.cpp \
+    examples/rtp_video_stream_transcoded.cpp \
+    examples/transmuxing.cpp \
+    examples/transrating.cpp \
+    examples/transsizing.cpp \
+    examples/webcam.cpp \
+    examples/youtube_stream_copy.cpp \
+    examples/youtube_stream_transcode.cpp \
     fpp/refi/VideoFilters/DrawText.cpp \
     fpp/refi/ResampleContext.cpp \
     main.cpp \
@@ -34,7 +52,6 @@ SOURCES += \
     fpp/core/FFmpegException.cpp \
     fpp/core/Logger.cpp \
     fpp/core/Object.cpp \
-    fpp/core/Thread.cpp \
     fpp/core/Utils.cpp \
     fpp/refi/AudioFilterContext.cpp \
     fpp/base/FilterContext.cpp \
@@ -45,6 +62,7 @@ SOURCES += \
     fpp/stream/VideoParameters.cpp
 
 HEADERS += \
+    examples/examples.hpp \
     fpp/base/CodecContext.hpp \
     fpp/base/Dictionary.hpp \
     fpp/base/FormatContext.hpp \
@@ -59,7 +77,6 @@ HEADERS += \
     fpp/core/FFmpegException.hpp \
     fpp/core/Logger.hpp \
     fpp/core/Object.hpp \
-    fpp/core/Thread.hpp \
     fpp/core/Utils.hpp \
     fpp/core/async/AsyncList.hpp \
     fpp/core/async/AsyncObject.hpp \

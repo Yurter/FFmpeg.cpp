@@ -7,7 +7,7 @@ extern "C" {
     #include <libavformat/avformat.h>
 }
 
-#define not_inited_codec_id(x) ((x) == AVCodecID::AV_CODEC_ID_NONE)
+constexpr auto not_inited_codec_id { [](auto x) { return x == AVCodecID::AV_CODEC_ID_NONE; } };
 
 namespace fpp {
 
@@ -16,7 +16,8 @@ namespace fpp {
         , _codec { nullptr }
         , _duration { 0 }
         , _stream_index { INVALID_INT }
-        , _time_base { DEFAULT_RATIONAL } {
+        , _time_base { DEFAULT_RATIONAL }
+        , _format_flags { 0 } {
         setName("Parameters");
         reset();
     }
@@ -40,6 +41,10 @@ namespace fpp {
     void Parameters::setCodec(AVCodec* codec) {
         _codec = codec;
         raw().codec_id = _codec->id;
+    }
+
+    bool Parameters::testFormatFlag(int flag) const {
+        return _format_flags & flag;
     }
 
     void Parameters::setBitrate(int64_t bitrate) {
@@ -76,6 +81,10 @@ namespace fpp {
         raw().extradata_size = int(data_size);
     }
 
+    void Parameters::setFormatFlags(int flags) {
+        _format_flags = flags;
+    }
+
     AVCodecID Parameters::codecId() const {
         return raw().codec_id;
     }
@@ -83,7 +92,7 @@ namespace fpp {
     std::string Parameters::codecName() const {
         if (not_inited_ptr(_codec)) {
             throw std::runtime_error {
-                __FUNCTION__ "failed: codec is null" };
+                std::string { __FUNCTION__ } + "failed: codec is null" };
         }
         return _codec->name;
     }
@@ -91,7 +100,7 @@ namespace fpp {
     AVCodec* Parameters::codec() const {
         if (not_inited_ptr(_codec)) {
             throw std::runtime_error {
-                __FUNCTION__ "failed: codec is null"
+                std::string { __FUNCTION__ } + "failed: codec is null"
             };
         }
         return _codec;
@@ -121,6 +130,10 @@ namespace fpp {
         return isDecoder() ? "decoder" : "encoder";
     }
 
+    int Parameters::formatFlags() const {
+        return _format_flags;
+    }
+
     void Parameters::increaseDuration(const int64_t value) {
         _duration += value;
     }
@@ -134,11 +147,11 @@ namespace fpp {
             + "tb " + utils::to_string(timeBase());
     }
 
-    void Parameters::completeFrom(const SharedParameters other) {
-        setExtradata(other->extradata());
-        if (not_inited_codec_id(codecId())) { setEncoder(other->codecId());   }
-        if (not_inited_int(bitrate()))      { setBitrate(other->bitrate());   }
-        if (not_inited_q(timeBase()))       { setTimeBase(other->timeBase()); }
+    void Parameters::completeFrom(const SpParameters other) {
+//        if (extradata().second == 0)        { setExtradata(other->extradata()); }
+        if (not_inited_codec_id(codecId())) { setEncoder(other->codecId());     }
+        if (not_inited_int(bitrate()))      { setBitrate(other->bitrate());     }
+        if (not_inited_q(timeBase()))       { setTimeBase(other->timeBase());   }
     }
 
     void Parameters::parseStream(const AVStream* avstream) {
@@ -150,52 +163,26 @@ namespace fpp {
     }
 
     void Parameters::initCodecpar(AVCodecParameters* codecpar) const {
-        if (const auto ret {
-            ::avcodec_parameters_copy(codecpar, ptr())
-        }; ret < 0) {
-            throw FFmpegException {
-                __FUNCTION__ ", avcodec_parameters_copy() failed"
-                , ret
-            };
-        }
+        ffmpeg_api_strict(avcodec_parameters_copy, codecpar, ptr());
     }
 
     void Parameters::parseCodecpar(AVCodecParameters* codecpar) {
-        if (const auto ret {
-            ::avcodec_parameters_copy(ptr(), codecpar)
-        }; ret < 0) {
-            throw FFmpegException {
-                __FUNCTION__ ", avcodec_parameters_copy() failed"
-                , ret
-            };
-        }
+        ffmpeg_api_strict(avcodec_parameters_copy, ptr(), codecpar);
     }
 
     void Parameters::initCodecContext(AVCodecContext* codec_context) const {
-        if (const auto ret {
-            ::avcodec_parameters_to_context(codec_context, ptr())
-        }; ret < 0) {
-            throw FFmpegException {
-                __FUNCTION__ ", avcodec_parameters_to_context() failed"
-                , ret
-            };
-        }
+        ffmpeg_api_strict(avcodec_parameters_to_context, codec_context, ptr());
 
-//        codec_context->flags |= AV_CODEC_FLAG_GLOBAL_HEADER; // TODO check it 03.04 ломает транскодированный ртп стрим..
+        if (testFormatFlag(AVFMT_GLOBALHEADER)) {
+            codec_context->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
+        }
 //        codec_context->time_base = timeBase();
 //        codec_context->time_base = AVRational { 1, framerate };
 
     }
 
     void Parameters::parseCodecContext(const AVCodecContext* codec_context) {
-        if (const auto ret {
-            ::avcodec_parameters_from_context(ptr(), codec_context)
-        }; ret < 0) {
-            throw FFmpegException {
-                __FUNCTION__ ", avcodec_parameters_from_context() failed"
-                , ret
-            };
-        }
+        ffmpeg_api_strict(avcodec_parameters_from_context, ptr(), codec_context);
     }
 
     void Parameters::reset() {
@@ -220,7 +207,7 @@ namespace fpp {
         raw().level               = FF_LEVEL_UNKNOWN;
     }
 
-    bool Parameters::betterThen(const SharedParameters& other) {
+    bool Parameters::betterThen(const SpParameters& other) {
         return this->bitrate() > other->bitrate();
     }
 

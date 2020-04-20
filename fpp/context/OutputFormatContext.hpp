@@ -13,28 +13,25 @@ namespace fpp {
     public:
 
         OutputFormatContext(const std::string_view mrl);
-        virtual ~OutputFormatContext() override;
+        ~OutputFormatContext() override;
 
-        SharedStream        createStream(SharedParameters params);
-        SharedStream        copyStream(
-                                const SharedStream other
-                                , SharedParameters output_params = SharedParameters {}
-                            );
+        void                createStream(SpParameters params);
+        void                copyStream(const SharedStream other);
 
-        void                write(Packet packet, WriteMode write_mode = WriteMode::Instant);
+        bool                write(Packet packet, WriteMode write_mode = WriteMode::Instant);
         void                flush();
 
         std::string         sdp();
 
     private:
 
-        virtual void        createContext()         override;
-        virtual bool        openContext(Options options) override;
-        virtual std::string formatName() const      override;
-        virtual void        beforeCloseContext()    override;
+        void                createContext() override;
+        bool                openContext(Options options) override;
+        std::string         formatName() const override;
+        void                closeContext() override;
 
         [[nodiscard]]
-        virtual StreamVector parseFormatContext() override;
+        StreamVector        parseFormatContext() override;
 
         Code                guessOutputFromat();
         void                writeHeader();

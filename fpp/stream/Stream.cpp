@@ -33,7 +33,7 @@ namespace fpp {
     }
 
     // output stream
-    Stream::Stream(AVStream* avstream, const SharedParameters parameters)
+    Stream::Stream(AVStream* avstream, const SpParameters parameters)
         : Stream(avstream, parameters->type()) {
 
         setName("Out" + utils::to_string(type()) + "Stream");
@@ -50,8 +50,14 @@ namespace fpp {
     }
 
     std::string Stream::toString() const {
+        const auto tag {
+            ::av_dict_get(raw()->metadata, "language", nullptr, AV_DICT_MATCH_CASE)
+        };
+        const auto lang {
+            tag ? '(' + std::string { tag->value } + ')' : ""
+        };
         return "[" + std::to_string(index()) + "] "
-                + utils::to_string(type()) + " stream: "
+                + utils::to_string(type()) + " stream" + lang + ": "
                 + params->toString();
     }
 
@@ -64,36 +70,16 @@ namespace fpp {
                 , params->timeBase()
             );
         }
-        else if (raw()->start_time != AV_NOPTS_VALUE) {
-            if (packet.dts() != AV_NOPTS_VALUE) {
-                packet.setDts(packet.dts() - raw()->start_time);
-            }
-            if (packet.pts() != AV_NOPTS_VALUE) {
-                packet.setPts(packet.pts() - raw()->start_time);
-            }
-        }
+
+//        shiftStamps(packet);  // TODO remove & fix duration in MediaInfo 15.04
 
         if (packet.duration() == 0) {
-            if (raw()->cur_dts == AV_NOPTS_VALUE) {
-                const auto fps {
-                    ::av_q2intfloat(
-                        std::static_pointer_cast<VideoParameters>(params)->frameRate()
-                    )
-                };
-                const auto inv_tb {
-                    ::av_q2intfloat(::av_inv_q(params->timeBase()))
-                };
-                const auto avg_pkt_dur {
-                    inv_tb / fps
-                };
-                packet.setDuration(avg_pkt_dur);
-            } else {
-                packet.setDuration(std::abs(packet.dts() - raw()->cur_dts));
-            }
+            calculatePacketDuration(packet);
         }
 
-        checkStampMonotonicity(packet);
-        checkDtsPtsOrder(packet);
+//        avoidNegativeTimestamp(packet);
+//        checkStampMonotonicity(packet);
+//        checkDtsPtsOrder(packet);
 
         packet.setPos(-1);
         packet.setTimeBase(params->timeBase());
@@ -186,41 +172,74 @@ namespace fpp {
         return raw()->codecpar;
     }
 
-    void Stream::checkStampMonotonicity(Packet& packet) {
-//        if (is("InVideoStream"))
-//        log_error("DTS: " << packet.dts());
-        if (_prev_dts == AV_NOPTS_VALUE) {
-            _prev_dts = packet.dts();
-            return;
+    void Stream::shiftStamps(Packet& packet) {
+        if (raw()->start_time == AV_NOPTS_VALUE) {
+            raw()->start_time = packet.pts();
         }
-        if (_prev_dts >= packet.dts()) {
-            log_warning(
-                "Application provided invalid, "
-                "non monotonically increasing dts to muxer "
-                "in stream " << packet.streamIndex() << ": "
-                << _prev_dts << " >= " << packet.dts()
-            );
-            packet.setDts(_prev_dts + 1);
+        if (packet.dts() != AV_NOPTS_VALUE) {
+            packet.setDts(packet.dts() - raw()->start_time);
+        }
+        if (packet.pts() != AV_NOPTS_VALUE) {
+            packet.setPts(packet.pts() - raw()->start_time);
         }
     }
 
-    void Stream::checkDtsPtsOrder(Packet& packet) {
-//        if (is("InVideoStream"))
-//        log_error("2DTS: " << packet.dts());
-//        if (packet.pts() == AV_NOPTS_VALUE) {
-//            return;
-//        }
-        if (packet.pts() == AV_NOPTS_VALUE) {
-            packet.setPts(packet.dts());
-            return;
-        }
-        if (packet.pts() < packet.dts()) {
-            log_warning(
-                "pts (" << packet.pts() << ") < dts (" << packet.dts() << ") "
-                << "in stream " << packet.streamIndex()
-            );
-            packet.setPts(packet.dts());
+    void Stream::calculatePacketDuration(Packet& packet) {
+        if (raw()->cur_dts == AV_NOPTS_VALUE) {
+            const auto fps {
+                ::av_q2intfloat(
+                    std::static_pointer_cast<VideoParameters>(params)->frameRate()
+                )
+            };
+            const auto inv_tb {
+                ::av_q2intfloat(::av_inv_q(params->timeBase()))
+            };
+            const auto avg_pkt_dur {
+                inv_tb / fps
+            };
+            packet.setDuration(avg_pkt_dur);
+        } else {
+            packet.setDuration(std::abs(packet.dts() - raw()->cur_dts));
         }
     }
+
+//    void Stream::avoidNegativeTimestamp(Packet& packet) {
+//        if (packet.dts() < 0) {
+//            packet.setDts(0);
+//        }
+//        if (packet.pts() < 0) {
+//            packet.setPts(0);
+//        }
+//    }
+
+//    void Stream::checkStampMonotonicity(Packet& packet) {
+//        if (_prev_dts == AV_NOPTS_VALUE) {
+//            _prev_dts = packet.dts();
+//            return;
+//        }
+//        if (_prev_dts >= packet.dts()) {
+//            log_warning(
+//                "Application provided invalid, "
+//                "non monotonically increasing dts to muxer "
+//                "in stream " << packet.streamIndex() << ": "
+//                << _prev_dts << " >= " << packet.dts()
+//            );
+//            packet.setDts(_prev_dts + 1);
+//        }
+//    }
+
+//    void Stream::checkDtsPtsOrder(Packet& packet) {
+//        if (packet.pts() == AV_NOPTS_VALUE) {
+//            packet.setPts(packet.dts());
+//            return;
+//        }
+//        if (packet.pts() < packet.dts()) {
+//            log_warning(
+//                "pts (" << packet.pts() << ") < dts (" << packet.dts() << ") "
+//                << "in stream " << packet.streamIndex()
+//            );
+//            packet.setPts(packet.dts());
+//        }
+//    }
 
 } // namespace fpp

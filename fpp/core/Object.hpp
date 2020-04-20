@@ -19,7 +19,7 @@
 namespace fpp {
 
     /* Коды результата выполнения некоторых функций */
-    enum class [[nodiscard]] Code: uint8_t {
+    enum class [[nodiscard]] Code: uint8_t { // TODO remove 20.04
         OK,
         ERR,
         EXIT,

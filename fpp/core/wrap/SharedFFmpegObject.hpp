@@ -10,18 +10,18 @@ namespace fpp {
 
     public:
 
-        SharedFFmpegObject(std::shared_ptr<T> shared_object = std::shared_ptr<T> {})
+        SharedFFmpegObject(std::shared_ptr<T> shared_object = {})
             : _shared_object(shared_object) {
         }
 
-        void reset(std::shared_ptr<T> shared_object = std::shared_ptr<T> {}) {
+        void reset(std::shared_ptr<T> shared_object = {}) {
             _shared_object = shared_object;
         }
 
         auto raw() {
             if (!_shared_object) {
                 throw std::runtime_error {
-                    __FUNCTION__ " failed: object is null"
+                    std::string { __FUNCTION__ } + " failed: object is null"
                 };
             }
             return _shared_object.get();
@@ -30,7 +30,7 @@ namespace fpp {
         const T* raw() const {
             if (!_shared_object) {
                 throw std::runtime_error {
-                    __FUNCTION__ " failed: object is null"
+                    std::string { __FUNCTION__ } + " failed: object is null"
                 };
             }
             return _shared_object.get();

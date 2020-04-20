@@ -39,10 +39,10 @@ namespace fpp {
             ::sws_getContext(
                 int(in_param->width()), int(in_param->height()), in_param->pixelFormat()
                 , int(out_param->width()), int(out_param->height()), out_param->pixelFormat()
-                , SWS_BICUBIC   /* flags     */
-                , nullptr       /* srcFilter */
-                , nullptr       /* dstFilter */
-                , nullptr       /* param     */
+                , SWS_BICUBIC /* flags     */
+                , nullptr     /* srcFilter */
+                , nullptr     /* dstFilter */
+                , nullptr     /* param     */
             )
             , [](auto* ctx) { ::sws_freeContext(ctx); }
         });
@@ -69,9 +69,7 @@ namespace fpp {
         frame.raw().format = output_params->pixelFormat();
         frame.raw().width  = int(output_params->width());
         frame.raw().height = int(output_params->height());
-        if (const auto ret { ::av_frame_get_buffer(frame.ptr(), 32) }; ret < 0) {
-            throw FFmpegException { "av_frame_get_buffer failed", ret };
-        }
+        ffmpeg_api_strict(av_frame_get_buffer, frame.ptr(), 32);
         return frame;
     }
 

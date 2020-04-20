@@ -6,10 +6,10 @@ extern "C" {
     #include <libavformat/avformat.h>
 }
 
-#define DEFAULT_SAMPLE_FORMAT   AV_SAMPLE_FMT_NONE
-#define DEFAULT_CHANEL_LAYOUT   0
-#define not_inited_smp_fmt(x)   ((x) == DEFAULT_SAMPLE_FORMAT)
-#define not_inited_ch_layout(x) ((x) == DEFAULT_CHANEL_LAYOUT)
+constexpr auto DEFAULT_SAMPLE_FORMAT { AV_SAMPLE_FMT_NONE };
+constexpr auto DEFAULT_CHANEL_LAYOUT { 0 };
+constexpr auto not_inited_smp_fmt    { [](auto x) { return x == DEFAULT_SAMPLE_FORMAT; } };
+constexpr auto not_inited_ch_layout  { [](auto x) { return x == DEFAULT_CHANEL_LAYOUT; } };
 
 namespace fpp {
 
@@ -23,13 +23,6 @@ namespace fpp {
     }
 
     void AudioParameters::setSampleFormat(AVSampleFormat sample_format) {
-        if (!utils::compatible_with_sample_format(codec(), sample_format)) {
-            throw std::invalid_argument {
-                utils::to_string(sample_format)
-                + " doesn't compatible with "
-                + codecName()
-            };
-        }
         raw().format = int(sample_format);
     }
 
@@ -73,7 +66,7 @@ namespace fpp {
             + "channels " + std::to_string(channels());
     }
 
-    void AudioParameters::completeFrom(const SharedParameters other) {
+    void AudioParameters::completeFrom(const SpParameters other) {
         Parameters::completeFrom(other);
         const auto other_audio {
             std::static_pointer_cast<AudioParameters>(other)
@@ -100,7 +93,7 @@ namespace fpp {
         setFrameSize(avstream->codecpar->frame_size);
     }
 
-    bool AudioParameters::betterThen(const SharedParameters& other) {
+    bool AudioParameters::betterThen(const SpParameters& other) {
         const auto other_audio { std::static_pointer_cast<AudioParameters>(other) };
         const auto this_sound_quality { sampleRate() * channels() };
         const auto other_sound_quality { other_audio->sampleRate() * other_audio->channels() };

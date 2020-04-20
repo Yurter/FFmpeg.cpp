@@ -93,7 +93,8 @@ namespace fpp {
         std::string str = utils::to_string(type()) + " frame: ";
         if (isVideo()) {
             str += std::to_string(size()) + " bytes, "
-                    + (keyFrame() ? "[I]" : "[_]") + ", "
+//                    + (keyFrame() ? "[I]" : "[_]") + ", "
+                    + '[' + ::av_get_picture_type_char(raw().pict_type) +']' + ", "
                     + "pts " + utils::pts_to_string(raw().pts) + ", "
                     + "width " + std::to_string(raw().width) + ", "
                     + "height " + std::to_string(raw().height) + ", "
@@ -120,16 +121,12 @@ namespace fpp {
     }
 
     void Frame::ref(const Frame& other) {
-        if (::av_frame_ref(ptr(), other.ptr()) != 0) {
-            throw FFmpegException { "av_packet_ref failed" };
-        }
+        ffmpeg_api_strict(av_frame_ref, ptr(), other.ptr());
         setTimeBase(other.timeBase());
     }
 
     void Frame::ref(const AVFrame& other, AVRational time_base) {
-        if (::av_frame_ref(ptr(), &other) != 0) {
-            throw FFmpegException { "av_packet_ref failed" };
-        }
+        ffmpeg_api_strict(av_frame_ref, ptr(), &other);
         setTimeBase(time_base);
     }
 

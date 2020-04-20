@@ -61,6 +61,8 @@ namespace fpp {
             return "Video";
         case MediaType::Audio:
             return "Audio";
+        case MediaType::Subtitle:
+            return "Subtitle";
         case MediaType::EndOF:
             return "EOF";
         }
@@ -155,10 +157,12 @@ namespace fpp {
                 return MediaType::Video;
             case AVMediaType::AVMEDIA_TYPE_AUDIO:
                 return MediaType::Audio;
+            case AVMediaType::AVMEDIA_TYPE_SUBTITLE:
+                return MediaType::Subtitle;
             default: {
                 throw std::invalid_argument {
-                    __FUNCTION__ " failed, bad type "
-                    + std::to_string(int(type))
+                    std::string { __FUNCTION__ } + " failed, bad type "
+                        + std::to_string(int(type))
                 };
             }
         }
@@ -170,10 +174,12 @@ namespace fpp {
                 return AVMediaType::AVMEDIA_TYPE_VIDEO;
             case MediaType::Audio:
                 return AVMediaType::AVMEDIA_TYPE_AUDIO;
+            case MediaType::Subtitle:
+                return AVMediaType::AVMEDIA_TYPE_SUBTITLE;
             default: {
                 throw std::invalid_argument {
-                    __FUNCTION__ " failed, bad type "
-                    + std::to_string(int(type))
+                    std::string { __FUNCTION__ } + " failed, bad type "
+                        + std::to_string(int(type))
                 };
             }
         }
@@ -220,17 +226,17 @@ namespace fpp {
     bool utils::compatible_with_pixel_format(const AVCodec* codec, AVPixelFormat pixel_format) {
         if (!codec) {
             throw std::runtime_error {
-                __FUNCTION__" failed: codec is NULL"
+                std::string { __FUNCTION__ } +" failed: codec is NULL"
             };
         }
         if (!codec->pix_fmts) {
             static_log_warning(
                 "utils"
-                , __FUNCTION__" failed: codec->pix_fmts is NULL"
+                , std::string { __FUNCTION__ } +" failed: codec->pix_fmts is NULL"
             );
             return true;
 //            throw std::runtime_error {
-//               __FUNCTION__" failed: codec->pix_fmts is NULL"
+//               std::string { __FUNCTION__ } +" failed: codec->pix_fmts is NULL"
 //            };
         }
 
@@ -247,17 +253,17 @@ namespace fpp {
     bool utils::compatible_with_sample_format(const AVCodec* codec, AVSampleFormat sample_format) {
         if (!codec) {
             throw std::runtime_error {
-                __FUNCTION__" failed: codec is NULL"
+                std::string { __FUNCTION__ } +" failed: codec is NULL"
             };
         }
         if (!codec->sample_fmts) {
             static_log_warning(
                 "utils"
-                , __FUNCTION__" failed: codec->sample_fmts is NULL"
+                , std::string { __FUNCTION__ } +" failed: codec->sample_fmts is NULL"
             );
             return true;
 //            throw std::runtime_error {
-//                __FUNCTION__" failed: codec->sample_fmts is NULL"
+//                std::string { __FUNCTION__ } +" failed: codec->sample_fmts is NULL"
 //            };
         }
 
@@ -285,11 +291,9 @@ namespace fpp {
     }
 
     void utils::device_register_all() {
-        static auto register_flag { false };
-        if (!register_flag) {
-            ::avdevice_register_all();
-            register_flag = true;
-        }
+        static struct CallOnce {
+            CallOnce() { ::avdevice_register_all(); }
+        }_;
     }
 
     const char* utils::guess_format_short_name(const std::string_view media_resurs_locator) {
@@ -305,17 +309,23 @@ namespace fpp {
         if (media_resurs_locator.find("aevalsrc=") != std::string_view::npos) {
             return "lavfi";
         }
-        if (media_resurs_locator.find("anullsrc=") != std::string_view::npos) { /* Silence              */
+        if (media_resurs_locator.find("anullsrc=") != std::string_view::npos) {
             return "lavfi";
         }
-        if (media_resurs_locator.find("sine=") != std::string_view::npos) {     /* Hum/squeak           */
+        if (media_resurs_locator.find("sine=") != std::string_view::npos) {
             return "lavfi";
         }
-        if (media_resurs_locator.find("video=") != std::string_view::npos) {    /* USB camera's video   */
+        if (media_resurs_locator.find("video=") != std::string_view::npos) {
             return "dshow";
         }
-        if (media_resurs_locator.find("audio=") != std::string_view::npos) {    /* USB micro's audio    */
+        if (media_resurs_locator.find("audio=") != std::string_view::npos) {
             return "TODO 13.01";
+        }
+        if (media_resurs_locator == "desktop") {
+            return "gdigrab";
+        }
+        if (media_resurs_locator.find("concat") != std::string_view::npos) {
+            return "concat";
         }
         return nullptr;
     }
@@ -351,6 +361,10 @@ namespace fpp {
             return "avcodec_send_packet failed: failed to add packet \
                     to internal queue, or similar other errors: \
                     legitimate decoding errors";
+        }
+        if (AVERROR_INVALIDDATA == ret) {
+            return "avcodec_send_packet failed: Invalid data found "
+                   "when processing input";
         }
         return "avcodec_send_packet failed: unknown code: " + std::to_string(ret);
     }
@@ -421,7 +435,7 @@ namespace fpp {
         return std::to_string(ret);
     }
 
-    SharedParameters utils::make_youtube_video_params() {
+    SpParameters utils::make_youtube_video_params() {
         const auto params { fpp::VideoParameters::make_shared() };
         params->setEncoder(AVCodecID::AV_CODEC_ID_H264);
         params->setPixelFormat(AVPixelFormat::AV_PIX_FMT_YUV420P);
@@ -430,7 +444,7 @@ namespace fpp {
         return params;
     }
 
-    SharedParameters utils::make_youtube_audio_params() {
+    SpParameters utils::make_youtube_audio_params() {
         const auto params { fpp::AudioParameters::make_shared() };
         params->setEncoder(AVCodecID::AV_CODEC_ID_AAC);
         params->setSampleFormat(AV_SAMPLE_FMT_FLTP);
@@ -457,12 +471,14 @@ namespace fpp {
         return result;
     }
 
-    SharedParameters utils::make_params(MediaType type) {
+    SpParameters utils::make_params(MediaType type) {
         switch (type) {
             case MediaType::Video:
                 return VideoParameters::make_shared();
             case MediaType::Audio:
                 return AudioParameters::make_shared();
+            case MediaType::Subtitle:
+                return Parameters::make_shared(MediaType::Subtitle);
             default:
                 throw std::invalid_argument {
                     "make_params failed: invalid media type"
@@ -470,12 +486,14 @@ namespace fpp {
         }
     }
 
-    SharedParameters utils::make_params(AVMediaType type) {
+    SpParameters utils::make_params(AVMediaType type) {
         switch (type) {
             case AVMediaType::AVMEDIA_TYPE_VIDEO:
                 return VideoParameters::make_shared();
             case AVMediaType::AVMEDIA_TYPE_AUDIO:
                 return AudioParameters::make_shared();
+            case AVMediaType::AVMEDIA_TYPE_SUBTITLE:
+                return Parameters::make_shared(MediaType::Subtitle);
             default:
                 throw std::invalid_argument {
                     "make_params failed: invalid media type"

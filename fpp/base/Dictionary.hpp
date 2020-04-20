@@ -8,14 +8,15 @@ struct AVDictionary;
 
 namespace fpp {
 
-    using Options = std::vector<std::pair<std::string,std::string>>;
+    using Entry = std::pair<std::string,std::string>;
+    using Options = std::vector<Entry>;
 
     class Dictionary : public Object {
 
     public:
 
         Dictionary(const Options& options);
-        virtual ~Dictionary() override;
+        ~Dictionary() override;
 
         void setOption(const std::string_view key, const std::string_view value);
         void setOption(const std::string_view key,                int64_t value);
@@ -28,8 +29,8 @@ namespace fpp {
         AVDictionary*   alloc(const Options&) const;
         void            free();
 
-        static void setString(AVDictionary** dict, const std::string_view key, const std::string_view value);
-        static void setInt   (AVDictionary** dict, const std::string_view key,                int64_t value);
+        void setString(AVDictionary** dict, const std::string_view key, const std::string_view value) const;
+        void setInt   (AVDictionary** dict, const std::string_view key,                int64_t value) const;
 
     private:
 

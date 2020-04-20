@@ -9,11 +9,10 @@ extern "C" {
 
 namespace fpp {
 
-    InputFormatContext::InputFormatContext(const std::string_view mrl)
+    InputFormatContext::InputFormatContext(const std::string_view mrl, const std::string_view format_short_name)
         : FormatContext(mrl)
-        , _input_format { nullptr } {
+        , _input_format { findInputFormat(format_short_name.data()) } {
         setName("InFmtCtx");
-        createContext();
     }
 
     InputFormatContext::~InputFormatContext() {
@@ -23,17 +22,17 @@ namespace fpp {
     void InputFormatContext::seek(int64_t stream_index, int64_t timestamp, SeekPrecision seek_precision) {
         auto flags { 0 };
         switch (seek_precision) {
-        case SeekPrecision::Forward:
-            flags = 0;
-            break;
-        case SeekPrecision::Backward:
-            flags = AVSEEK_FLAG_BACKWARD;
-            break;
-        case SeekPrecision::Any:
-            flags = AVSEEK_FLAG_ANY;
-            break;
-        case SeekPrecision::Precisely:
-            throw std::runtime_error { "NOT_IMPLEMENTED" };
+            case SeekPrecision::Forward:
+                flags = 0;
+                break;
+            case SeekPrecision::Backward:
+                flags = AVSEEK_FLAG_BACKWARD;
+                break;
+            case SeekPrecision::Any:
+                flags = AVSEEK_FLAG_ANY;
+                break;
+            case SeekPrecision::Precisely:
+                throw std::runtime_error { "NOT_IMPLEMENTED" };
         }
         if (const auto ret {
                 ::av_seek_frame(raw(), int(stream_index), timestamp, flags)
@@ -49,6 +48,7 @@ namespace fpp {
     }
 
     Packet InputFormatContext::read() {
+        setInterrupter(timeoutReading());
         Packet packet { MediaType::Unknown };
         if (const auto ret { ::av_read_frame(raw(), packet.ptr()) }; ret < 0) {
             if (ret == AVERROR_EOF) {
@@ -64,17 +64,14 @@ namespace fpp {
         return packet;
     }
 
-    void InputFormatContext::createContext() {
-        reset(std::shared_ptr<AVFormatContext> {
-            ::avformat_alloc_context()
-            , [](auto* ctx) { ::avformat_free_context(ctx); }
-        });
-    }
-
     bool InputFormatContext::openContext(Options options) {
-        guessInputFromat();
+        if (!inputFormat()) {
+            guessInputFromat();
+        }
         Dictionary dictionary { options };
-        AVFormatContext* fmt_ctx { nullptr };
+        AVFormatContext* fmt_ctx { ::avformat_alloc_context() };
+        setInterruptCallback(fmt_ctx);
+        setInterrupter(timeoutOpening());
         if (const auto ret {
                 ::avformat_open_input(
                     &fmt_ctx
@@ -82,12 +79,12 @@ namespace fpp {
                     , inputFormat()
                     , dictionary.get()
                 )
-            }; ret < 0) { // TODO ret code explanation 26.03
+            }; ret < 0) {
             return false;
         }
         reset(std::shared_ptr<AVFormatContext> {
             fmt_ctx
-            , [](auto* ctx) { ::avformat_free_context(ctx); }
+            , [](auto* ctx) { /*::avformat_free_context(ctx);*/ } // TODO avformat_close_input free context 10.04
         });
         setInputFormat(raw()->iformat);
         if (const auto ret {
@@ -106,10 +103,26 @@ namespace fpp {
         return raw()->iformat->name;
     }
 
+    void InputFormatContext::closeContext() {
+        auto ctx { raw() }; // TODO 10.04
+        ::avformat_close_input(&ctx);
+        _input_format = nullptr;
+    }
+
     StreamVector InputFormatContext::parseFormatContext() {
         StreamVector result;
-        for (unsigned i { 0 }; i < raw()->nb_streams; ++i) {
-            result.push_back(Stream::make_input_stream(raw()->streams[i]));
+        for (auto i { 0u }; i < raw()->nb_streams; ++i) {
+            const auto stream_type { // TODO do not ignore not AV streams 09.04
+                raw()->streams[i]->codecpar->codec_type
+            };
+            if ((stream_type == AVMEDIA_TYPE_VIDEO)
+                || (stream_type == AVMEDIA_TYPE_AUDIO)
+                || (stream_type == AVMEDIA_TYPE_SUBTITLE)) {
+                result.push_back(Stream::make_input_stream(raw()->streams[i]));
+                result.back()->params->setFormatFlags(inputFormat()->flags);
+            } else {
+                log_warning("Input " << utils::to_string(stream_type) << "stream ignored (TODO 15.04)");
+            }
         }
         return result;
     }
@@ -118,12 +131,19 @@ namespace fpp {
         const auto short_name {
             utils::guess_format_short_name(mediaResourceLocator())
         };
+        setInputFormat(findInputFormat(short_name));
+    }
+
+    AVInputFormat* InputFormatContext::findInputFormat(const char* short_name) const {
         if (short_name) {
             if (std::string { short_name } == "dshow") {
                 utils::device_register_all();
             }
+            else if (std::string { short_name } == "gdigrab") {
+                utils::device_register_all();
+            }
         }
-        setInputFormat(::av_find_input_format(short_name));
+        return ::av_find_input_format(short_name);
     }
 
     AVInputFormat* InputFormatContext::inputFormat() {

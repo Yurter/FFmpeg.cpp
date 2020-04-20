@@ -10,7 +10,7 @@ extern "C" {
 
 namespace fpp {
 
-    VideoFilterContext::VideoFilterContext(SharedParameters parameters, const std::string/*_view*/ filters_descr)
+    VideoFilterContext::VideoFilterContext(SpParameters parameters, const std::string/*_view*/ filters_descr)
         : FilterContext(parameters, filters_descr) {
         setName("VideoFltCtx");
         init();
@@ -51,20 +51,14 @@ namespace fpp {
         );
 
         AVFilterContext* raw_ptr { nullptr };
-        if (const auto ret {
-                ::avfilter_graph_create_filter(
-                    &raw_ptr
-                    , buffersrc
-                    , "in"      /* name   */
-                    , args
-                    , nullptr   /* opaque */
-                    , _filter_graph.get()
-            )}; ret < 0) {
-            throw FFmpegException {
-                __FUNCTION__ " avfilter_graph_create_filter() failed"
-                , ret
-            };
-        }
+        ffmpeg_api_strict(avfilter_graph_create_filter
+            , &raw_ptr
+            , buffersrc
+            , "in"      /* name   */
+            , args
+            , nullptr   /* opaque */
+            , _filter_graph.get()
+        );
 
         _buffersrc_ctx.reset(
             raw_ptr
@@ -84,20 +78,14 @@ namespace fpp {
 
         /* buffer video sink: to terminate the filter chain */
         AVFilterContext* raw_ptr { nullptr };
-        if (const auto ret {
-                ::avfilter_graph_create_filter(
-                    &raw_ptr
-                    , buffersink
-                    , "out"     /* name   */
-                    , nullptr   /* args   */
-                    , nullptr   /* opaque */
-                    , _filter_graph.get()
-            )}; ret < 0) {
-            throw FFmpegException {
-                __FUNCTION__ " avfilter_graph_create_filter() failed"
-                , ret
-            };
-        }
+        ffmpeg_api_strict(avfilter_graph_create_filter
+            , &raw_ptr
+            , buffersink
+            , "out"     /* name   */
+            , nullptr   /* args   */
+            , nullptr   /* opaque */
+            , _filter_graph.get()
+        );
 
         _buffersink_ctx.reset(
             raw_ptr
@@ -120,20 +108,13 @@ namespace fpp {
             )
         };
 
-        if (const auto ret {
-            ::av_opt_set_bin(
-                _buffersink_ctx.get()
-                , "pix_fmts"
-                ,  reinterpret_cast<const uint8_t*>(pix_fmts)
-                , array_size
-                , AV_OPT_SEARCH_CHILDREN
-        )}; ret < 0) {
-            throw FFmpegException {
-                __FUNCTION__ " av_opt_set_bin failed"
-                , ret
-            };
-        }
-
+        ffmpeg_api_strict(av_opt_set_bin
+            , _buffersink_ctx.get()
+            , "pix_fmts"
+            ,  reinterpret_cast<const uint8_t*>(pix_fmts)
+            , array_size
+            , AV_OPT_SEARCH_CHILDREN
+        );
     }
 
 } // namespace fpp

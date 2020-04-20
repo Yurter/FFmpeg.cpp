@@ -90,27 +90,25 @@ namespace fpp {
     std::string Packet::toString() const {
         /* Video packet: [I], 1516 bytes, dts 1709, pts 1709, duration 29, time_base 1/90000, stream index 0    */
         /* Audio packet: [I], 1045 bytes, dts 392, pts 392, duration 26, time_base 1/44100, stream index 1      */
-        return utils::to_string(type()) + " packet: "
-                + (keyFrame() ? "[I]" : "[_]") + ", "
-                + std::to_string(raw().size) + " bytes, "
-                + "dts " + utils::pts_to_string(raw().dts) + ", "
-                + "pts " + utils::pts_to_string(raw().pts) + ", "
-                + "duration " + std::to_string(raw().duration) + ", "
-                + "time_base " + utils::to_string(_time_base) + ", "
-                + "stream index " + std::to_string(raw().stream_index);
+        return utils::to_string(type()) + " packet" +
+                (!isEOF()
+                    ? std::string { ": " } + (keyFrame() ? "[I]" : "[_]") + ", "
+                        + std::to_string(raw().size) + " bytes, "
+                        + "dts " + utils::pts_to_string(raw().dts) + ", "
+                        + "pts " + utils::pts_to_string(raw().pts) + ", "
+                        + "duration " + std::to_string(raw().duration) + ", "
+                        + "time_base " + utils::to_string(_time_base) + ", "
+                        + "stream index " + std::to_string(raw().stream_index)
+                    : "" );
     }
 
     void Packet::ref(const Packet& other) {
-        if (::av_packet_ref(ptr(), other.ptr()) != 0) {
-            throw FFmpegException { "av_packet_ref failed" };
-        }
+        ffmpeg_api_strict(av_packet_ref, ptr(), other.ptr());
         setTimeBase(other.timeBase());
     }
 
     void Packet::ref(const AVPacket& other, AVRational time_base) {
-        if (::av_packet_ref(ptr(), &other) != 0) {
-            throw FFmpegException { "av_packet_ref failed" };
-        }
+        ffmpeg_api_strict(av_packet_ref, ptr(), &other);
         setTimeBase(time_base);
     }
 
