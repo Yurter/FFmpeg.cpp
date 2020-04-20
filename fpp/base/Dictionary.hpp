@@ -16,7 +16,7 @@ namespace fpp {
     public:
 
         Dictionary(const Options& options);
-        virtual ~Dictionary() override;
+        ~Dictionary() override;
 
         void setOption(const std::string_view key, const std::string_view value);
         void setOption(const std::string_view key,                int64_t value);

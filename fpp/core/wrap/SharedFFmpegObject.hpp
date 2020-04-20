@@ -10,11 +10,11 @@ namespace fpp {
 
     public:
 
-        SharedFFmpegObject(std::shared_ptr<T> shared_object = std::shared_ptr<T> {})
+        SharedFFmpegObject(std::shared_ptr<T> shared_object = {})
             : _shared_object(shared_object) {
         }
 
-        void reset(std::shared_ptr<T> shared_object = std::shared_ptr<T> {}) {
+        void reset(std::shared_ptr<T> shared_object = {}) {
             _shared_object = shared_object;
         }
 

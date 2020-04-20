@@ -53,7 +53,7 @@ namespace fpp {
         static bool         compatible_with_pixel_format(const AVCodec* codec, AVPixelFormat pixel_format);
         static bool         compatible_with_sample_format(const AVCodec* codec, AVSampleFormat sample_format);
 
-        static const char*  guess_format_short_name(const std::string_view media_resurs_locator);
+        static const char*  guess_format_short_name(const std::string_view media_resurs_locator); //TODO return type std::string_view 20.04
 
         /* FFmpeg's error codes explanation */
         static std::string  option_set_error_to_string(int ret);

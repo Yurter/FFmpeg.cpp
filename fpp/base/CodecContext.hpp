@@ -18,7 +18,7 @@ namespace fpp {
         const AVCodec*      codec()  const;
         bool                opened();
 
-        const SpParameters params;
+        const SpParameters  params;
 
     protected:
 

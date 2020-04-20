@@ -23,9 +23,7 @@ namespace fpp {
         Stream(AVStream* avstream);
         Stream(AVStream* avstream, const SpParameters parameters);
 
-        virtual ~Stream() override = default;
-
-        virtual std::string toString() const override final;
+        std::string         toString() const override final;
 
         void                stampPacket(Packet& packet);
         bool                timeIsOver() const;

@@ -7,12 +7,12 @@ namespace fpp {
 
     public:
 
-        virtual std::string toString() const override;
+        std::string         toString() const override;
 
     private:
 
-        virtual void        initBufferSource()  override;
-        virtual void        initBufferSink()    override;
+        void                initBufferSource()  override;
+        void                initBufferSink()    override;
 
     };
 

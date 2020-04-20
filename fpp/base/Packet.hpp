@@ -16,7 +16,7 @@ namespace fpp {
         Packet(MediaType type);
         Packet(const Packet& other);
         Packet(const AVPacket& avpacket, AVRational time_base, MediaType type);
-        virtual ~Packet() override;
+        ~Packet() override;
 
         Packet& operator=(const Packet& other);
 
@@ -36,7 +36,7 @@ namespace fpp {
         bool                keyFrame()      const;
 
         size_t              size()          const;
-        virtual std::string toString()      const override;
+        std::string         toString()      const override;
 
     private:
 
