@@ -3,14 +3,14 @@
 #include <fpp/base/MediaData.hpp>
 #include <vector>
 
-#define DEFAULT_TIME_BASE AVRational { 1, 1000 }
+extern "C" {
+    #include <libavcodec/avcodec.h> // TODO: move to cpp file 20.04
+}
+
+constexpr auto DEFAULT_TIME_BASE { AVRational { 1, 1000 } };
 
 struct AVStream;
 struct AVCodecParams;
-
-extern "C" {
-    #include <libavcodec/avcodec.h>
-}
 
 namespace fpp {
 

@@ -7,7 +7,7 @@ extern "C" {
     #include <libavformat/avformat.h>
 }
 
-#define not_inited_codec_id(x) ((x) == AVCodecID::AV_CODEC_ID_NONE)
+constexpr auto not_inited_codec_id { [](auto x) { return x == AVCodecID::AV_CODEC_ID_NONE; } };
 
 namespace fpp {
 
