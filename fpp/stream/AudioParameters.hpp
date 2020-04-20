@@ -27,7 +27,7 @@ namespace fpp {
         std::string         toString() const override;
 
         void                completeFrom(const SpParameters other) override;
-        void                parseStream(const AVStream* avstream)      override;
+        void                parseStream(const AVStream* avstream)  override;
         bool                betterThen(const SpParameters& other)  override;
 
         static SpAudioParameters make_shared() {

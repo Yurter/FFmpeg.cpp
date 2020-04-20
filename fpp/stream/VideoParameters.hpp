@@ -29,7 +29,7 @@ namespace fpp {
         std::string         toString() const override;
         void                completeFrom(const SpParameters other) override;
         bool                betterThen(const SpParameters& other)  override;
-        void                parseStream(const AVStream* avstream)      override;
+        void                parseStream(const AVStream* avstream)  override;
         void                initCodecContext(AVCodecContext* codec_context) const override;
         void                parseCodecContext(const AVCodecContext* codec_context) override;
 
