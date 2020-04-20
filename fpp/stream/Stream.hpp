@@ -43,9 +43,9 @@ namespace fpp {
 
         void                shiftStamps(Packet& packet);
         void                calculatePacketDuration(Packet& packet);
-        void                avoidNegativeTimestamp(Packet& packet);
-        void                checkStampMonotonicity(Packet& packet);
-        void                checkDtsPtsOrder(Packet& packet);
+//        void                avoidNegativeTimestamp(Packet& packet);
+//        void                checkStampMonotonicity(Packet& packet);
+//        void                checkDtsPtsOrder(Packet& packet);
 
     public:
 
