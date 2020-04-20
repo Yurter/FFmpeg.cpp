@@ -36,6 +36,4 @@ namespace fpp {
 
     };
 
-    using SharedAudioParameters = std::shared_ptr<AudioParameters>;
-
 } // namespace fpp
