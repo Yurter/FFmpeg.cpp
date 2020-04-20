@@ -11,14 +11,14 @@ namespace fpp {
 
     public:
 
-        CodecContext(const SharedParameters params);
+        CodecContext(const SpParameters params);
 
         std::string         toString() const override final;
 
         const AVCodec*      codec()  const;
         bool                opened();
 
-        const SharedParameters params;
+        const SpParameters params;
 
     protected:
 

@@ -21,7 +21,7 @@ namespace fpp {
     public:
 
         Stream(AVStream* avstream);
-        Stream(AVStream* avstream, const SharedParameters parameters);
+        Stream(AVStream* avstream, const SpParameters parameters);
 
         virtual ~Stream() override = default;
 
@@ -51,7 +51,7 @@ namespace fpp {
 
     public:
 
-        SharedParameters    params;
+        SpParameters    params;
 
     private:
 
@@ -68,7 +68,7 @@ namespace fpp {
             return std::make_shared<Stream>(avstream);
         }
 
-        static inline SharedStream make_output_stream(AVStream* avstream, const SharedParameters parameters) {
+        static inline SharedStream make_output_stream(AVStream* avstream, const SpParameters parameters) {
             return std::make_shared<Stream>(avstream, parameters);
         }
 

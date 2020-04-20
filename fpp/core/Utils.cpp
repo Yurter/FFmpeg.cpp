@@ -435,7 +435,7 @@ namespace fpp {
         return std::to_string(ret);
     }
 
-    SharedParameters utils::make_youtube_video_params() {
+    SpParameters utils::make_youtube_video_params() {
         const auto params { fpp::VideoParameters::make_shared() };
         params->setEncoder(AVCodecID::AV_CODEC_ID_H264);
         params->setPixelFormat(AVPixelFormat::AV_PIX_FMT_YUV420P);
@@ -444,7 +444,7 @@ namespace fpp {
         return params;
     }
 
-    SharedParameters utils::make_youtube_audio_params() {
+    SpParameters utils::make_youtube_audio_params() {
         const auto params { fpp::AudioParameters::make_shared() };
         params->setEncoder(AVCodecID::AV_CODEC_ID_AAC);
         params->setSampleFormat(AV_SAMPLE_FMT_FLTP);
@@ -471,7 +471,7 @@ namespace fpp {
         return result;
     }
 
-    SharedParameters utils::make_params(MediaType type) {
+    SpParameters utils::make_params(MediaType type) {
         switch (type) {
             case MediaType::Video:
                 return VideoParameters::make_shared();
@@ -486,7 +486,7 @@ namespace fpp {
         }
     }
 
-    SharedParameters utils::make_params(AVMediaType type) {
+    SpParameters utils::make_params(AVMediaType type) {
         switch (type) {
             case AVMediaType::AVMEDIA_TYPE_VIDEO:
                 return VideoParameters::make_shared();

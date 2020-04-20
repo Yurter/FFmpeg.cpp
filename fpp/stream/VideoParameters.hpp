@@ -27,8 +27,8 @@ namespace fpp {
         AVRational          sampleAspectRatio() const;
 
         std::string         toString() const override;
-        void                completeFrom(const SharedParameters other) override;
-        bool                betterThen(const SharedParameters& other)  override;
+        void                completeFrom(const SpParameters other) override;
+        bool                betterThen(const SpParameters& other)  override;
         void                parseStream(const AVStream* avstream)      override;
         void                initCodecContext(AVCodecContext* codec_context) const override;
         void                parseCodecContext(const AVCodecContext* codec_context) override;

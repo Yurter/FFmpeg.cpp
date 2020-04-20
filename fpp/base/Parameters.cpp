@@ -147,7 +147,7 @@ namespace fpp {
             + "tb " + utils::to_string(timeBase());
     }
 
-    void Parameters::completeFrom(const SharedParameters other) {
+    void Parameters::completeFrom(const SpParameters other) {
 //        if (extradata().second == 0)        { setExtradata(other->extradata()); }
         if (not_inited_codec_id(codecId())) { setEncoder(other->codecId());     }
         if (not_inited_int(bitrate()))      { setBitrate(other->bitrate());     }
@@ -207,7 +207,7 @@ namespace fpp {
         raw().level               = FF_LEVEL_UNKNOWN;
     }
 
-    bool Parameters::betterThen(const SharedParameters& other) {
+    bool Parameters::betterThen(const SpParameters& other) {
         return this->bitrate() > other->bitrate();
     }
 

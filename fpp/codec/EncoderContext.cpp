@@ -5,7 +5,7 @@
 
 namespace fpp {
 
-    EncoderContext::EncoderContext(const SharedParameters params, Options options)
+    EncoderContext::EncoderContext(const SpParameters params, Options options)
         : CodecContext(params) {
         setName("EncCtx");
         if (!params->isEncoder()) {

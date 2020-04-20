@@ -33,7 +33,7 @@ namespace fpp {
     }
 
     // output stream
-    Stream::Stream(AVStream* avstream, const SharedParameters parameters)
+    Stream::Stream(AVStream* avstream, const SpParameters parameters)
         : Stream(avstream, parameters->type()) {
 
         setName("Out" + utils::to_string(type()) + "Stream");

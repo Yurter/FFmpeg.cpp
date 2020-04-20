@@ -63,10 +63,10 @@ namespace fpp {
         static std::string  receive_packet_error_to_string(int ret);
         static std::string  swr_convert_frame_error_to_string(int ret);
 
-        static SharedParameters make_params(MediaType type);
-        static SharedParameters make_params(AVMediaType type);
-        static SharedParameters make_youtube_video_params();
-        static SharedParameters make_youtube_audio_params();
+        static SpParameters make_params(MediaType type);
+        static SpParameters make_params(AVMediaType type);
+        static SpParameters make_youtube_video_params();
+        static SpParameters make_youtube_audio_params();
 
         static std::string  merge_sdp_files(const std::string& sdp_one, const std::string& sdp_two);
 

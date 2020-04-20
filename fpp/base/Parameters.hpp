@@ -15,8 +15,8 @@ extern "C" {
 namespace fpp {
 
     class Parameters;
-    using SharedParameters = std::shared_ptr<Parameters>;
-    using IOParams = struct { SharedParameters in; SharedParameters out; };
+    using SpParameters = std::shared_ptr<Parameters>;
+    using IOParams = struct { SpParameters in; SpParameters out; };
     using Extradata = std::pair<uint8_t*,size_t>;
 
     class Parameters : public FFmpegObject<AVCodecParameters>, public MediaData {
@@ -52,8 +52,8 @@ namespace fpp {
         void                increaseDuration(const int64_t value);
 
         virtual std::string toString() const override;
-        virtual bool        betterThen(const SharedParameters& other);
-        virtual void        completeFrom(const SharedParameters other);
+        virtual bool        betterThen(const SpParameters& other);
+        virtual void        completeFrom(const SpParameters other);
 
         virtual void        parseStream(const AVStream* avstream);
 
@@ -62,7 +62,7 @@ namespace fpp {
         virtual void        initCodecContext(AVCodecContext* codec_context) const;
         virtual void        parseCodecContext(const AVCodecContext* codec_context);
 
-        static SharedParameters make_shared(MediaType media_type) {
+        static SpParameters make_shared(MediaType media_type) {
             return std::make_shared<Parameters>(media_type);
         }
 

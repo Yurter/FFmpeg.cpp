@@ -9,7 +9,7 @@ extern "C" {
 
 namespace fpp {
 
-    CodecContext::CodecContext(const SharedParameters params)
+    CodecContext::CodecContext(const SpParameters params)
         : MediaData(params->type())
         , params { params } {
         setName("CodecContext");
