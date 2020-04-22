@@ -40,7 +40,9 @@ namespace fpp {
 
     void Parameters::setCodec(AVCodec* codec) {
         _codec = codec;
-        raw().codec_id = _codec->id;
+        if (_codec) {
+            raw().codec_id = _codec->id;
+        }
     }
 
     bool Parameters::testFormatFlag(int flag) const {
@@ -90,19 +92,18 @@ namespace fpp {
     }
 
     std::string Parameters::codecName() const {
-        if (not_inited_ptr(_codec)) {
-            throw std::runtime_error {
-                std::string { __FUNCTION__ } + "failed: codec is null" };
+        if (!_codec) {
+            return "none";
         }
         return _codec->name;
     }
 
     AVCodec* Parameters::codec() const {
-        if (not_inited_ptr(_codec)) {
-            throw std::runtime_error {
-                std::string { __FUNCTION__ } + "failed: codec is null"
-            };
-        }
+//        if (!_codec) {
+//            throw std::runtime_error {
+//                std::string { __FUNCTION__ } + " failed: codec is null"
+//            };
+//        }
         return _codec;
     }
 
@@ -140,12 +141,23 @@ namespace fpp {
 
     std::string Parameters::toString() const {
         return utils::to_string(type()) + " "
-            + codecName() + " "
-            + (::av_codec_is_decoder(codec()) ? "decoder" : "encoder") + ", "
-            + (bitrate() ? std::to_string(bitrate()) : "N/A") + " bit/s, "
-            + "dur " + std::to_string(duration()) + ", "
-            + "tb " + utils::to_string(timeBase());
+            + codecName()
+            + (codec()
+                ? std::string { " " }
+                    + (::av_codec_is_decoder(codec()) ? "decoder" : "encoder") + ", "
+                    + (bitrate() ? std::to_string(bitrate()) : "N/A") + " bit/s, "
+                    + "dur " + std::to_string(duration()) + ", "
+                    + "tb " + utils::to_string(timeBase())
+               : "");
     }
+//    std::string Parameters::toString() const {
+//        return utils::to_string(type()) + " "
+//                + codecName() + " "
+//                + (::av_codec_is_decoder(codec()) ? "decoder" : "encoder") + ", "
+//                + (bitrate() ? std::to_string(bitrate()) : "N/A") + " bit/s, "
+//                + "dur " + std::to_string(duration()) + ", "
+//                + "tb " + utils::to_string(timeBase());
+//    }
 
     void Parameters::completeFrom(const SpParameters other) {
 //        if (extradata().second == 0)        { setExtradata(other->extradata()); }
