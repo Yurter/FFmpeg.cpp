@@ -35,6 +35,7 @@ SOURCES += \
     examples/transsizing.cpp \
     examples/webcam.cpp \
     examples/youtube_stream_copy.cpp \
+    examples/youtube_stream_copy_with_silence.cpp \
     examples/youtube_stream_transcode.cpp \
     fpp/refi/VideoFilters/DrawText.cpp \
     fpp/refi/ResampleContext.cpp \
