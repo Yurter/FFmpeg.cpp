@@ -133,6 +133,9 @@ namespace fpp {
             else if (std::string { short_name } == "gdigrab") {
                 utils::device_register_all();
             }
+            else if (std::string { short_name } == "lavfi") {
+                utils::device_register_all();
+            }
         }
         return ::av_find_input_format(short_name);
     }
