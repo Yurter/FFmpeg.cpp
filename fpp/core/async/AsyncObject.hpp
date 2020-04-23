@@ -24,8 +24,6 @@ namespace fpp {
             });
         }
 
-        virtual ~AsyncObject() = default;
-
         AsyncObject& operator=(const AsyncObject& other) {
             std::lock_guard lock(_mutex);
             other.access([this](const T& other_data){
