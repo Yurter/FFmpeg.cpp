@@ -67,10 +67,10 @@ namespace fpp {
         struct tm* timeinfo;
         char buffer[80];
 
-        time (&rawtime);
-        timeinfo = localtime(&rawtime);
+        ::time(&rawtime);
+        timeinfo = ::localtime(&rawtime);
 
-        strftime(buffer, 80, "%Y-%m-%d_%H-%M-%S.txt", timeinfo);
+        ::strftime(buffer, 80, "%Y-%m-%d_%H-%M-%S.txt", timeinfo);
         return std::string(buffer);
     }
 
@@ -113,7 +113,7 @@ namespace fpp {
     }
 
     std::string Logger::getThreadId() const {
-        //TODO: DOESNT COMPILE ON GCC (LINUX)!!!!!!!!!!!!!!!!!
+        //TODO: DOESNT COMPILE ON GCC (LINUX)!!!!!!!!!!!!!!!!! // use -pthread linking option
 //        const auto thread_id_max_length = 5;
 //        std::string thread_id = (std::stringstream() << std::this_thread::get_id()).str();
 //        thread_id.insert(0, thread_id_max_length - thread_id.length(), '0');
@@ -251,5 +251,59 @@ namespace fpp {
         const std::string formated_message = formatMessage(caller_name, code_position, log_level, message);
         print(log_level, formated_message);
     }
+
+    Logger::ConsoleHandler::ConsoleHandler(LogLevel log_level) :
+        _lock { _mutex }
+        , _h_stdout { ::GetStdHandle(STD_OUTPUT_HANDLE) } {
+        setConsoleColor(log_level);
+    }
+
+    Logger::ConsoleHandler::~ConsoleHandler() {
+        resetConsoleColor();
+    }
+
+    void Logger::ConsoleHandler::setConsoleColor(LogLevel log_level) const {
+        #ifdef _WIN32
+
+        constexpr auto white    { FOREGROUND_RED|FOREGROUND_GREEN|FOREGROUND_BLUE       };
+        constexpr auto yellow   { FOREGROUND_GREEN|FOREGROUND_RED|FOREGROUND_INTENSITY  };
+        constexpr auto red      { FOREGROUND_RED|FOREGROUND_INTENSITY                   };
+        constexpr auto blue     { FOREGROUND_BLUE|FOREGROUND_GREEN|FOREGROUND_INTENSITY };
+        constexpr auto purpule  { FOREGROUND_BLUE|FOREGROUND_RED|FOREGROUND_INTENSITY   };
+
+        switch (log_level) {
+            case LogLevel::Quiet:
+                return;
+            case LogLevel::Info:
+                ::SetConsoleTextAttribute(_h_stdout, white);
+                return;
+            case LogLevel::Warning:
+                ::SetConsoleTextAttribute(_h_stdout, yellow);
+                return;
+            case LogLevel::Error:
+                ::SetConsoleTextAttribute(_h_stdout, red);
+                return;
+            case LogLevel::Debug:
+                ::SetConsoleTextAttribute(_h_stdout, blue);
+                return;
+            case LogLevel::Trace:
+                ::SetConsoleTextAttribute(_h_stdout, purpule);
+                return;
+        }
+
+        #elif __linux__
+            // https://stackoverflow.com/questions/2616906/how-do-i-output-coloured-text-to-a-linux-terminal // TODO: 23.04
+        #endif
+    }
+
+    void Logger::ConsoleHandler::resetConsoleColor() const {
+        #ifdef _WIN32
+        constexpr auto white { FOREGROUND_RED|FOREGROUND_GREEN|FOREGROUND_BLUE };
+        ::SetConsoleTextAttribute(_h_stdout, white);
+        #elif __linux__
+            // https://stackoverflow.com/questions/2616906/how-do-i-output-coloured-text-to-a-linux-terminal // TODO: 23.04
+        #endif
+    }
+
 
 } // namespace fpp

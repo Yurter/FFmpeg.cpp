@@ -48,6 +48,23 @@ namespace fpp {
 
     private:
 
+        struct ConsoleHandler {
+
+            ConsoleHandler(LogLevel log_level);
+            ~ConsoleHandler();
+
+        private:
+
+            void setConsoleColor(LogLevel log_level) const;
+            void resetConsoleColor() const;
+
+            void* _h_stdout;
+            std::mutex _mutex;
+            std::lock_guard<std::mutex> _lock;
+        };
+
+    private:
+
         Code                print(const LogLevel log_level, const std::string& log_text);
         void                openFile(const std::string& log_dir);
         void                closeFile();
