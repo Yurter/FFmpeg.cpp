@@ -112,17 +112,8 @@ namespace fpp {
     StreamVector InputFormatContext::parseFormatContext() {
         StreamVector result;
         for (auto i { 0u }; i < raw()->nb_streams; ++i) {
-            const auto stream_type { // TODO do not ignore not AV streams 09.04
-                raw()->streams[i]->codecpar->codec_type
-            };
-            if ((stream_type == AVMEDIA_TYPE_VIDEO)
-                || (stream_type == AVMEDIA_TYPE_AUDIO)
-                || (stream_type == AVMEDIA_TYPE_SUBTITLE)) {
-                result.push_back(Stream::make_input_stream(raw()->streams[i]));
-                result.back()->params->setFormatFlags(inputFormat()->flags);
-            } else {
-                log_warning("Input " << utils::to_string(stream_type) << "stream ignored (TODO 15.04)");
-            }
+            result.push_back(Stream::make_input_stream(raw()->streams[i]));
+            result.back()->params->setFormatFlags(inputFormat()->flags);
         }
         return result;
     }
@@ -140,6 +131,9 @@ namespace fpp {
                 utils::device_register_all();
             }
             else if (std::string { short_name } == "gdigrab") {
+                utils::device_register_all();
+            }
+            else if (std::string { short_name } == "lavfi") {
                 utils::device_register_all();
             }
         }

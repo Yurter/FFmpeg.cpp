@@ -63,6 +63,10 @@ namespace fpp {
             return "Audio";
         case MediaType::Subtitle:
             return "Subtitle";
+        case MediaType::Data:
+            return "Data";
+        case MediaType::Attachment:
+            return "Attachment";
         case MediaType::EndOF:
             return "EOF";
         }
@@ -159,6 +163,12 @@ namespace fpp {
                 return MediaType::Audio;
             case AVMediaType::AVMEDIA_TYPE_SUBTITLE:
                 return MediaType::Subtitle;
+            case AVMediaType::AVMEDIA_TYPE_DATA:
+                return MediaType::Data;
+            case AVMediaType::AVMEDIA_TYPE_ATTACHMENT:
+                return MediaType::Attachment;
+            case AVMediaType::AVMEDIA_TYPE_UNKNOWN:
+                return MediaType::Unknown;
             default: {
                 throw std::invalid_argument {
                     std::string { __FUNCTION__ } + " failed, bad type "
@@ -176,6 +186,10 @@ namespace fpp {
                 return AVMediaType::AVMEDIA_TYPE_AUDIO;
             case MediaType::Subtitle:
                 return AVMediaType::AVMEDIA_TYPE_SUBTITLE;
+            case MediaType::Data:
+                return AVMediaType::AVMEDIA_TYPE_DATA;
+            case MediaType::Attachment:
+                return AVMediaType::AVMEDIA_TYPE_ATTACHMENT;
             default: {
                 throw std::invalid_argument {
                     std::string { __FUNCTION__ } + " failed, bad type "
@@ -479,6 +493,10 @@ namespace fpp {
                 return AudioParameters::make_shared();
             case MediaType::Subtitle:
                 return Parameters::make_shared(MediaType::Subtitle);
+            case MediaType::Data:
+                return Parameters::make_shared(MediaType::Data);
+            case MediaType::Attachment:
+                return Parameters::make_shared(MediaType::Attachment);
             default:
                 throw std::invalid_argument {
                     "make_params failed: invalid media type"
@@ -494,6 +512,10 @@ namespace fpp {
                 return AudioParameters::make_shared();
             case AVMediaType::AVMEDIA_TYPE_SUBTITLE:
                 return Parameters::make_shared(MediaType::Subtitle);
+            case AVMediaType::AVMEDIA_TYPE_DATA:
+                return Parameters::make_shared(MediaType::Data);
+            case AVMediaType::AVMEDIA_TYPE_ATTACHMENT:
+                return Parameters::make_shared(MediaType::Attachment);
             default:
                 throw std::invalid_argument {
                     "make_params failed: invalid media type"

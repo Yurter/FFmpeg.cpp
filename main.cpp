@@ -16,6 +16,8 @@ auto main() -> int {
         // YouTube stream
 //        youtube_stream_copy();
 //        youtube_stream_transcode();
+//        youtube_stream_copy_with_silence();
+//        youtube_stream_transcode_with_silence();
 
         // RTP stream
 //        rtp_video_stream();
