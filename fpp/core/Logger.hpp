@@ -50,7 +50,7 @@ namespace fpp {
 
         struct ConsoleHandler {
 
-            ConsoleHandler(LogLevel log_level);
+            ConsoleHandler(std::mutex& mutex, LogLevel log_level);
             ~ConsoleHandler();
 
         private:
@@ -59,7 +59,6 @@ namespace fpp {
             void resetConsoleColor() const;
 
             void* _h_stdout;
-            std::mutex _mutex;
             std::lock_guard<std::mutex> _lock;
         };
 

@@ -252,9 +252,9 @@ namespace fpp {
         print(log_level, formated_message);
     }
 
-    Logger::ConsoleHandler::ConsoleHandler(LogLevel log_level) :
-        _lock { _mutex }
-        , _h_stdout { ::GetStdHandle(STD_OUTPUT_HANDLE) } {
+    Logger::ConsoleHandler::ConsoleHandler(std::mutex& mutex, LogLevel log_level) :
+        _h_stdout { ::GetStdHandle(STD_OUTPUT_HANDLE) }
+        , _lock { mutex } {
         setConsoleColor(log_level);
     }
 
