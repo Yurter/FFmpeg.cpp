@@ -24,7 +24,7 @@ namespace fpp {
         ::av_log_set_callback(nullptr);
     }
 
-    std::string Logger::getTimeStamp() const { //TODO перенести реализацию в утилиты currentTimeFormated()  16.01
+    std::string Logger::currentTimeFormated() const {
         const auto now { std::chrono::system_clock::now() };
         const auto in_time_t { std::chrono::system_clock::to_time_t(now) };
 
@@ -43,7 +43,7 @@ namespace fpp {
         return ss.str();
     }
 
-    std::string Logger::getThreadId() const {
+    std::string Logger::threadIdFormated() const {
         //TODO: DOESNT COMPILE ON GCC (LINUX)!!!!!!!!!!!!!!!!! // use -pthread linking option
 //        const auto thread_id_max_length = 5;
 //        std::string thread_id = (std::stringstream() << std::this_thread::get_id()).str();
@@ -94,22 +94,17 @@ namespace fpp {
         }
     }
 
-    std::string Logger::encodeLogLevel(LogLevel value) const {
+    std::string_view Logger::logLevelToString(LogLevel value) const {
         switch (value) {
-        case LogLevel::Info:
-            return "info";
-        case LogLevel::Warning:
-            return "warn";
-        case LogLevel::Error:
-            return "err ";
-//        case LogLevel::Verbose:
-//        case LogLevel::Debug:
-//            return "deb ";
-//        case LogLevel::Trace:
-//            return "trac";
-        case LogLevel::Quiet:
-            return "   ";
-        }
+            case LogLevel::Info:
+                return "info";
+            case LogLevel::Warning:
+                return "warn";
+            case LogLevel::Error:
+                return "err ";
+            case LogLevel::Quiet:
+                return "   ";
+            }
         return "?";
     }
 
