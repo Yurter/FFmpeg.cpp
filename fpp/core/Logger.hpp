@@ -18,11 +18,11 @@ namespace fpp {
         /* Стандартная информация */
         Info,
         /* Сообщения, используемые при отладке кода */
-        Debug,
+        Debug, // TODO: remove (23.04)
         /* ? */
-        Verbose, //TODO вынести часть лога в этот раздел из дебага
+        Verbose, //TODO вынести часть лога в этот раздел из дебага // TODO: remove (23.04)
         /* Чрезвычайно подробный лог, полезный при разработке fpp */
-        Trace,
+        Trace, // TODO: remove (23.04)
     };
 
     class Logger : public Object {
@@ -34,8 +34,8 @@ namespace fpp {
         void                setLogLevel(LogLevel log_level);
         void                setFFmpegLogLevel(LogLevel log_level);
 
-        bool                ignoreMessage(const LogLevel message_log_level);
-        void                print(const std::string& caller_name, const std::string& code_position, const LogLevel log_level, const std::string& message);
+        bool                ignoreMessage(LogLevel message_log_level) const;
+        void                print(const std::string& caller_name, const std::string& code_position, const LogLevel log_level, const std::string& message) const;
 
     private:
 
@@ -64,23 +64,23 @@ namespace fpp {
 
     private:
 
-        void                print(const LogLevel log_level, const std::string& log_text);
+        void                print(const LogLevel log_level, const std::string& log_text) const;
         void                openFile(const std::string& log_dir);
         void                closeFile();
         std::string         genFileName() const;
-        std::string         formatMessage(std::string caller_name, const std::string& code_position, LogLevel log_level, const std::string& message);
+        std::string         formatMessage(std::string caller_name, const std::string& code_position, LogLevel log_level, const std::string& message) const;
         std::string         getTimeStamp() const;
         std::string         getThreadId() const;
         std::string         getTraceFormat(const std::string& code_position) const;
         static void         log_callback(void* ptr, int level, const char* fmt, va_list vl);
         static LogLevel     convert_log_level(int ffmpeg_level);
-        std::string         encodeLogLevel(LogLevel value);
+        std::string         encodeLogLevel(LogLevel value) const;
         std::string         shortenCodePosition(const std::string& value) const;
 
     private:
 
         LogLevel            _log_level;
-        std::mutex          _print_mutex;
+        mutable std::mutex  _print_mutex;
 
     };
 
@@ -102,13 +102,6 @@ namespace fpp {
 #define set_ffmpeg_log_level(x) logger.setFFmpegLogLevel(x)
 
 /* Макрос для отправки строкового сообщения в лог */
-//#define log_message(caller_name, log_level, message)    FPP_BEGIN\
-//                                                            if constexpr (!logger.ignoreMessage(log_level)) {\
-//                                                                std::stringstream log_ss;\
-//                                                                log_ss << message;\
-//                                                                logger.print(caller_name, code_pos, log_level, log_ss.str());\
-//                                                            }\
-//                                                        FPP_END
 #define log_message(caller_name, log_level, message) FPP_BEGIN\
     if (!logger.ignoreMessage(log_level)) {\
         std::stringstream log_ss;\

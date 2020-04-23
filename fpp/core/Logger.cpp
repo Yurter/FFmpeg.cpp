@@ -28,7 +28,7 @@ namespace fpp {
         ::av_log_set_callback(nullptr);
     }
 
-    void Logger::print(const LogLevel log_level, const std::string& log_text) {
+    void Logger::print(const LogLevel log_level, const std::string& log_text) const {
         ConsoleHandler handler { _print_mutex, log_level };
         std::cout << log_text << '\n';
     }
@@ -45,39 +45,38 @@ namespace fpp {
         return std::string(buffer);
     }
 
-    std::string Logger::formatMessage(std::string caller_name, const std::string& code_position, LogLevel log_level, const std::string& message) {
-        std::string header;
-
-        const bool debug_type = log_level >= LogLevel::Debug;
-        const bool trace_type = log_level >= LogLevel::Trace;
-
-        const size_t max_name_length = 15;
-
+    std::string Logger::formatMessage(std::string caller_name, const std::string& code_position, LogLevel log_level, const std::string& message) const {
+        constexpr size_t max_name_length { 15 };
         caller_name.resize(max_name_length, ' ');
 
-        header += "[" + encodeLogLevel(log_level) + "]";
-        header += "[" + getTimeStamp() + "]";
-        header += "[" + caller_name + "]";
+        const auto debug_log { log_level >= LogLevel::Debug };
+        const auto trace_log { log_level >= LogLevel::Trace };
 
-        if (debug_type) { header += " [" + getThreadId() + "]"; }
-        if (trace_type) { header += getTraceFormat(code_position); }
-        if (!trace_type) { header += " "; }
+        const auto header {
+            "[" + encodeLogLevel(log_level) + "]" +
+            "[" + getTimeStamp() + "]" +
+            "[" + caller_name + "]" +
+            (debug_log ? " [" + getThreadId() + "]" : "") +
+            (trace_log ? getTraceFormat(code_position) : " ")
+        };
 
         return header + message;
     }
 
     std::string Logger::getTimeStamp() const { //TODO перенести реализацию в утилиты currentTimeFormated()  16.01
-        const auto now = std::chrono::system_clock::now();
-        const auto in_time_t = std::chrono::system_clock::to_time_t(now);
+        const auto now { std::chrono::system_clock::now() };
+        const auto in_time_t { std::chrono::system_clock::to_time_t(now) };
 
         std::stringstream ss;
         ss << std::put_time(std::localtime(&in_time_t), "%H:%M:%S");
 
-        const auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(
-                            now.time_since_epoch()
-                        ).count() % 1000;
-        auto ms_str = std::to_string(ms);
-        const auto ms_max_length = 3;
+        const auto ms {
+            std::chrono::duration_cast<std::chrono::milliseconds>(
+                now.time_since_epoch()
+            ).count() % 1000
+        };
+        auto ms_str { std::to_string(ms) };
+        constexpr auto ms_max_length { 3 };
         ss << "." << ms_str.insert(0, ms_max_length - ms_str.length(), '0');
 
         return ss.str();
@@ -143,7 +142,7 @@ namespace fpp {
         }
     }
 
-    std::string Logger::encodeLogLevel(LogLevel value) {
+    std::string Logger::encodeLogLevel(LogLevel value) const {
         switch (value) {
         case LogLevel::Info:
             return "info";
@@ -214,12 +213,14 @@ namespace fpp {
         }
     }
 
-    bool Logger::ignoreMessage(const LogLevel message_log_level) {
+    bool Logger::ignoreMessage(LogLevel message_log_level) const {
         return (message_log_level == LogLevel::Quiet) || (message_log_level > _log_level);
     }
 
-    void Logger::print(const std::string& caller_name, const std::string& code_position, const LogLevel log_level, const std::string& message) {
-        const std::string formated_message = formatMessage(caller_name, code_position, log_level, message);
+    void Logger::print(const std::string& caller_name, const std::string& code_position, const LogLevel log_level, const std::string& message) const {
+        const auto formated_message {
+            formatMessage(caller_name, code_position, log_level, message)
+        };
         print(log_level, formated_message);
     }
 
