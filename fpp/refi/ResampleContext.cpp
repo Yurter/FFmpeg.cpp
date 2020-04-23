@@ -44,24 +44,24 @@ namespace fpp {
         ffmpeg_api_strict(swr_init, raw());
 
         log_info("Inited "
-            << "from ["
-                << "ch_layout " <<  utils::channel_layout_to_string(
+            , "from ["
+                , "ch_layout " , utils::channel_layout_to_string(
                                         int(in_param->channels())
                                         , in_param->channelLayout()
                                     )
-                << ", smp_rate " << in_param->sampleRate()
-                << ", " << in_param->sampleFormat()
-                << ", nb_smp " << in_param->frameSize()
-                << "] "
-            << "to ["
-                 << "ch_layout " << utils::channel_layout_to_string(
+                , ", smp_rate ", in_param->sampleRate()
+                , ", ", in_param->sampleFormat()
+                , ", nb_smp ", in_param->frameSize()
+                , "] "
+            , "to ["
+                 , "ch_layout ", utils::channel_layout_to_string(
                                         int(out_param->channels())
                                         , out_param->channelLayout()
                                     )
-                 << ", smp_rate " << out_param->sampleRate()
-                 << ", " << out_param->sampleFormat()
-                 << ", nb_smp " << out_param->frameSize()
-                 << "] "
+                 , ", smp_rate ", out_param->sampleRate()
+                 , ", ", out_param->sampleFormat()
+                 , ", nb_smp ", out_param->frameSize()
+                 , "] "
         );
     }
 

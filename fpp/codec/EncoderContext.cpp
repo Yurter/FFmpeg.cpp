@@ -22,7 +22,6 @@ namespace fpp {
     }
 
     PacketList EncoderContext::flush() {
-        log_debug("Flushing");
         sendFlushFrame();
         return receivePackets({ DEFAULT_TIME_BASE });
     }
