@@ -64,7 +64,7 @@ namespace fpp {
 
     private:
 
-        Code                print(const LogLevel log_level, const std::string& log_text);
+        void                print(const LogLevel log_level, const std::string& log_text);
         void                openFile(const std::string& log_dir);
         void                closeFile();
         std::string         genFileName() const;

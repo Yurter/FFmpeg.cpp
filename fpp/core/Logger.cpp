@@ -28,14 +28,9 @@ namespace fpp {
         ::av_log_set_callback(nullptr);
     }
 
-    Code Logger::print(const LogLevel log_level, const std::string& log_text) {
-        ConsoleHandler handler {
-            _print_mutex, log_level
-        };
-
+    void Logger::print(const LogLevel log_level, const std::string& log_text) {
+        ConsoleHandler handler { _print_mutex, log_level };
         std::cout << log_text << '\n';
-
-        return Code::OK;
     }
 
     std::string Logger::genFileName() const {
