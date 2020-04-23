@@ -33,7 +33,7 @@ SOURCES += \
     examples/transmuxing.cpp \
     examples/transrating.cpp \
     examples/transsizing.cpp \
-    examples/webcam.cpp \
+    examples/webcam_to_file.cpp \
     examples/youtube_stream_copy.cpp \
     examples/youtube_stream_copy_with_silence.cpp \
     examples/youtube_stream_transcode.cpp \
