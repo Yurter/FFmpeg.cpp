@@ -8,6 +8,7 @@ void record_screen_win();
 void youtube_stream_copy();
 void youtube_stream_transcode();
 void youtube_stream_copy_with_silence();
+void youtube_stream_transcode_with_silence();
 
 // RTP stream
 void rtp_video_stream();
