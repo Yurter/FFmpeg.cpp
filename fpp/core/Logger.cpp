@@ -29,36 +29,12 @@ namespace fpp {
     }
 
     Code Logger::print(const LogLevel log_level, const std::string& log_text) {
-        std::lock_guard lock(_print_mutex);
-#ifdef _WIN32
-        HANDLE hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
-
-        switch (log_level) {
-        case LogLevel::Quiet:
-            break;
-        case LogLevel::Info:
-            SetConsoleTextAttribute(hStdout, FOREGROUND_RED|FOREGROUND_GREEN|FOREGROUND_BLUE);
-            break;
-        case LogLevel::Warning:
-            SetConsoleTextAttribute(hStdout, FOREGROUND_GREEN|FOREGROUND_RED|FOREGROUND_INTENSITY);
-            break;
-        case LogLevel::Error:
-            SetConsoleTextAttribute(hStdout, FOREGROUND_RED|FOREGROUND_INTENSITY);
-            break;
-        case LogLevel::Debug:
-            SetConsoleTextAttribute(hStdout, FOREGROUND_BLUE|FOREGROUND_GREEN|FOREGROUND_INTENSITY);
-            break;
-        case LogLevel::Trace:
-            SetConsoleTextAttribute(hStdout, FOREGROUND_BLUE|FOREGROUND_INTENSITY|FOREGROUND_RED);
-            break;
-        }
-#endif
+        ConsoleHandler handler {
+            _print_mutex, log_level
+        };
 
         std::cout << log_text << '\n';
 
-#ifdef _WIN32
-        SetConsoleTextAttribute(hStdout, FOREGROUND_RED|FOREGROUND_GREEN|FOREGROUND_BLUE);
-#endif
         return Code::OK;
     }
 
