@@ -65,7 +65,7 @@ void webcam_to_file() {
         , sink.stream(fpp::MediaType::Video)->params
     }};
 
-    /* create fps filter (because of bug 'vlc and variable framerate') */
+    /* create fps filter (because of bug 'vlc and h264 variable framerate') */
     fpp::VideoFilterContext filter {
         source.stream(fpp::MediaType::Video)->params
         , "fps=fps=25,setpts=400000*PTS"
