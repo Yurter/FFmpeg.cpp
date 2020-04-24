@@ -25,6 +25,8 @@ SOURCES += \
     examples/concatenate.cpp \
     examples/filter_text_on_video.cpp \
     examples/filter_timelapase.cpp \
+    examples/multiple_outputs_parallel.cpp \
+    examples/multiple_outputs_sequence.cpp \
     examples/record_screen_win.cpp \
     examples/rtp_audio_stream.cpp \
     examples/rtp_video_and_audio_stream.cpp \

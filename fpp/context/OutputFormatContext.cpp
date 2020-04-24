@@ -13,7 +13,6 @@ namespace fpp {
         : FormatContext(mrl)
         , _output_format { nullptr } {
         setName("OutFmtCtx");
-        createContext();
     }
 
     OutputFormatContext::~OutputFormatContext() {
@@ -29,6 +28,7 @@ namespace fpp {
         else if (write_mode == WriteMode::Interleaved) {
             ffmpeg_api(av_interleaved_write_frame, raw(), packet.ptr());
         }
+        return true;
     }
 
     void OutputFormatContext::flush() {

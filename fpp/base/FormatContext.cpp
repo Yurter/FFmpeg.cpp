@@ -10,13 +10,13 @@ extern "C" {
 namespace fpp {
 
     FormatContext::FormatContext(const std::string_view mrl)
-        : _media_resource_locator { mrl }
-        , _opened { false }
+        : _opened { false }
         , _timeout_opening { 20'000 }
         , _timeout_closing { 5'000 }
         , _timeout_reading { 5'000 }
         , _timeout_writing { 1'000 } {
         setName("FormatContext");
+        setMediaResourceLocator(mrl);
     }
 
     void FormatContext::close() {
@@ -112,6 +112,13 @@ namespace fpp {
         return _media_resource_locator;
     }
 
+    void FormatContext::setMediaResourceLocator(const std::string_view mrl) {
+        _media_resource_locator = mrl;
+        if (!_media_resource_locator.empty()) {
+            createContext();
+        }
+    }
+
     void FormatContext::setStreams(StreamVector stream_list) {
         _streams = stream_list;
     }
@@ -131,10 +138,6 @@ namespace fpp {
 
     void FormatContext::addStream(SharedStream stream) {
         _streams.push_back(stream);
-    }
-
-    void FormatContext::setMediaResourceLocator(const std::string_view mrl) {
-        _media_resource_locator = mrl;
     }
 
     int64_t FormatContext::streamNumber() const {

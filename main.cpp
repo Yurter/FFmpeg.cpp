@@ -30,6 +30,7 @@ auto main() -> int {
 //        timelapase();
 
 //        concatenate();
+//        multiple_outputs_sequence();
 
     } catch (const fpp::FFmpegException& e) {
         fpp::static_log_error("catch",  "FFmpegException: ", e.what());
