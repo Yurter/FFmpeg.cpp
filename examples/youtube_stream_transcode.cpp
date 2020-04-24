@@ -22,10 +22,10 @@ void youtube_stream_transcode() {
 
     /* check input streams */
     if (!source.stream(fpp::MediaType::Video)) {
-        std::cout << "Youtube require video stream\n";
+        fpp::static_log_error(__func__, "Youtube require video stream");
     }
     if (!source.stream(fpp::MediaType::Audio)) {
-        std::cout << "Youtube require video stream\n";
+        fpp::static_log_error(__func__, "Youtube require video stream");
     }
 
     /* get input parameters */
