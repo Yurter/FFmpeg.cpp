@@ -6,8 +6,8 @@ extern "C" {
     #include <libavformat/avformat.h>
 }
 
-#define DEFAULT_PIXEL_FORMAT    AV_PIX_FMT_NONE
-#define not_inited_pix_fmt(x)   ((x) == DEFAULT_PIXEL_FORMAT)
+constexpr auto DEFAULT_PIXEL_FORMAT { AVPixelFormat::AV_PIX_FMT_NONE };
+constexpr auto not_inited_pix_fmt   { [](auto x) { return x == DEFAULT_PIXEL_FORMAT; } };
 
 namespace fpp {
 

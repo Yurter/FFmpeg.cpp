@@ -9,6 +9,12 @@ extern "C" {
 
 namespace fpp {
 
+    constexpr auto NOPTS_VALUE      { AV_NOPTS_VALUE };
+    constexpr auto DEFAULT_RATIONAL { AVRational { 0, 1 } };
+    constexpr auto DEFAULT_INT      { 0 };
+    constexpr auto not_inited_q     { [](auto x) { return ::av_cmp_q(x, DEFAULT_RATIONAL) == 0; } };
+    constexpr auto not_inited_int   { [](auto x) { return x == DEFAULT_INT; } };
+
     class utils {
 
     public:
@@ -24,7 +30,6 @@ namespace fpp {
         static std::string  to_string(AVRational rational);
         static std::string  to_string(AVSampleFormat value);
         static std::string  to_string(AVPixelFormat pxl_fmt);
-        static std::string  to_string(Code code);
         static std::string  to_string(bool value);
         static std::string  to_string(MediaType type);
         static std::string  pts_to_string(int64_t pts);
@@ -46,9 +51,6 @@ namespace fpp {
         static bool         audio_filter_required(const IOParams& params);
 
         static bool         compare_float(float a, float b);
-
-        static bool         exit_code(Code code);
-        static bool         error_code(Code code);
 
         static bool         compatible_with_pixel_format(const AVCodec* codec, AVPixelFormat pixel_format);
         static bool         compatible_with_sample_format(const AVCodec* codec, AVSampleFormat sample_format);
@@ -105,11 +107,6 @@ namespace fpp {
 
     inline std::ostream& operator<<(std::ostream& os, const MediaType type) {
         os << utils::to_string(type);
-        return os;
-    }
-
-    inline std::ostream& operator<<(std::ostream& os, const Code code) {
-        os << utils::to_string(code);
         return os;
     }
 

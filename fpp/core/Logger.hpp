@@ -37,7 +37,7 @@ namespace fpp {
                 return;
             }
             const auto formated_message {
-                formatMessage(caller_name, log_level, (std::forward<Args>(args), ...))
+                formatMessage(caller_name, log_level, std::forward<Args>(args)...)
             };
             _print_func(log_level, formated_message);
         }
@@ -113,17 +113,17 @@ namespace fpp {
 
     template <typename... Args>
     inline auto static_log_info(const std::string_view caller_name, Args&&... args) {
-        Logger::instance().print(caller_name, LogLevel::Info, (std::forward<Args>(args), ...));
+        Logger::instance().print(caller_name, LogLevel::Info, std::forward<Args>(args)...);
     }
 
     template <typename... Args>
     inline auto static_log_warning(const std::string_view caller_name, Args&&... args) {
-        Logger::instance().print(caller_name, LogLevel::Warning, (std::forward<Args>(args), ...));
+        Logger::instance().print(caller_name, LogLevel::Warning, std::forward<Args>(args)...);
     }
 
     template <typename... Args>
     inline auto static_log_error(const std::string_view caller_name, Args&&... args) {
-        Logger::instance().print(caller_name, LogLevel::Error, (std::forward<Args>(args), ...));
+        Logger::instance().print(caller_name, LogLevel::Error, std::forward<Args>(args)...);
     }
 
 } // namespace fpp

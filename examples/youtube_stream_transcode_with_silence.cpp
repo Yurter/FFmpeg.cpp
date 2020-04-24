@@ -22,7 +22,7 @@ void youtube_stream_transcode_with_silence() {
 
     /* check input video stream */
     if (!video_source.stream(fpp::MediaType::Video)) {
-        std::cout << "Youtube require video stream\n";
+        fpp::static_log_error(__func__, "Youtube require video stream");
         return;
     }
 

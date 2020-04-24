@@ -13,7 +13,6 @@ namespace fpp {
         : FormatContext(mrl)
         , _output_format { nullptr } {
         setName("OutFmtCtx");
-        createContext();
     }
 
     OutputFormatContext::~OutputFormatContext() {
@@ -29,6 +28,7 @@ namespace fpp {
         else if (write_mode == WriteMode::Interleaved) {
             ffmpeg_api(av_interleaved_write_frame, raw(), packet.ptr());
         }
+        return true;
     }
 
     void OutputFormatContext::flush() {
@@ -136,7 +136,7 @@ namespace fpp {
         createStream(output_params);
     }
 
-    Code OutputFormatContext::guessOutputFromat() {
+    void OutputFormatContext::guessOutputFromat() {
         const auto out_fmt {
             ::av_guess_format(
                 nullptr                          /* short_name */
@@ -150,7 +150,6 @@ namespace fpp {
             };
         }
         setOutputFormat(out_fmt);
-        return Code::OK;
     }
 
     StreamVector OutputFormatContext::parseFormatContext() {

@@ -21,3 +21,5 @@ void text_on_video();
 void timelapase();
 
 void concatenate();
+void multiple_outputs_sequence();
+void multiple_outputs_parallel();

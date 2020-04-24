@@ -12,7 +12,7 @@ namespace fpp {
 
     public:
 
-        OutputFormatContext(const std::string_view mrl);
+        OutputFormatContext(const std::string_view mrl = {});
         ~OutputFormatContext() override;
 
         void                createStream(SpParameters params);
@@ -33,7 +33,7 @@ namespace fpp {
         [[nodiscard]]
         StreamVector        parseFormatContext() override;
 
-        Code                guessOutputFromat();
+        void                guessOutputFromat();
         void                writeHeader();
         void                writeTrailer();
         void                initStreamsCodecpar();

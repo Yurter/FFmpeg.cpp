@@ -16,12 +16,14 @@ void webcam_to_file() {
 
     /* change default image size (480x360) */
     fpp::Options webcam_options {
-        { "video_size", "1024x768" }
+        { "video_size", "11024x768" }
         , { "framerate", "30" }
     };
 
     /* open source */
-    source.open(webcam_options);
+    if (!source.open(webcam_options)) {
+        return;
+    }
 
     /* create sink */
     fpp::OutputFormatContext sink {
@@ -65,7 +67,7 @@ void webcam_to_file() {
         , sink.stream(fpp::MediaType::Video)->params
     }};
 
-    /* create fps filter (because of bug 'vlc and variable framerate') */
+    /* create fps filter (because of bug 'vlc and h264 variable framerate') */
     fpp::VideoFilterContext filter {
         source.stream(fpp::MediaType::Video)->params
         , "fps=fps=25,setpts=400000*PTS"
