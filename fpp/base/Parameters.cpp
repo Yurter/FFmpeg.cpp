@@ -99,11 +99,6 @@ namespace fpp {
     }
 
     AVCodec* Parameters::codec() const {
-//        if (!_codec) {
-//            throw std::runtime_error {
-//                std::string { __FUNCTION__ } + " failed: codec is null"
-//            };
-//        }
         return _codec;
     }
 
