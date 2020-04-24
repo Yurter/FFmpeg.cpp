@@ -16,12 +16,14 @@ void webcam_to_file() {
 
     /* change default image size (480x360) */
     fpp::Options webcam_options {
-        { "video_size", "1024x768" }
+        { "video_size", "11024x768" }
         , { "framerate", "30" }
     };
 
     /* open source */
-    source.open(webcam_options);
+    if (!source.open(webcam_options)) {
+        return;
+    }
 
     /* create sink */
     fpp::OutputFormatContext sink {
