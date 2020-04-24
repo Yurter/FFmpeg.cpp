@@ -6,7 +6,7 @@ extern "C" {
     #include <libavformat/avformat.h>
 }
 
-constexpr auto DEFAULT_SAMPLE_FORMAT { AV_SAMPLE_FMT_NONE };
+constexpr auto DEFAULT_SAMPLE_FORMAT { AVSampleFormat::AV_SAMPLE_FMT_NONE };
 constexpr auto DEFAULT_CHANEL_LAYOUT { 0 };
 constexpr auto not_inited_smp_fmt    { [](auto x) { return x == DEFAULT_SAMPLE_FORMAT; } };
 constexpr auto not_inited_ch_layout  { [](auto x) { return x == DEFAULT_CHANEL_LAYOUT; } };
