@@ -63,7 +63,7 @@ namespace fpp {
             return false;
         }
         if (!openContext(options)) {
-            log_error("Could not open " + mediaResourceLocator());
+            log_error("Could not open ", mediaResourceLocator());
             return false;
         }
         setOpened(true);
@@ -101,7 +101,7 @@ namespace fpp {
         if (interrupter->isTimeout()) {
             static_log_error(
                 "interrupt_callback"
-                , "Timed out: " << interrupter->timeout_ms
+                , "Timed out: ", interrupter->timeout_ms
             );
             return FAIL;
         }

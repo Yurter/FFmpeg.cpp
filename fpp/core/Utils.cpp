@@ -63,6 +63,10 @@ namespace fpp {
             return "Audio";
         case MediaType::Subtitle:
             return "Subtitle";
+        case MediaType::Data:
+            return "Data";
+        case MediaType::Attachment:
+            return "Attachment";
         case MediaType::EndOF:
             return "EOF";
         }
@@ -159,6 +163,12 @@ namespace fpp {
                 return MediaType::Audio;
             case AVMediaType::AVMEDIA_TYPE_SUBTITLE:
                 return MediaType::Subtitle;
+            case AVMediaType::AVMEDIA_TYPE_DATA:
+                return MediaType::Data;
+            case AVMediaType::AVMEDIA_TYPE_ATTACHMENT:
+                return MediaType::Attachment;
+            case AVMediaType::AVMEDIA_TYPE_UNKNOWN:
+                return MediaType::Unknown;
             default: {
                 throw std::invalid_argument {
                     std::string { __FUNCTION__ } + " failed, bad type "
@@ -176,6 +186,10 @@ namespace fpp {
                 return AVMediaType::AVMEDIA_TYPE_AUDIO;
             case MediaType::Subtitle:
                 return AVMediaType::AVMEDIA_TYPE_SUBTITLE;
+            case MediaType::Data:
+                return AVMediaType::AVMEDIA_TYPE_DATA;
+            case MediaType::Attachment:
+                return AVMediaType::AVMEDIA_TYPE_ATTACHMENT;
             default: {
                 throw std::invalid_argument {
                     std::string { __FUNCTION__ } + " failed, bad type "
@@ -479,6 +493,10 @@ namespace fpp {
                 return AudioParameters::make_shared();
             case MediaType::Subtitle:
                 return Parameters::make_shared(MediaType::Subtitle);
+            case MediaType::Data:
+                return Parameters::make_shared(MediaType::Data);
+            case MediaType::Attachment:
+                return Parameters::make_shared(MediaType::Attachment);
             default:
                 throw std::invalid_argument {
                     "make_params failed: invalid media type"
@@ -494,6 +512,10 @@ namespace fpp {
                 return AudioParameters::make_shared();
             case AVMediaType::AVMEDIA_TYPE_SUBTITLE:
                 return Parameters::make_shared(MediaType::Subtitle);
+            case AVMediaType::AVMEDIA_TYPE_DATA:
+                return Parameters::make_shared(MediaType::Data);
+            case AVMediaType::AVMEDIA_TYPE_ATTACHMENT:
+                return Parameters::make_shared(MediaType::Attachment);
             default:
                 throw std::invalid_argument {
                     "make_params failed: invalid media type"
@@ -509,17 +531,17 @@ namespace fpp {
 
         if (in->width() != out->width()) {
             static_log_warning("utils", "Rescaling required: width mismatch "
-                               << in->width() << " != " << out->width());
+                               , in->width(), " != " , out->width());
             return true;
         }
         if (in->height() != out->height()) {
             static_log_warning("utils", "Rescaling required: height mismatch "
-                               << in->height() << " != " << out->height());
+                               , in->height(), " != " , out->height());
             return true;
         }
         if (in->pixelFormat() != out->pixelFormat()) {
             static_log_warning("utils", "Rescaling required: pixel format mismatch "
-                               << in->pixelFormat() << " != " << out->pixelFormat());
+                               , in->pixelFormat(), " != " , out->pixelFormat());
             return true;
         }
 
@@ -534,22 +556,22 @@ namespace fpp {
 
         if (in->sampleRate() != out->sampleRate()) {
             static_log_warning("utils", "Resampling required: sample rate mismatch "
-                               << in->sampleRate() << " != " << out->sampleRate());
+                               , in->sampleRate(), " != ", out->sampleRate());
             return true;
         }
         if (in->sampleFormat() != out->sampleFormat()) {
             static_log_warning("utils", "Resampling required: sample format mismatch "
-                               << in->sampleFormat() << " != " << out->sampleFormat());
+                               , in->sampleFormat(), " != ", out->sampleFormat());
             return true;
         }
         if (in->channels() != out->channels()) {
             static_log_warning("utils", "Resampling required: channels mismatch "
-                               << in->channels() << " != " << out->channels());
+                               , in->channels(), " != ", out->channels());
             return true;
         }
         if (in->channelLayout() != out->channelLayout()) {
             static_log_warning("utils", "Resampling required: channel layout mismatch "
-                               << in->channelLayout() << " != " << out->channelLayout());
+                               , in->channelLayout(), " != ", out->channelLayout());
             return true;
         }
 
@@ -564,9 +586,9 @@ namespace fpp {
 
         if (in->frameRate() != out->frameRate()) {
             static_log_warning("utils", "Video filter required: framerate mismatch "
-                                           << to_string(in->frameRate())
-                                           << " != "
-                                           << to_string(out->frameRate())
+                                           , to_string(in->frameRate())
+                                           , " != "
+                                           , to_string(out->frameRate())
             );
             return true;
         }
@@ -586,9 +608,9 @@ namespace fpp {
 
         if (in->codecId() != out->codecId()) {
             static_log_warning("utils", "Transcoding required: codec id mismatch "
-                                           << in->codecId()
-                                           << " != "
-                                           << out->codecId()
+                                           , in->codecId()
+                                           , " != "
+                                           , out->codecId()
             );
             return true;
         }

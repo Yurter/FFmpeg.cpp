@@ -1,10 +1,10 @@
-#include <iostream>
 #include <examples/examples.hpp>
 #include <fpp/core/FFmpegException.hpp>
+#include <fpp/core/Logger.hpp>
 
 auto main() -> int {
 
-    std::cout << "Started\n";
+    fpp::static_log_info("main", "Started");
 
     try {
 
@@ -16,6 +16,8 @@ auto main() -> int {
         // YouTube stream
 //        youtube_stream_copy();
 //        youtube_stream_transcode();
+//        youtube_stream_copy_with_silence();
+//        youtube_stream_transcode_with_silence();
 
         // RTP stream
 //        rtp_video_stream();
@@ -30,15 +32,14 @@ auto main() -> int {
 //        concatenate();
 
     } catch (const fpp::FFmpegException& e) {
-        std::cout << "FFmpegException: " << e.what() << "\n";
+        fpp::static_log_error("catch",  "FFmpegException: ", e.what());
     } catch (const std::exception& e) {
-        std::cout << "Exception: " << e.what() << "\n";
+        fpp::static_log_error("catch",  "Exception: ", e.what());
     } catch (...) {
-        std::cout << "Unknown exception\n";
+        fpp::static_log_error("catch",  "Unknown exception");
     }
 
-    std::cout << "Finished\n";
-
+    fpp::static_log_info("main", "Finished");
     return 0;
 
 }

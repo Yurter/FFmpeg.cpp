@@ -16,7 +16,6 @@ namespace fpp {
     }
 
     void CodecContext::init(Options options) {
-        log_debug("Initialization");
         reset({
             ::avcodec_alloc_context3(codec())
             , [](auto* codec_ctx) {
@@ -28,7 +27,6 @@ namespace fpp {
     }
 
     void CodecContext::open(Options options) {
-        log_debug("Opening");
         params->initCodecContext(raw());
         Dictionary dictionary { options };
         if (const auto ret {

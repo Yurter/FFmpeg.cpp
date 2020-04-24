@@ -65,7 +65,7 @@ namespace fpp {
             , [](auto* ctx) { ::avfilter_free(ctx); }
         );
 
-        log_debug("Filter in inited with args: " << args);
+        log_info("Filter in inited with args: ", args);
     }
 
     void VideoFilterContext::initBufferSink() {

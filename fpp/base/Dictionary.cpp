@@ -44,7 +44,7 @@ namespace fpp {
             while ((entry = ::av_dict_get(_dictionary, "", entry, AV_DICT_IGNORE_SUFFIX))) {
                 static_log_warning(
                     "Dictionary"
-                    , "Unused option: " << entry->key << " " << entry->value
+                    , "Unused option: ", entry->key, " ", entry->value
                 );
             }
             ::av_dict_free(&_dictionary);

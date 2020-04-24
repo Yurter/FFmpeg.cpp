@@ -51,7 +51,7 @@ namespace fpp {
 
         void                increaseDuration(const int64_t value);
 
-        virtual std::string toString() const override;
+        std::string         toString() const override;
         virtual bool        betterThen(const SpParameters& other);
         virtual void        completeFrom(const SpParameters other);
 
