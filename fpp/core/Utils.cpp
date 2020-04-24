@@ -93,7 +93,7 @@ namespace fpp {
     }
 
     std::string utils::pts_to_string(int64_t pts) {
-        return pts == AV_NOPTS_VALUE ? "NOPTS" : std::to_string(pts);
+        return (pts == NOPTS_VALUE) ? "NOPTS" : std::to_string(pts);
     }
 
     std::string utils::to_string(bool value) {
@@ -101,19 +101,19 @@ namespace fpp {
     }
 
     std::string utils::to_string(AVPixelFormat pxl_fmt) {
-        const char* ret { ::av_get_pix_fmt_name(pxl_fmt) };
-        if (not_inited_ptr(ret)) {
+        const auto ret { ::av_get_pix_fmt_name(pxl_fmt) };
+        if (!ret) {
             return "NONE";
         }
-        return std::string(ret);
+        return std::string { ret };
     }
 
     std::string utils::to_string(AVSampleFormat value) {
-        const char* ret { ::av_get_sample_fmt_name(value) };
-        if (not_inited_ptr(ret)) {
+        const auto ret { ::av_get_sample_fmt_name(value) };
+        if (!ret) {
             return "NONE";
         }
-        return std::string(ret);
+        return std::string { ret };
     }
 
     std::string utils::to_string(AVCodecID codec_id) {
@@ -137,11 +137,11 @@ namespace fpp {
     }
 
     std::string utils::time_to_string(int64_t time_stamp, AVRational time_base) {
-        const auto time_ms = av_rescale_q(time_stamp, time_base, DEFAULT_TIME_BASE);
-        const int64_t ms = time_ms % 1000;
-        const int64_t ss = (time_ms / 1000) % 60;
-        const int64_t mm = ((time_ms / 1000) % 3600) / 60;
-        const int64_t hh = (time_ms / 1000) / 3600;
+        const auto time_ms { ::av_rescale_q(time_stamp, time_base, DEFAULT_TIME_BASE) };
+        const auto ms {   time_ms % 1000               };
+        const auto ss {  (time_ms / 1000) % 60         };
+        const auto mm { ((time_ms / 1000) % 3600) / 60 };
+        const auto hh {  (time_ms / 1000) / 3600       };
         return std::to_string(hh) + ':' + std::to_string(mm) + ':' + std::to_string(ss) + '.' + std::to_string(ms);
     }
 
@@ -149,7 +149,7 @@ namespace fpp {
         if (channel_layout == 0) {
             return "Unknown or unspecified";
         }
-        const auto buf_size { 32 };
+        constexpr auto buf_size { 32 };
         char buf[buf_size];
         ::av_get_channel_layout_string(buf, buf_size, nb_channels, channel_layout);
         return std::string { buf };
@@ -197,38 +197,6 @@ namespace fpp {
                 };
             }
         }
-    }
-
-    bool utils::exit_code(Code code) {
-        if (error_code(code))                   { return true; }
-        if (code == Code::EXIT)                 { return true; }
-        if (code == Code::END_OF_FILE)          { return true; }
-        return false;
-    }
-
-    bool utils::error_code(Code code) {
-        if (code == Code::ERR)                  { return true; }
-        if (code == Code::EXCEPTION)            { return true; }
-        if (code == Code::NOT_INITED)           { return true; }
-        if (code == Code::FFMPEG_ERROR)         { return true; }
-        if (code == Code::INVALID_INPUT)        { return true; }
-        if (code == Code::NOT_IMPLEMENTED)      { return true; }
-        if (code == Code::INVALID_CALL_ORDER)   { return true; }
-        return false;
-    }
-
-    std::string utils::to_string(Code code) {
-        if (code == Code::OK)                   { return "OK";                      }
-        if (code == Code::ERR)                  { return "Error";                   }
-        if (code == Code::EXIT)                 { return "Exit";                    }
-        if (code == Code::AGAIN)                { return "Again";                   }
-        if (code == Code::NOT_INITED)           { return "Not inited";              }
-        if (code == Code::END_OF_FILE)          { return "EOF";                     }
-        if (code == Code::FFMPEG_ERROR)         { return "FFmpeg error";            }
-        if (code == Code::INVALID_INPUT)        { return "Invalid input";           }
-        if (code == Code::NOT_IMPLEMENTED)      { return "Method not implemented";  }
-        if (code == Code::INVALID_CALL_ORDER)   { return "Invalid call order";      }
-        return "Unknown error code: " + std::to_string(int(code));
     }
 
     std::string utils::to_string(AVRational rational) {

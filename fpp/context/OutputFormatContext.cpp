@@ -136,7 +136,7 @@ namespace fpp {
         createStream(output_params);
     }
 
-    Code OutputFormatContext::guessOutputFromat() {
+    void OutputFormatContext::guessOutputFromat() {
         const auto out_fmt {
             ::av_guess_format(
                 nullptr                          /* short_name */
@@ -150,7 +150,6 @@ namespace fpp {
             };
         }
         setOutputFormat(out_fmt);
-        return Code::OK;
     }
 
     StreamVector OutputFormatContext::parseFormatContext() {
