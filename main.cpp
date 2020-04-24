@@ -31,6 +31,7 @@ auto main() -> int {
 
 //        concatenate();
 //        multiple_outputs_sequence();
+//        multiple_outputs_parallel();
 
     } catch (const fpp::FFmpegException& e) {
         fpp::static_log_error("catch",  "FFmpegException: ", e.what());
