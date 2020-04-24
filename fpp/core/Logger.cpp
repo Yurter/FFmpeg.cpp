@@ -1,6 +1,7 @@
 #include "Logger.hpp"
 #include <fpp/core/Utils.hpp>
 #include <string>
+#include <iostream>
 #include <thread>
 #ifdef _WIN32
 #include <Windows.h>
@@ -12,8 +13,12 @@
 
 namespace fpp {
 
-    Logger::Logger()
-        : _log_level(LogLevel::Info) {
+    Logger::Logger() :
+        _log_level(LogLevel::Info)
+        , _print_func { [&](LogLevel log_level, const std::string& message) {
+            ConsoleHandler handler { _print_mutex, log_level };
+            std::cout << message << '\n';
+        } } {
 //        av_log_set_callback(log_callback); //TODO later
 //        setFFmpegLogLevel(LogLevel::Info);
         print("Logger", LogLevel::Info, "Logger opened");
@@ -117,7 +122,7 @@ namespace fpp {
         _log_level = log_level;
     }
 
-    void Logger::setFFmpegLogLevel(LogLevel log_level) {
+    void Logger::setFFmpegLogLevel(LogLevel log_level) const {
         switch (log_level) {
         case LogLevel::Info:
             ::av_log_set_level(AV_LOG_INFO);
@@ -138,6 +143,10 @@ namespace fpp {
             ::av_log_set_level(AV_LOG_QUIET);
             break;
         }
+    }
+
+    void Logger::setPrintCallback(std::function<void (LogLevel, const std::string&)> foo) {
+        _print_func = foo;
     }
 
     bool Logger::ignoreMessage(LogLevel message_log_level) const {

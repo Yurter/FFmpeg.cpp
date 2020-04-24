@@ -2,7 +2,7 @@
 #include <fstream>
 #include <sstream>
 #include <iomanip>
-#include <iostream>
+#include <functional>
 #include <mutex>
 
 namespace fpp {
@@ -28,7 +28,8 @@ namespace fpp {
         static Logger&      instance();
 
         void                setLogLevel(LogLevel log_level);
-        void                setFFmpegLogLevel(LogLevel log_level);
+        void                setFFmpegLogLevel(LogLevel log_level) const;
+        void                setPrintCallback(std::function<void(LogLevel,const std::string&)> foo);
 
         template <typename... Args>
         void print(const std::string_view caller_name, LogLevel log_level, Args&&... args) const {
@@ -38,9 +39,7 @@ namespace fpp {
             const auto formated_message {
                 formatMessage(caller_name, log_level, (std::forward<Args>(args), ...))
             };
-
-            ConsoleHandler handler { _print_mutex, log_level };
-            std::cout << formated_message << '\n';
+            _print_func(log_level, formated_message);
         }
 
     private:
@@ -95,6 +94,7 @@ namespace fpp {
 
         LogLevel            _log_level;
         mutable std::mutex  _print_mutex;
+        std::function<void(LogLevel,std::string)> _print_func;
 
     };
 
