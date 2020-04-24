@@ -24,6 +24,8 @@ namespace fpp {
     public:
 
         Parameters(MediaType type);
+        Parameters(const Parameters& other);
+        Parameters& operator=(const Parameters& other);
 
         void                setDecoder(AVCodecID codec_id);
         void                setEncoder(AVCodecID codec_id);

@@ -22,6 +22,27 @@ namespace fpp {
         reset();
     }
 
+    Parameters::Parameters(const Parameters& other) :
+        MediaData(other.type()) {
+        ffmpeg_api_strict(avcodec_parameters_copy, ptr(), other.ptr());
+        _codec = other.codec();
+        _duration = other.duration();
+        _stream_index = other.streamIndex();
+        _time_base = other.timeBase();
+        _format_flags = other.formatFlags();
+    }
+
+    Parameters& Parameters::operator=(const Parameters& other) {
+        setType(other.type());
+        setExtradata({});
+        ffmpeg_api_strict(avcodec_parameters_copy, ptr(), other.ptr());
+        _codec = other.codec();
+        _duration = other.duration();
+        _stream_index = other.streamIndex();
+        _time_base = other.timeBase();
+        _format_flags = other.formatFlags();
+    }
+
     void Parameters::setDecoder(AVCodecID codec_id) {
         setCodec(::avcodec_find_decoder(codec_id));
     }
