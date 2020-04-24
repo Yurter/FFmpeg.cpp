@@ -9,21 +9,6 @@
 
 namespace fpp {
 
-    /* Коды результата выполнения некоторых функций */
-    enum class [[nodiscard]] Code: uint8_t { // TODO remove 20.04
-        OK,
-        ERR,
-        EXIT,
-        AGAIN,
-        EXCEPTION,
-        NOT_INITED,
-        END_OF_FILE,
-        FFMPEG_ERROR,
-        INVALID_INPUT,
-        NOT_IMPLEMENTED,
-        INVALID_CALL_ORDER,
-    };
-
     using uid_t = int64_t;
 
     class Object {

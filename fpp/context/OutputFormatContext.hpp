@@ -33,7 +33,7 @@ namespace fpp {
         [[nodiscard]]
         StreamVector        parseFormatContext() override;
 
-        Code                guessOutputFromat();
+        void                guessOutputFromat();
         void                writeHeader();
         void                writeTrailer();
         void                initStreamsCodecpar();
