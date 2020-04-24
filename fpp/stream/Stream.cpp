@@ -12,8 +12,8 @@ namespace fpp {
     Stream::Stream(AVStream* avstream, MediaType type)
         : FFmpegObject(avstream)
         , MediaData(type)
-        , _prev_dts { AV_NOPTS_VALUE }
-        , _prev_pts { AV_NOPTS_VALUE }
+        , _prev_dts { NOPTS_VALUE }
+        , _prev_pts { NOPTS_VALUE }
         , _packet_index { 0 }
         , _start_time_point { FROM_START }
         , _end_time_point { TO_END } {
@@ -166,26 +166,26 @@ namespace fpp {
     }
 
     AVCodecParameters* Stream::codecpar() {
-        if (not_inited_ptr(raw())) {
+        if (!raw()) {
             throw std::runtime_error { "stream is null" };
         }
         return raw()->codecpar;
     }
 
     void Stream::shiftStamps(Packet& packet) {
-        if (raw()->start_time == AV_NOPTS_VALUE) {
+        if (raw()->start_time == NOPTS_VALUE) {
             raw()->start_time = packet.pts();
         }
-        if (packet.dts() != AV_NOPTS_VALUE) {
+        if (packet.dts() != NOPTS_VALUE) {
             packet.setDts(packet.dts() - raw()->start_time);
         }
-        if (packet.pts() != AV_NOPTS_VALUE) {
+        if (packet.pts() != NOPTS_VALUE) {
             packet.setPts(packet.pts() - raw()->start_time);
         }
     }
 
     void Stream::calculatePacketDuration(Packet& packet) {
-        if (raw()->cur_dts == AV_NOPTS_VALUE) {
+        if (raw()->cur_dts == NOPTS_VALUE) {
             const auto fps {
                 ::av_q2intfloat(
                     std::static_pointer_cast<VideoParameters>(params)->frameRate()

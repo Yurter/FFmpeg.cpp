@@ -75,8 +75,8 @@ namespace fpp {
     private:
 
         AVCodec*            _codec;
-        int64_t             _duration;
-        uid_t               _stream_index;
+        int64_t             _duration;      // TODO: remove (24.04)
+        uid_t               _stream_index;  // TODO: remove (24.04)
         AVRational          _time_base;
         int                 _format_flags;
 

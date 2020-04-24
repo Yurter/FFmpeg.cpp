@@ -133,7 +133,7 @@ namespace fpp {
     }
 
     void ResampleContext::stampFrame(Frame& output_frame) {
-        if (_source_pts != AV_NOPTS_VALUE) {
+        if (_source_pts != NOPTS_VALUE) {
             const auto in_param {
                 std::static_pointer_cast<const AudioParameters>(params.in)
             };
@@ -150,7 +150,7 @@ namespace fpp {
             };
             output_frame.setPts(out_pts);
         } else {
-            output_frame.setPts(AV_NOPTS_VALUE);
+            output_frame.setPts(NOPTS_VALUE);
         }
         _samples_count += output_frame.nbSamples();
     }

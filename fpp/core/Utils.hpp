@@ -9,6 +9,12 @@ extern "C" {
 
 namespace fpp {
 
+    constexpr auto NOPTS_VALUE      { AV_NOPTS_VALUE };
+    constexpr auto DEFAULT_RATIONAL { AVRational { 0, 1 } };
+    constexpr auto DEFAULT_INT      { 0 };
+    constexpr auto not_inited_q     { [](auto x) { return ::av_cmp_q(x, DEFAULT_RATIONAL) == 0; } };
+    constexpr auto not_inited_int   { [](auto x) { return x == DEFAULT_INT; } };
+
     class utils {
 
     public:
