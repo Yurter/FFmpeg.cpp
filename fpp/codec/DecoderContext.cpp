@@ -22,7 +22,6 @@ namespace fpp {
     }
 
     FrameList DecoderContext::flush() {
-        log_debug("Flushing");
         sendFlushPacket();
         return receiveFrames();
     }

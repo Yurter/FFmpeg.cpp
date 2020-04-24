@@ -11,7 +11,6 @@ namespace fpp {
         FFmpegObject(T data = T {})
             : _object(data) {
         }
-        virtual ~FFmpegObject() = default;
 
         void                setRaw(T data) { _object = data; }
 

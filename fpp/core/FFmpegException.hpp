@@ -9,9 +9,8 @@ namespace fpp {
     public:
 
         FFmpegException(const std::string& error_message, int ret = 0);
-        virtual ~FFmpegException() override = default;
 
-        virtual const char* what()  const noexcept override;
+        const char*         what()  const noexcept override;
         int                 ret()   const noexcept;
 
     protected:
@@ -27,16 +26,31 @@ namespace fpp {
 #define ffmpeg_api(foo,...) \
     do {\
         if (const auto ret { foo(__VA_ARGS__) }; ret < 0) {\
-            log_error(#foo " failed: " + CODE_POS);\
             return false;\
         }\
     } while (false)
+//#define ffmpeg_api(foo,...) \
+//    do {\
+//        if (const auto ret { foo(__VA_ARGS__) }; ret < 0) {\
+//            log_error(#foo " failed: " + CODE_POS);\
+//            return false;\
+//        }\
+//    } while (false)
 
 #define ffmpeg_api_strict(foo,...) \
     do {\
         if (const auto ret { foo(__VA_ARGS__) }; ret < 0) {\
             throw fpp::FFmpegException {\
-                #foo " failed: " + CODE_POS\
+                " failed: "\
             };\
         }\
     } while (false)
+
+//#define ffmpeg_api_strict(foo,...) \
+//    do {\
+//        if (const auto ret { foo(__VA_ARGS__) }; ret < 0) {\
+//            throw fpp::FFmpegException {\
+//                #foo " failed: " + CODE_POS\
+//            };\
+//        }\
+//    } while (false)

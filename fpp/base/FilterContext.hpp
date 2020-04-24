@@ -14,7 +14,6 @@ namespace fpp {
     public:
 
         FilterContext(SpParameters parameters, const std::string& filters_descr);
-        virtual ~FilterContext() override = default;
 
         FrameList           filter(Frame source_frame);
         std::string         description() const;

@@ -48,16 +48,16 @@ namespace fpp {
         });
 
         log_info("Inited "
-            << "from "
-                << "[" << in_param->width()
-                << "x"  << in_param->height()
-                << ", " << in_param->pixelFormat()
-                << "] "
-            << "to "
-                << "[" << out_param->width()
-                << "x"  << out_param->height()
-                << ", " << out_param->pixelFormat()
-                << "]"
+            , "from "
+                , "[" , in_param->width()
+                , "x"  , in_param->height()
+                , ", " , in_param->pixelFormat()
+                , "] "
+            , "to "
+                , "[" , out_param->width()
+                , "x"  , out_param->height()
+                , ", " , out_param->pixelFormat()
+                , "]"
         );
     }
 

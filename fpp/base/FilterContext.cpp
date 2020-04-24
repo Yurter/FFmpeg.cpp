@@ -72,7 +72,7 @@ namespace fpp {
             , nullptr /* context used for logging */
         );
 
-        log_info("Filter description: " << _filters_descr);
+        log_info("Filter description: ", _filters_descr);
 
         ffmpeg_api_strict(avfilter_graph_config
            , _filter_graph.get()
