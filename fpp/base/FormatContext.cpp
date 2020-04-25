@@ -9,14 +9,13 @@ extern "C" {
 
 namespace fpp {
 
-    FormatContext::FormatContext(const std::string_view mrl)
+    FormatContext::FormatContext()
         : _opened { false }
         , _timeout_opening { 20'000 }
         , _timeout_closing { 5'000 }
         , _timeout_reading { 5'000 }
         , _timeout_writing { 1'000 } {
         setName("FormatContext");
-        setMediaResourceLocator(mrl);
     }
 
     void FormatContext::close() {

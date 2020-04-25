@@ -19,7 +19,9 @@ void timelapase() {
     };
 
     /* open source */
-    source.open();
+    if (!source.open()) {
+        return;
+    }
 
     /* create sink */
     fpp::OutputFormatContext sink {
@@ -76,7 +78,9 @@ void timelapase() {
     }};
 
     /* open sink */
-    sink.open();
+    if (!sink.open()) {
+        return;
+    }
 
     fpp::Packet input_packet {
         fpp::MediaType::Unknown
