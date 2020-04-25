@@ -10,9 +10,9 @@ extern "C" {
 namespace fpp {
 
     OutputFormatContext::OutputFormatContext(const std::string_view mrl)
-        : FormatContext(mrl)
-        , _output_format { nullptr } {
+        : _output_format { nullptr } {
         setName("OutFmtCtx");
+        setMediaResourceLocator(mrl);
     }
 
     OutputFormatContext::~OutputFormatContext() {

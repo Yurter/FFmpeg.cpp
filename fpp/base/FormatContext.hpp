@@ -15,7 +15,7 @@ namespace fpp {
 
     public:
 
-        FormatContext(const std::string_view mrl = {});
+        FormatContext();
 
         std::string         mediaResourceLocator()  const;
         void                setMediaResourceLocator(const std::string_view);

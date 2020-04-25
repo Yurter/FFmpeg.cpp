@@ -10,9 +10,9 @@ extern "C" {
 namespace fpp {
 
     InputFormatContext::InputFormatContext(const std::string_view mrl, const std::string_view format_short_name)
-        : FormatContext(mrl)
-        , _input_format { findInputFormat(format_short_name.data()) } {
+        : _input_format { findInputFormat(format_short_name.data()) } {
         setName("InFmtCtx");
+        setMediaResourceLocator(mrl);
     }
 
     InputFormatContext::~InputFormatContext() {
