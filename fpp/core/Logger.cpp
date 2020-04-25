@@ -7,7 +7,6 @@
 #include <Windows.h>
 #endif
 #include <ctime>
-#include <filesystem>
 #include <regex>
 #include <chrono>
 
@@ -154,7 +153,13 @@ namespace fpp {
     }
 
     Logger::ConsoleHandler::ConsoleHandler(std::mutex& mutex, LogLevel log_level) :
-        _h_stdout { ::GetStdHandle(STD_OUTPUT_HANDLE) }
+        _h_stdout {
+        #ifdef _WIN32
+            ::GetStdHandle(STD_OUTPUT_HANDLE)
+        #else
+            nullptr
+        #endif
+        }
         , _lock { mutex } {
         setConsoleColor(log_level);
     }

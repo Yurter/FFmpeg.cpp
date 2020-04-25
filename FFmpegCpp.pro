@@ -12,6 +12,9 @@ CONFIG -= qt
 #INCLUDEPATH += D:\dev\00_ffmpeg\ffmpeg-4.1.3-win64-dev\include
 #LIBS += -LD:\dev\00_ffmpeg\ffmpeg-4.1.3-win64-dev\lib
 
+INCLUDEPATH += /usr/include/x86_64-linux-gnu/
+#LIBS += -L/usr/lib/x86_64-linux-gnu/
+
 INCLUDEPATH += G:\dev\00_ffmpeg\ffmpeg-4.2.2-win64-dev\include
 LIBS += -LG:\dev\00_ffmpeg\ffmpeg-4.2.2-win64-dev\lib
 
@@ -40,8 +43,8 @@ SOURCES += \
     examples/youtube_stream_copy_with_silence.cpp \
     examples/youtube_stream_transcode.cpp \
     examples/youtube_stream_transcode_with_silence.cpp \
-    fpp/refi/VideoFilters/DrawText.cpp \
     fpp/refi/ResampleContext.cpp \
+    fpp/refi/VideoFilters/Drawtext.cpp \
     main.cpp \
     fpp/base/CodecContext.cpp \
     fpp/base/Dictionary.cpp \
