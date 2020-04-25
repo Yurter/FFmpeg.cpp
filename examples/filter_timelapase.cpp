@@ -82,6 +82,9 @@ void timelapase() {
         return;
     }
 
+    /* set read timeout if endless source stream */
+    source.stream(fpp::MediaType::Video)->setEndTimePoint(60'000);
+
     fpp::Packet input_packet {
         fpp::MediaType::Unknown
     };
