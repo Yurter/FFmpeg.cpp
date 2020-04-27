@@ -7,6 +7,9 @@ extern "C" {
     #include <libavcodec/avcodec.h>
 }
 
+constexpr auto ffmpeg_4_0 { AV_VERSION_INT(56,14,100) };
+static_assert (LIBAVCODEC_VERSION_INT >= ffmpeg_4_0, "Use ffmpeg libs 4th version or newer");
+
 namespace fpp {
 
     constexpr auto NOPTS_VALUE      { AV_NOPTS_VALUE };
