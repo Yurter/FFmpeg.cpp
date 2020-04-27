@@ -19,6 +19,8 @@ namespace fpp {
 
     public:
 
+        static std::string  ffmpeg_version();
+
         static uid_t        gen_uid();
         static uid_t        gen_stream_uid(uid_t context_uid, uid_t stream_index);
         static uid_t        get_context_uid(uid_t stream_uid);

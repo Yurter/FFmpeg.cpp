@@ -259,6 +259,10 @@ namespace fpp {
         return false;
     }
 
+    std::string utils::ffmpeg_version() {
+        return std::string { ::av_version_info() };
+    }
+
     uid_t utils::gen_uid() {
         static std::atomic<uid_t> object_uid_handle = 0;
         return object_uid_handle++;
