@@ -20,11 +20,11 @@ namespace fpp {
         } } {
 //        av_log_set_callback(log_callback); //TODO later
 //        setFFmpegLogLevel(LogLevel::Info);
-        print("Logger", LogLevel::Info, "Logger opened");
+//        print("Logger", LogLevel::Info, "Logger opened");
     }
 
     Logger::~Logger() {
-        print("Logger", LogLevel::Info, "Logger closed");
+//        print("Logger", LogLevel::Info, "Logger closed");
         ::av_log_set_callback(nullptr);
     }
 

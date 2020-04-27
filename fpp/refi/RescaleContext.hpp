@@ -13,11 +13,11 @@ namespace fpp {
 
     public:
 
-        RescaleContext(IOParams parameters);
+        RescaleContext(InOutParams parameters);
 
         Frame               scale(const Frame source_frame);
 
-        const IOParams      params;
+        const InOutParams      params;
 
     private:
 

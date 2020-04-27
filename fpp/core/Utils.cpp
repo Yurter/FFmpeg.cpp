@@ -2,6 +2,7 @@
 #include <thread>
 #include <atomic>
 #include <algorithm>
+#include <cassert>
 #include <fpp/core/Logger.hpp>
 #include <fpp/core/FFmpegException.hpp>
 #include <fpp/stream/VideoParameters.hpp>
@@ -11,45 +12,6 @@ extern "C" {
     #include <libavutil/imgutils.h>
     #include <libavdevice/avdevice.h>
 }
-
-#define both_params_is_video(params) \
-    do {\
-        if (!params.in->isVideo()) {\
-            throw std::runtime_error {\
-                std::string { __FUNCTION__ } + " failed - in is not a video param"\
-            };\
-        }\
-        if (!params.out->isVideo()) {\
-            throw std::runtime_error {\
-                std::string { __FUNCTION__ } + " failed - out is not a video param"\
-            };\
-        }\
-    } while (false)
-
-#define both_params_is_audio(params) \
-    do {\
-        if (!params.in->isAudio()) {\
-            throw std::runtime_error {\
-                std::string { __FUNCTION__ } + " failed - in is not a audio param"\
-            };\
-        }\
-        if (!params.out->isAudio()) {\
-            throw std::runtime_error {\
-                std::string { __FUNCTION__ } + " failed - out is not a audio param"\
-            };\
-        }\
-    } while (false)
-
-#define params_has_same_type(params) \
-    do {\
-        if (params.in->type() != params.out->type()) {\
-            throw std::runtime_error {\
-                std::string { __FUNCTION__ }\
-                    + " failed - in is " + to_string(params.in->type())\
-                    + " but out is " + to_string(params.out->type())\
-            };\
-        }\
-    } while (false)
 
 namespace fpp {
 
@@ -259,17 +221,8 @@ namespace fpp {
         return false;
     }
 
-    uid_t utils::gen_uid() {
-        static std::atomic<uid_t> object_uid_handle = 0;
-        return object_uid_handle++;
-    }
-
-    uid_t utils::gen_stream_uid(uid_t context_uid, uid_t stream_index) {
-        return (context_uid + 1) * 100 + stream_index;
-    }
-
-    uid_t utils::get_context_uid(uid_t stream_uid) {
-        return stream_uid / 100;
+    std::string utils::ffmpeg_version() {
+        return std::string { ::av_version_info() };
     }
 
     void utils::device_register_all() {
@@ -491,8 +444,8 @@ namespace fpp {
         }
     }
 
-    bool utils::rescaling_required(const IOParams& params) {
-        both_params_is_video(params);
+    bool utils::rescaling_required(const InOutParams& params) {
+        assert(params.in->isVideo() && params.out->isVideo());
 
         const auto in  { std::static_pointer_cast<const VideoParameters>(params.in)  };
         const auto out { std::static_pointer_cast<const VideoParameters>(params.out) };
@@ -516,8 +469,8 @@ namespace fpp {
         return false;
     }
 
-    bool utils::resampling_required(const IOParams& params) {
-        both_params_is_audio(params);
+    bool utils::resampling_required(const InOutParams& params) {
+        assert(params.in->isAudio() && params.out->isAudio());
 
         const auto in  { std::static_pointer_cast<const AudioParameters>(params.in)  };
         const auto out { std::static_pointer_cast<const AudioParameters>(params.out) };
@@ -546,8 +499,8 @@ namespace fpp {
         return false;
     }
 
-    bool utils::video_filter_required(const IOParams& params) {
-        both_params_is_video(params);
+    bool utils::video_filter_required(const InOutParams& params) {
+        assert(params.in->isVideo() && params.out->isVideo());
 
         const auto in  { std::static_pointer_cast<const VideoParameters>(params.in)  };
         const auto out { std::static_pointer_cast<const VideoParameters>(params.out) };
@@ -564,12 +517,12 @@ namespace fpp {
         return false;
     }
 
-    bool utils::audio_filter_required(const IOParams&) {
+    bool utils::audio_filter_required(const InOutParams&) {
         throw std::runtime_error { "audio_filter_required() is not implemented" };
     }
 
-    bool utils::transcoding_required(const IOParams& params) {
-        params_has_same_type(params);
+    bool utils::transcoding_required(const InOutParams& params) {
+        assert(params.in->type() == params.out->type());
 
         const auto in  { params.in  };
         const auto out { params.out };

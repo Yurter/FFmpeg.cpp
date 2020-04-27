@@ -1,10 +1,12 @@
 #include <examples/examples.hpp>
 #include <fpp/core/FFmpegException.hpp>
 #include <fpp/core/Logger.hpp>
+#include <fpp/core/Utils.hpp>
 
 auto main() -> int {
 
     fpp::static_log_info("main", "Started");
+    fpp::static_log_info("main", "FFmpeg version ", fpp::utils::ffmpeg_version());
 
     try {
 
@@ -23,7 +25,7 @@ auto main() -> int {
 //        rtp_video_stream();
 //        rtp_audio_stream();
 //        rtp_video_and_audio_stream();
-//        rtp_video_stream_transcoded();
+        rtp_video_stream_transcoded();
 
         // Filters
 //        text_on_video();

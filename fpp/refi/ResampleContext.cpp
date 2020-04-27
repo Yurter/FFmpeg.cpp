@@ -5,7 +5,7 @@
 
 namespace fpp {
 
-    ResampleContext::ResampleContext(IOParams parameters)
+    ResampleContext::ResampleContext(InOutParams parameters)
         : params { parameters }
         , _samples_count { 0 }
         , _source_pts { 0 } {

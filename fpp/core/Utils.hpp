@@ -7,6 +7,9 @@ extern "C" {
     #include <libavcodec/avcodec.h>
 }
 
+constexpr auto ffmpeg_4_0 { AV_VERSION_INT(56,14,100) };
+static_assert (LIBAVCODEC_VERSION_INT >= ffmpeg_4_0, "Use ffmpeg libs 4th version or newer");
+
 namespace fpp {
 
     constexpr auto NOPTS_VALUE      { AV_NOPTS_VALUE };
@@ -19,9 +22,7 @@ namespace fpp {
 
     public:
 
-        static uid_t        gen_uid();
-        static uid_t        gen_stream_uid(uid_t context_uid, uid_t stream_index);
-        static uid_t        get_context_uid(uid_t stream_uid);
+        static std::string  ffmpeg_version();
 
         static void         device_register_all();
 
@@ -44,18 +45,18 @@ namespace fpp {
         static void         sleep_for_sec(int64_t seconds);
         static void         sleep_for_min(int64_t minutes);
 
-        static bool         rescaling_required(const IOParams& params);
-        static bool         resampling_required(const IOParams& params);
-        static bool         transcoding_required(const IOParams& params);
-        static bool         video_filter_required(const IOParams& params);
-        static bool         audio_filter_required(const IOParams& params);
+        static bool         rescaling_required(const InOutParams& params);
+        static bool         resampling_required(const InOutParams& params);
+        static bool         transcoding_required(const InOutParams& params);
+        static bool         video_filter_required(const InOutParams& params);
+        static bool         audio_filter_required(const InOutParams& params);
 
         static bool         compare_float(float a, float b);
 
         static bool         compatible_with_pixel_format(const AVCodec* codec, AVPixelFormat pixel_format);
         static bool         compatible_with_sample_format(const AVCodec* codec, AVSampleFormat sample_format);
 
-        static const char*  guess_format_short_name(const std::string_view media_resurs_locator); //TODO return type std::string_view 20.04
+        static const char*  guess_format_short_name(const std::string_view media_resurs_locator); //TODO return type std::string_view (20.04)
 
         /* FFmpeg's error codes explanation */
         static std::string  option_set_error_to_string(int ret);
@@ -72,8 +73,8 @@ namespace fpp {
 
         static std::string  merge_sdp_files(const std::string& sdp_one, const std::string& sdp_two);
 
-        static std::vector<std::string> video_device_list();
-        static std::vector<std::string> audio_device_list();
+        static std::vector<std::string> video_device_list(); // TODO (27.04)
+        static std::vector<std::string> audio_device_list(); // TODO (27.04)
 
     };
 
