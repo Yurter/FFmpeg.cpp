@@ -176,7 +176,7 @@ namespace fpp {
 //    }
 
     void Parameters::completeFrom(const SpParameters other) {
-//        if (extradata().second == 0)        { setExtradata(other->extradata()); }
+        if (extradata().second == 0)        { setExtradata(other->extradata()); }
         if (not_inited_codec_id(codecId())) { setEncoder(other->codecId());     }
         if (not_inited_int(bitrate()))      { setBitrate(other->bitrate());     }
         if (not_inited_q(timeBase()))       { setTimeBase(other->timeBase());   }
@@ -204,6 +204,14 @@ namespace fpp {
         if (testFormatFlag(AVFMT_GLOBALHEADER)) {
             codec_context->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
         }
+
+        if (isEncoder()) { // TODO: check it, do not write extradata of input stream to encoder if stream transcoded (27.04)
+            if (codec_context->extradata) {
+                ::av_freep(&codec_context->extradata);
+                codec_context->extradata_size = 0;
+            }
+        }
+
 //        codec_context->time_base = timeBase();
 //        codec_context->time_base = AVRational { 1, framerate };
 
