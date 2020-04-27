@@ -2,6 +2,7 @@
 #include <thread>
 #include <atomic>
 #include <algorithm>
+#include <cassert>
 #include <fpp/core/Logger.hpp>
 #include <fpp/core/FFmpegException.hpp>
 #include <fpp/stream/VideoParameters.hpp>
@@ -11,45 +12,6 @@ extern "C" {
     #include <libavutil/imgutils.h>
     #include <libavdevice/avdevice.h>
 }
-
-#define both_params_is_video(params) \
-    do {\
-        if (!params.in->isVideo()) {\
-            throw std::runtime_error {\
-                std::string { __FUNCTION__ } + " failed - in is not a video param"\
-            };\
-        }\
-        if (!params.out->isVideo()) {\
-            throw std::runtime_error {\
-                std::string { __FUNCTION__ } + " failed - out is not a video param"\
-            };\
-        }\
-    } while (false)
-
-#define both_params_is_audio(params) \
-    do {\
-        if (!params.in->isAudio()) {\
-            throw std::runtime_error {\
-                std::string { __FUNCTION__ } + " failed - in is not a audio param"\
-            };\
-        }\
-        if (!params.out->isAudio()) {\
-            throw std::runtime_error {\
-                std::string { __FUNCTION__ } + " failed - out is not a audio param"\
-            };\
-        }\
-    } while (false)
-
-#define params_has_same_type(params) \
-    do {\
-        if (params.in->type() != params.out->type()) {\
-            throw std::runtime_error {\
-                std::string { __FUNCTION__ }\
-                    + " failed - in is " + to_string(params.in->type())\
-                    + " but out is " + to_string(params.out->type())\
-            };\
-        }\
-    } while (false)
 
 namespace fpp {
 
@@ -483,7 +445,7 @@ namespace fpp {
     }
 
     bool utils::rescaling_required(const IOParams& params) {
-        both_params_is_video(params);
+        assert(params.in->isVideo() && params.out->isVideo());
 
         const auto in  { std::static_pointer_cast<const VideoParameters>(params.in)  };
         const auto out { std::static_pointer_cast<const VideoParameters>(params.out) };
@@ -508,7 +470,7 @@ namespace fpp {
     }
 
     bool utils::resampling_required(const IOParams& params) {
-        both_params_is_audio(params);
+        assert(params.in->isAudio() && params.out->isAudio());
 
         const auto in  { std::static_pointer_cast<const AudioParameters>(params.in)  };
         const auto out { std::static_pointer_cast<const AudioParameters>(params.out) };
@@ -538,7 +500,7 @@ namespace fpp {
     }
 
     bool utils::video_filter_required(const IOParams& params) {
-        both_params_is_video(params);
+        assert(params.in->isVideo() && params.out->isVideo());
 
         const auto in  { std::static_pointer_cast<const VideoParameters>(params.in)  };
         const auto out { std::static_pointer_cast<const VideoParameters>(params.out) };
@@ -560,7 +522,7 @@ namespace fpp {
     }
 
     bool utils::transcoding_required(const IOParams& params) {
-        params_has_same_type(params);
+        assert(params.in->type() == params.out->type());
 
         const auto in  { params.in  };
         const auto out { params.out };
