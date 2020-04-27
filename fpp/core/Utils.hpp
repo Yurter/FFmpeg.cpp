@@ -45,11 +45,11 @@ namespace fpp {
         static void         sleep_for_sec(int64_t seconds);
         static void         sleep_for_min(int64_t minutes);
 
-        static bool         rescaling_required(const IOParams& params);
-        static bool         resampling_required(const IOParams& params);
-        static bool         transcoding_required(const IOParams& params);
-        static bool         video_filter_required(const IOParams& params);
-        static bool         audio_filter_required(const IOParams& params);
+        static bool         rescaling_required(const InOutParams& params);
+        static bool         resampling_required(const InOutParams& params);
+        static bool         transcoding_required(const InOutParams& params);
+        static bool         video_filter_required(const InOutParams& params);
+        static bool         audio_filter_required(const InOutParams& params);
 
         static bool         compare_float(float a, float b);
 

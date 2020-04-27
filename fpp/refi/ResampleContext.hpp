@@ -13,11 +13,11 @@ namespace fpp {
 
     public:
 
-        ResampleContext(IOParams parameters);
+        ResampleContext(InOutParams parameters);
 
         FrameList           resample(const Frame source_frame);
 
-        const IOParams      params;
+        const InOutParams      params;
 
     private:
 

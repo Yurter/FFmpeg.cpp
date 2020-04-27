@@ -444,7 +444,7 @@ namespace fpp {
         }
     }
 
-    bool utils::rescaling_required(const IOParams& params) {
+    bool utils::rescaling_required(const InOutParams& params) {
         assert(params.in->isVideo() && params.out->isVideo());
 
         const auto in  { std::static_pointer_cast<const VideoParameters>(params.in)  };
@@ -469,7 +469,7 @@ namespace fpp {
         return false;
     }
 
-    bool utils::resampling_required(const IOParams& params) {
+    bool utils::resampling_required(const InOutParams& params) {
         assert(params.in->isAudio() && params.out->isAudio());
 
         const auto in  { std::static_pointer_cast<const AudioParameters>(params.in)  };
@@ -499,7 +499,7 @@ namespace fpp {
         return false;
     }
 
-    bool utils::video_filter_required(const IOParams& params) {
+    bool utils::video_filter_required(const InOutParams& params) {
         assert(params.in->isVideo() && params.out->isVideo());
 
         const auto in  { std::static_pointer_cast<const VideoParameters>(params.in)  };
@@ -517,11 +517,11 @@ namespace fpp {
         return false;
     }
 
-    bool utils::audio_filter_required(const IOParams&) {
+    bool utils::audio_filter_required(const InOutParams&) {
         throw std::runtime_error { "audio_filter_required() is not implemented" };
     }
 
-    bool utils::transcoding_required(const IOParams& params) {
+    bool utils::transcoding_required(const InOutParams& params) {
         assert(params.in->type() == params.out->type());
 
         const auto in  { params.in  };
