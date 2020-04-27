@@ -263,19 +263,6 @@ namespace fpp {
         return std::string { ::av_version_info() };
     }
 
-    uid_t utils::gen_uid() {
-        static std::atomic<uid_t> object_uid_handle = 0;
-        return object_uid_handle++;
-    }
-
-    uid_t utils::gen_stream_uid(uid_t context_uid, uid_t stream_index) {
-        return (context_uid + 1) * 100 + stream_index;
-    }
-
-    uid_t utils::get_context_uid(uid_t stream_uid) {
-        return stream_uid / 100;
-    }
-
     void utils::device_register_all() {
         static struct CallOnce {
             CallOnce() { ::avdevice_register_all(); }
