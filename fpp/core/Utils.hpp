@@ -24,10 +24,6 @@ namespace fpp {
 
         static std::string  ffmpeg_version();
 
-        static uid_t        gen_uid();
-        static uid_t        gen_stream_uid(uid_t context_uid, uid_t stream_index);
-        static uid_t        get_context_uid(uid_t stream_uid);
-
         static void         device_register_all();
 
         static std::string  to_string(AVMediaType type);
@@ -60,7 +56,7 @@ namespace fpp {
         static bool         compatible_with_pixel_format(const AVCodec* codec, AVPixelFormat pixel_format);
         static bool         compatible_with_sample_format(const AVCodec* codec, AVSampleFormat sample_format);
 
-        static const char*  guess_format_short_name(const std::string_view media_resurs_locator); //TODO return type std::string_view 20.04
+        static const char*  guess_format_short_name(const std::string_view media_resurs_locator); //TODO return type std::string_view (20.04)
 
         /* FFmpeg's error codes explanation */
         static std::string  option_set_error_to_string(int ret);
@@ -77,8 +73,8 @@ namespace fpp {
 
         static std::string  merge_sdp_files(const std::string& sdp_one, const std::string& sdp_two);
 
-        static std::vector<std::string> video_device_list();
-        static std::vector<std::string> audio_device_list();
+        static std::vector<std::string> video_device_list(); // TODO (27.04)
+        static std::vector<std::string> audio_device_list(); // TODO (27.04)
 
     };
 
