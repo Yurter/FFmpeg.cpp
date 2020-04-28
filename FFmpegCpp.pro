@@ -43,6 +43,7 @@ SOURCES += \
     examples/youtube_stream_copy_with_silence.cpp \
     examples/youtube_stream_transcode.cpp \
     examples/youtube_stream_transcode_with_silence.cpp \
+    fpp/refi/BitStreamFilterContext.cpp \
     fpp/refi/ResampleContext.cpp \
     fpp/refi/VideoFilters/Drawtext.cpp \
     main.cpp \
@@ -94,6 +95,7 @@ HEADERS += \
     fpp/core/wrap/FFmpegObject.hpp \
     fpp/core/wrap/SharedFFmpegObject.hpp \
     fpp/refi/AudioFilterContext.hpp \
+    fpp/refi/BitStreamFilterContext.hpp \
     fpp/refi/VideoFilters/DrawText.hpp \
     fpp/base/FilterContext.hpp \
     fpp/refi/ResampleContext.hpp \
