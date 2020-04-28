@@ -1,12 +1,11 @@
 #pragma once
 #include <fpp/stream/VideoParameters.hpp>
 #include <fpp/stream/AudioParameters.hpp>
-#include <fpp/core/time/Chronometer.hpp>
 #include <fpp/base/Packet.hpp>
 #include <vector>
 
-#define FROM_START  0
-#define TO_END      LLONG_MAX
+constexpr auto FROM_START { 0ll       };
+constexpr auto TO_END     { LLONG_MAX };
 
 namespace fpp {
 
