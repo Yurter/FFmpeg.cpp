@@ -41,6 +41,7 @@ namespace fpp {
         _stream_index = other.streamIndex();
         _time_base = other.timeBase();
         _format_flags = other.formatFlags();
+        return *this;
     }
 
     void Parameters::setDecoder(AVCodecID codec_id) {
