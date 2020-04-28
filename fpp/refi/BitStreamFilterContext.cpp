@@ -28,7 +28,7 @@ namespace fpp {
         ffmpeg_api_strict(::av_bsf_init, bfs_ctx);
 
         reset({
-            nullptr, [](AVBSFContext* ctx) {
+            bfs_ctx, [](AVBSFContext* ctx) {
                 ::av_bsf_flush(ctx);
                 ::av_bsf_free(&ctx);
             }
@@ -37,6 +37,7 @@ namespace fpp {
 
     Packet BitStreamFilterContext::filter(Packet packet) {
         Packet filtered_packet { packet.type() };
+        filtered_packet.setTimeBase(packet.timeBase());
         ffmpeg_api_strict(::av_bsf_send_packet,    raw(), packet.ptr()         );
         ffmpeg_api_strict(::av_bsf_receive_packet, raw(), filtered_packet.ptr());
         return filtered_packet;
