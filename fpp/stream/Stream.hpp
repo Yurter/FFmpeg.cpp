@@ -31,6 +31,8 @@ namespace fpp {
         void                setStartTimePoint(int64_t msec);
         void                setEndTimePoint(int64_t msec);
 
+        void                stampFromZero(bool value);
+
         int64_t             index()             const;
         int64_t             startTimePoint()    const;
         int64_t             endTimePoint()      const;
@@ -58,6 +60,8 @@ namespace fpp {
 
         int64_t             _start_time_point; // TODO not used 25.03
         int64_t             _end_time_point;
+
+        bool                _stamp_from_zero;
 
     public:
 
