@@ -1,5 +1,4 @@
-#include <iostream>
-#include <fstream>
+#include "examples.hpp"
 #include <fpp/context/InputFormatContext.hpp>
 #include <fpp/context/OutputFormatContext.hpp>
 #include <fpp/codec/DecoderContext.hpp>
@@ -7,9 +6,6 @@
 #include <fpp/refi/ResampleContext.hpp>
 #include <fpp/refi/RescaleContext.hpp>
 #include <fpp/refi/VideoFilterContext.hpp>
-#include <fpp/refi/VideoFilters/DrawText.hpp>
-#include <fpp/core/Utils.hpp>
-#include "examples.hpp"
 
 void timelapase() {
 
@@ -60,7 +56,7 @@ void timelapase() {
     };
 
     /* create filter */
-    const auto accel { 3 };
+    constexpr auto accel { 3 };
     const auto filters_descr {
         fpp::FilterContext::keep_every_frame(accel)
             + fpp::FilterContext::Separator
