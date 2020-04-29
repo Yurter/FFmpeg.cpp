@@ -11,8 +11,9 @@ namespace fpp {
 
     public:
 
-        BitStreamFilterContext(const InOutParams params, const std::string_view filter_name);
-                                        // TODO: ^^^^^^ change to single param (28.04)
+//        BitStreamFilterContext(const InOutParams params, const std::string_view filter_name);
+        BitStreamFilterContext(const fpp::SpParameters param, const std::string_view filter_name);
+
         Packet filter(Packet packet);
 
     };
