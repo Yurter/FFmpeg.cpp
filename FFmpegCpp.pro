@@ -28,6 +28,7 @@ SOURCES += \
     examples/concatenate.cpp \
     examples/filter_text_on_video.cpp \
     examples/filter_timelapase.cpp \
+    examples/mic_to_file.cpp \
     examples/multiple_outputs_parallel.cpp \
     examples/multiple_outputs_sequence.cpp \
     examples/record_screen_win.cpp \

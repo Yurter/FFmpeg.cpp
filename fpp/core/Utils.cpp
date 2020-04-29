@@ -254,7 +254,7 @@ namespace fpp {
             return "dshow";
         }
         if (media_resurs_locator.find("audio=") != std::string_view::npos) {
-            return "TODO 13.01";
+            return "dshow";
         }
         if (media_resurs_locator == "desktop") {
             return "gdigrab";
