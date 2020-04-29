@@ -15,16 +15,16 @@ namespace fpp {
 
         ResampleContext(InOutParams parameters);
 
-        FrameList           resample(const Frame source_frame);
+        FrameVector         resample(const Frame source_frame);
 
-        const InOutParams      params;
+        const InOutParams   params;
 
     private:
 
         void                init();
         Frame               createFrame() const;
         void                sendFrame(const Frame source_frame);
-        FrameList           receiveFrames();
+        FrameVector         receiveFrames();
         void                stampFrame(Frame& output_frame);
 
     private:

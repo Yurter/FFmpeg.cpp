@@ -15,10 +15,10 @@ namespace fpp {
 
         FilterContext(SpParameters parameters, const std::string& filters_descr);
 
-        FrameList           filter(Frame source_frame);
+        FrameVector         filter(Frame source_frame);
         std::string         description() const;
 
-        const SpParameters params;
+        const SpParameters  params;
 
     public:
 
