@@ -7,6 +7,7 @@ auto main() -> int {
 
     fpp::static_log_info("main", "Started");
     fpp::static_log_info("main", "FFmpeg version ", fpp::utils::ffmpeg_version());
+    fpp::set_ffmpeg_log_level(fpp::LogLevel::Error);
 
     try {
 
