@@ -1,6 +1,7 @@
 ﻿#include "FormatContext.hpp"
 #include <fpp/core/Utils.hpp>
 #include <fpp/core/Logger.hpp>
+#include <iomanip>
 
 extern "C" {
     #include <libavformat/avformat.h>
@@ -42,14 +43,13 @@ namespace fpp {
     }
 
     std::string FormatContext::toString() const {
-        auto context_info {
-            formatName() + ',' + ' '
-            + mediaResourceLocator() + ':'
-        };
+        std::stringstream ss;
+        ss << formatName() << ',' << ' ';
+        ss << std::quoted(mediaResourceLocator()) << ':';
         for (const auto& stream : streams()) {
-            context_info += '\n' + stream->toString();
+            ss << '\n' << stream->toString();
         }
-        return context_info;
+        return ss.str();
     }
 
     void FormatContext::setOpened(bool opened) {
