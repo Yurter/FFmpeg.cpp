@@ -1,7 +1,7 @@
 #pragma once
 #include <fpp/core/wrap/FFmpegObject.hpp>
 #include <fpp/base/MediaData.hpp>
-#include <list> // TODO: change to vector (28.04)
+#include <vector>
 
 extern "C" {
     #include <libavcodec/avcodec.h>
@@ -50,6 +50,6 @@ namespace fpp {
 
     };
 
-    using PacketList = std::list<Packet>;
+    using PacketVector = std::vector<Packet>;
 
 } // namespace fpp
