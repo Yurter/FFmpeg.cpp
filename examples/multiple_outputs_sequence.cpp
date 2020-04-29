@@ -1,5 +1,4 @@
 #include "examples.hpp"
-
 #include <fpp/context/InputFormatContext.hpp>
 #include <fpp/context/OutputFormatContext.hpp>
 
@@ -18,16 +17,15 @@ void multiple_outputs_sequence() {
     /* create sink */
     fpp::OutputFormatContext sink;
 
-    for (auto i { 0 }; i < 5; ++i) {
+    constexpr auto N { 5 };
+    for (auto i { 0 }; i < N; ++i) {
 
         /* set next file name */
-        sink.setMediaResourceLocator(std::to_string(i).append(".flv"));
+        const auto file_name { std::to_string(i).append(".flv") }; // 0.flv, 1.flv...
+        sink.setMediaResourceLocator(file_name);
 
         /* copy source video stream to sink */
         sink.copyStream(source.stream(fpp::MediaType::Video));
-
-        // TODO: remove (23.04)
-        sink.stream(0)->params->setExtradata(source.stream(0)->params->extradata());
 
         /* open sink */
         if (!sink.open()) {
@@ -63,6 +61,7 @@ void multiple_outputs_sequence() {
             sink.write(packet);
         }
 
+        /* explicitly close context */
         sink.close();
 
     }
