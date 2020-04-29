@@ -57,6 +57,7 @@ void youtube_stream_transcode_with_silence() {
     sink.createStream(out_video_params);
     sink.createStream(out_audio_params);
 
+    /* create video codec contexts and rescaler */
     fpp::DecoderContext video_decoder {
         video_source.stream(fpp::MediaType::Video)->params
     };
@@ -87,6 +88,10 @@ void youtube_stream_transcode_with_silence() {
     fpp::EncoderContext audio_encoder {
         sink.stream(fpp::MediaType::Audio)->params
     };
+
+    /* because of non zero dshow start stamps
+     * and zero lavfi start stamps */
+    video_source.stream(fpp::MediaType::Video)->stampFromZero(true);
 
     /* open sink */
     if (!sink.open()) {
