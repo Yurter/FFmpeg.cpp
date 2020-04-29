@@ -21,6 +21,9 @@ namespace fpp {
 
     bool OutputFormatContext::write(Packet packet, WriteMode write_mode) {
         processPacket(packet);
+        if (packet.isEOF()) {
+            return false;
+        }
         setInterrupter(timeoutWriting());
         if (write_mode == WriteMode::Instant) {
             ffmpeg_api(av_write_frame, raw(), packet.ptr());

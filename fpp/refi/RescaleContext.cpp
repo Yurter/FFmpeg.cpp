@@ -3,6 +3,10 @@
 #include <fpp/core/Logger.hpp>
 #include <fpp/core/Utils.hpp>
 
+extern "C" {
+    #include <libswscale/swscale.h>
+}
+
 namespace fpp {
 
     RescaleContext::RescaleContext(InOutParams parameters)
@@ -69,7 +73,8 @@ namespace fpp {
         frame.raw().format = output_params->pixelFormat();
         frame.raw().width  = int(output_params->width());
         frame.raw().height = int(output_params->height());
-        ffmpeg_api_strict(av_frame_get_buffer, frame.ptr(), 32);
+        constexpr auto align { 32 };
+        ffmpeg_api_strict(av_frame_get_buffer, frame.ptr(), align);
         return frame;
     }
 

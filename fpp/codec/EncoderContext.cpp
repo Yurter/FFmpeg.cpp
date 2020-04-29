@@ -16,12 +16,12 @@ namespace fpp {
         init(options);
     }
 
-    PacketList EncoderContext::encode(const Frame& frame) {
+    PacketVector EncoderContext::encode(const Frame& frame) {
         sendFrame(frame);
         return receivePackets(frame.timeBase());
     }
 
-    PacketList EncoderContext::flush() {
+    PacketVector EncoderContext::flush() {
         sendFlushFrame();
         return receivePackets({ DEFAULT_TIME_BASE });
     }
@@ -48,8 +48,8 @@ namespace fpp {
         }
     }
 
-    PacketList EncoderContext::receivePackets(AVRational time_base) {
-        PacketList encoded_packets;
+    PacketVector EncoderContext::receivePackets(AVRational time_base) {
+        PacketVector encoded_packets;
         auto ret { 0 };
         while (0 == ret) {
             Packet packet { params->type() };

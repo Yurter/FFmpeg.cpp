@@ -1,5 +1,4 @@
 #include "examples.hpp"
-
 #include <fpp/context/InputFormatContext.hpp>
 #include <fpp/context/OutputFormatContext.hpp>
 #include <fpp/codec/DecoderContext.hpp>
@@ -46,7 +45,6 @@ void youtube_stream_copy_with_silence() {
 
     /* copy source's video stream to sink */
     sink.copyStream(video_source.stream(fpp::MediaType::Video));
-    sink.stream(0)->params->setExtradata(video_source.stream(0)->params->extradata()); // TODO: remove (23.04)
 
     /* create output audio params from anullsrc's */
     const auto in_audio_params {

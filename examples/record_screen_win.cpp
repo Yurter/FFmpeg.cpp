@@ -1,15 +1,9 @@
-#include <iostream>
-#include <fstream>
+#include "examples.hpp"
 #include <fpp/context/InputFormatContext.hpp>
 #include <fpp/context/OutputFormatContext.hpp>
 #include <fpp/codec/DecoderContext.hpp>
 #include <fpp/codec/EncoderContext.hpp>
-#include <fpp/refi/ResampleContext.hpp>
 #include <fpp/refi/RescaleContext.hpp>
-#include <fpp/refi/VideoFilterContext.hpp>
-#include <fpp/refi/VideoFilters/DrawText.hpp>
-#include <fpp/core/Utils.hpp>
-#include "examples.hpp"
 
 void record_screen_win() {
 
@@ -18,23 +12,24 @@ void record_screen_win() {
         "desktop"
     };
 
-    /* change default image size (480x360) */
-    fpp::Options webcam_options {
+    fpp::Options source_options {
         { "framerate", "ntsc" }
-        , { "offset_x", "100" }
-        , { "offset_y", "100" }
-        , { "video_size", "1820x980" }
+        , { "offset_x", "100" }       // remove this options
+        , { "offset_y", "100" }       // for recording
+        , { "video_size", "192x108" } // all available screen area
     };
 
     /* open source */
-    source.open(webcam_options);
+    if (!source.open(source_options)) {
+        return;
+    }
 
     /* create sink */
     fpp::OutputFormatContext sink {
         "desktop.flv"
     };
 
-    /* encode video because of camera's rawvideo codec */
+    /* encode video because of desktop's bmp codec */
     const auto out_params { fpp::VideoParameters::make_shared() };
     out_params->setEncoder(AVCodecID::AV_CODEC_ID_H264);
     out_params->setPixelFormat(AVPixelFormat::AV_PIX_FMT_YUV420P);
@@ -72,30 +67,30 @@ void record_screen_win() {
     }};
 
     /* open sink */
-    sink.open();
+    if (!sink.open()) {
+        return;
+    }
 
-    fpp::Packet input_packet {
+    fpp::Packet packet {
         fpp::MediaType::Unknown
     };
-    const auto read_video_packet {
-        [&input_packet,&source]() {
-            do {
-                input_packet = source.read();
-            } while (!input_packet.isVideo() && !input_packet.isEOF());
-            return !input_packet.isEOF();
+    const auto read_packet {
+        [&packet,&source]() {
+            packet = source.read();
+            return !packet.isEOF();
         }
     };
 
     /* because of endless webcam's video */
-//    source.stream(0)->setEndTimePoint(1000 * 1000);
+    constexpr auto one_minute { 1 * 60 * 1000 };
+    source.stream(0)->setEndTimePoint(one_minute);
 
     /* read and write packets */
-    while (read_video_packet()) {
-        if (input_packet.isVideo()) {
-            for (const auto& v_frame  : video_decoder.decode(input_packet)) {
-            /*const*/ auto rv_frame { rescaler.scale(v_frame) };
-            rv_frame.raw().pict_type = AV_PICTURE_TYPE_NONE;
-            for (const auto& v_packet : video_encoder.encode(rv_frame))     {
+    while (read_packet()) {
+        if (packet.isVideo()) {
+            for (const auto& v_frame  : video_decoder.decode(packet))   {
+                 const auto& rv_frame { rescaler.scale(v_frame) };
+            for (const auto& v_packet : video_encoder.encode(rv_frame)) {
                 sink.write(v_packet);
             }}
         }

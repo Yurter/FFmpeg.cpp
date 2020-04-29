@@ -1,5 +1,4 @@
 #include "examples.hpp"
-
 #include <fpp/context/InputFormatContext.hpp>
 #include <fpp/context/OutputFormatContext.hpp>
 #include <fpp/codec/DecoderContext.hpp>
@@ -16,7 +15,7 @@ void webcam_to_file() {
 
     /* change default image size (480x360) */
     fpp::Options webcam_options {
-        { "video_size", "11024x768" }
+        { "video_size", "1024x768" }
         , { "framerate", "30" }
     };
 
@@ -74,31 +73,33 @@ void webcam_to_file() {
     };
 
     /* open sink */
-    sink.open();
+    if (!sink.open()) {
+        return;
+    }
 
-    fpp::Packet input_packet {
+    fpp::Packet packet {
         fpp::MediaType::Unknown
     };
     const auto read_packet {
-        [&input_packet,&source]() {
-            input_packet = source.read();
-            return !input_packet.isEOF();
+        [&packet,&source]() {
+            packet = source.read();
+            return !packet.isEOF();
         }
     };
 
     /* because of endless webcam's video */
-//    source.stream(0)->setEndTimePoint(10 * 1000);
+    sink.stream(0)->setEndTimePoint(10 * 1000);
 
-    fpp::Chronometer chronometer;
+    auto stop_flag { false };
 
     /* read and write packets */
-    while (read_packet()) {
-        if (input_packet.isVideo()) {
-            for (const auto& v_frame  : video_decoder.decode(input_packet)) {
-            for (const auto& fv_frame : filter.filter(v_frame))             {
-            auto rv_frame { rescaler.scale(fv_frame) };
-            for (const auto& v_packet : video_encoder.encode(rv_frame))     {
-                sink.write(v_packet);
+    while (read_packet() && !stop_flag) {
+        if (packet.isVideo()) {
+            for (const auto& v_frame  : video_decoder.decode(packet))   {
+            for (const auto& fv_frame : filter.filter(v_frame))         {
+                 const auto& rv_frame { rescaler.scale(fv_frame) };
+            for (const auto& v_packet : video_encoder.encode(rv_frame)) {
+                stop_flag = !sink.write(v_packet);
             }}}
         }
     }
