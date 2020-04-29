@@ -3,9 +3,7 @@
 #include <fpp/stream/VideoParameters.hpp>
 #include <fpp/base/Frame.hpp>
 
-extern "C" {
-    #include <libswscale/swscale.h>
-}
+struct SwsContext;
 
 namespace fpp {
 
@@ -17,7 +15,7 @@ namespace fpp {
 
         Frame               scale(const Frame source_frame);
 
-        const InOutParams      params;
+        const InOutParams   params;
 
     private:
 
