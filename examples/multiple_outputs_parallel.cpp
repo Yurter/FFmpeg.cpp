@@ -21,10 +21,12 @@ void multiple_outputs_parallel() {
     std::array<fpp::OutputFormatContext,N> sinks;
 
     for (size_t i { 0 }; i < N; ++i) {
-        sinks[i].setMediaResourceLocator(std::to_string(i).append(".flv"));
+        const auto file_name { std::to_string(i).append(".flv") }; // 0.flv, 1.flv...
+        sinks[i].setMediaResourceLocator(file_name);
         sinks[i].copyStream(source.stream(fpp::MediaType::Video));
-        sinks[i].stream(0)->params->setExtradata(source.stream(0)->params->extradata()); // TODO: remove (23.04)
-        if (!sinks[i].open()) { return; }
+        if (!sinks[i].open()) {
+            return;
+        }
     }
 
     fpp::Packet packet {
@@ -39,12 +41,15 @@ void multiple_outputs_parallel() {
 
     /* read and write packets */
     while (read_packet()) {
-        for (size_t i { 0 }; i < N; ++i) {
-            sinks[i].write(packet);
+        for (auto& sink : sinks) {
+            sink.write(packet);
         }
     }
 
     /* explicitly close context */
     source.close();
+    for (auto& sink : sinks) {
+        sink.close();
+    }
 
 }
