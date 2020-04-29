@@ -1,5 +1,4 @@
 #include "examples.hpp"
-
 #include <fpp/context/InputFormatContext.hpp>
 #include <fpp/context/OutputFormatContext.hpp>
 #include <fpp/codec/DecoderContext.hpp>
@@ -74,7 +73,9 @@ void webcam_to_file() {
     };
 
     /* open sink */
-    sink.open();
+    if (!sink.open()) {
+        return;
+    }
 
     fpp::Packet packet {
         fpp::MediaType::Unknown

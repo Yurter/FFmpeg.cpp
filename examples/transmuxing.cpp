@@ -1,15 +1,6 @@
-#include <iostream>
-#include <fstream>
+#include "examples.hpp"
 #include <fpp/context/InputFormatContext.hpp>
 #include <fpp/context/OutputFormatContext.hpp>
-#include <fpp/codec/DecoderContext.hpp>
-#include <fpp/codec/EncoderContext.hpp>
-#include <fpp/refi/ResampleContext.hpp>
-#include <fpp/refi/RescaleContext.hpp>
-#include <fpp/refi/VideoFilterContext.hpp>
-#include <fpp/refi/VideoFilters/DrawText.hpp>
-#include <fpp/core/Utils.hpp>
-#include "examples.hpp"
 
 void transmuxing_file() {
 
@@ -19,11 +10,13 @@ void transmuxing_file() {
     };
 
     /* open source */
-    source.open();
+    if (!source.open()) {
+        return;
+    }
 
     /* create sink */
     fpp::OutputFormatContext sink {
-        "copy.flv"
+        "transmuxing.flv"
     };
 
     /* copy source's streams to sink */
@@ -32,25 +25,27 @@ void transmuxing_file() {
     }
 
     /* open sink */
-    sink.open();
+    if (!sink.open()) {
+        return;
+    }
 
     /* set timeout (because of endless rtsp stream) */
-    const auto one_minute { 1 * 60 * 1000 };
-    source.stream(fpp::MediaType::Video)->setEndTimePoint(one_minute);
+    constexpr auto one_minute { 1 * 60 * 1000 };
+    source.stream(0)->setEndTimePoint(one_minute);
 
-    fpp::Packet input_packet {
+    fpp::Packet packet {
         fpp::MediaType::Unknown
     };
     const auto read_packet {
-        [&input_packet,&source]() {
-            input_packet = source.read();
-            return !input_packet.isEOF();
+        [&packet,&source]() {
+            packet = source.read();
+            return !packet.isEOF();
         }
     };
 
     /* read and write packets */
     while (read_packet()) {
-        sink.write(input_packet);
+        sink.write(packet);
     }
 
     /* explicitly close contexts */
