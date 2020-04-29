@@ -16,7 +16,7 @@ void webcam_to_file() {
 
     /* change default image size (480x360) */
     fpp::Options webcam_options {
-        { "video_size", "11024x768" }
+        { "video_size", "1024x768" }
         , { "framerate", "30" }
     };
 
@@ -87,7 +87,7 @@ void webcam_to_file() {
     };
 
     /* because of endless webcam's video */
-//    source.stream(0)->setEndTimePoint(10 * 1000);
+    source.stream(0)->setEndTimePoint(10 * 1000);
 
     fpp::Chronometer chronometer;
 
