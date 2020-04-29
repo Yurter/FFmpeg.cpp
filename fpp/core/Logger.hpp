@@ -103,6 +103,10 @@ namespace fpp {
         Logger::instance().setLogLevel(log_level);
     }
 
+    inline auto set_ffmpeg_log_level(LogLevel log_level) {
+        Logger::instance().setFFmpegLogLevel(log_level);
+    }
+
     template <typename... Args>
     inline auto static_log_info(const std::string_view caller_name, Args&&... args) {
         Logger::instance().print(caller_name, LogLevel::Info, std::forward<Args>(args)...);
