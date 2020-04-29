@@ -11,7 +11,9 @@ void youtube_stream_copy() {
     };
 
     /* open source */
-    source.open();
+    if (!source.open()) {
+        return;
+    }
 
     /* check input streams */
     if (!source.stream(fpp::MediaType::Video)) {
@@ -34,12 +36,10 @@ void youtube_stream_copy() {
     sink.copyStream(source.stream(fpp::MediaType::Video));
     sink.copyStream(source.stream(fpp::MediaType::Audio));
 
-    // TODO: remove (23.04)
-    sink.stream(0)->params->setExtradata(source.stream(0)->params->extradata());
-    sink.stream(1)->params->setExtradata(source.stream(1)->params->extradata());
-
     /* open sink */
-    sink.open();
+    if (!sink.open()) {
+        return;
+    }
 
     fpp::Packet packet {
         fpp::MediaType::Unknown
