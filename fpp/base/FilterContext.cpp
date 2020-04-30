@@ -47,6 +47,12 @@ namespace fpp {
         return _filters_descr;
     }
 
+    std::string FilterContext::toString() const {
+        return utils::to_string(params->type())
+                + " filter: "
+                + utils::quoted(description());
+    }
+
     void FilterContext::init() {
 
         initFilterGraph();

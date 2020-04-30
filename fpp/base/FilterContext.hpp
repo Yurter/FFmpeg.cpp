@@ -18,6 +18,8 @@ namespace fpp {
         FrameVector         filter(Frame source_frame);
         std::string         description() const;
 
+        std::string         toString() const override final;
+
         const SpParameters  params;
 
     public:
