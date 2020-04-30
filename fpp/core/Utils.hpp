@@ -42,6 +42,8 @@ namespace fpp {
         static MediaType    to_media_type(AVMediaType type);
         static AVMediaType  from_media_type(MediaType type);
 
+        static std::string  quoted(const std::string_view str, char delim = '"');
+
         static void         sleep_for(int64_t milliseconds);
         static void         sleep_for_ms(int64_t milliseconds);
         static void         sleep_for_sec(int64_t seconds);

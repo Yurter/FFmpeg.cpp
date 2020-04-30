@@ -161,6 +161,10 @@ namespace fpp {
         }
     }
 
+    std::string utils::quoted(const std::string_view str, char delim) {
+        return delim + std::string { str } + delim;
+    }
+
     std::string utils::to_string(AVRational rational) {
         return std::to_string(rational.num)
                 + "/" +
