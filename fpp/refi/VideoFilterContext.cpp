@@ -24,10 +24,6 @@ namespace fpp {
         return "select='not(mod(n," + std::to_string(n) + "))'";
     }
 
-    std::string VideoFilterContext::toString() const {
-        return std::string { "TODO 23.03" };
-    }
-
     void VideoFilterContext::initBufferSource() {
         const auto buffersrc {
             ::avfilter_get_by_name("buffer")

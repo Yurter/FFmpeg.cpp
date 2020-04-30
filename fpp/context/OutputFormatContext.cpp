@@ -90,23 +90,33 @@ namespace fpp {
         });
     }
 
-    bool OutputFormatContext::openContext(Options options) { // TODO avio_open2 24.03
+    bool OutputFormatContext::openContext(Options options) {
         if (streamNumber() == 0) {
             throw std::logic_error {
                 "Can't open context without streams"
             };
         }
         initStreamsCodecpar();
+//        Dictionary dictionary { options }; // TODO: avio_open2 (24.03)
+//        if (!(raw()->flags & AVFMT_NOFILE)) {
+//            if (const auto ret {
+//                    ::avio_open2(
+//                        &raw()->pb                       /* AVIOContext */
+//                        , mediaResourceLocator().c_str() /* url         */
+//                        , AVIO_FLAG_WRITE                /* flags       */
+//                        , nullptr                        /* int_cb */
+//                        , dictionary.get()
+//                    )
+//                }; ret < 0) {
+//                return false;
+//            }
+//        }
         if (!(raw()->flags & AVFMT_NOFILE)) {
-            if (const auto ret {
-                    ::avio_open(
-                        &raw()->pb                       /* AVIOContext */
-                        , mediaResourceLocator().c_str() /* url         */
-                        , AVIO_FLAG_WRITE                /* flags       */
-                    )
-                }; ret < 0) {
-                return false;
-            }
+            ffmpeg_api(avio_open
+                , &raw()->pb                     /* AVIOContext */
+                , mediaResourceLocator().c_str() /* url         */
+                , AVIO_FLAG_WRITE                /* flags       */
+            );
         }
         writeHeader();
         parseStreamsTimeBase();

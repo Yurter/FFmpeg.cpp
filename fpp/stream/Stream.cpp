@@ -20,6 +20,9 @@ namespace fpp {
         , _stamp_from_zero { false } {
 
         setName("Stream");
+        if (duration() == NOPTS_VALUE) {
+            setDuration(0);
+        }
 
     }
 
@@ -40,13 +43,6 @@ namespace fpp {
         setName("Out" + utils::to_string(type()) + "Stream");
         params = parameters;
         params->initCodecpar(codecpar());
-        if (invalid_int(params->streamIndex())) {
-            params->setStreamIndex(index());
-        }
-        else {
-            // index pre-setted for some reason
-            raw()->index = int(params->streamIndex());
-        }
 
     }
 
@@ -89,7 +85,7 @@ namespace fpp {
         packet.setPos(-1);
         packet.setTimeBase(params->timeBase());
 
-        params->increaseDuration(packet.duration());
+        increaseDuration(packet.duration());
         _prev_dts = packet.dts();
         _prev_pts = packet.pts();
         _packet_index++;
@@ -102,7 +98,7 @@ namespace fpp {
         };
         const auto actual_duration {
             ::av_rescale_q(
-                params->duration()
+                duration()
                 , params->timeBase()
                 , DEFAULT_TIME_BASE
             )
@@ -117,9 +113,12 @@ namespace fpp {
         return false;
     }
 
-    void Stream::setIndex(int64_t value) {
-        raw()->index = int(value);
-        params->setStreamIndex(value);
+    void Stream::setIndex(int value) {
+        raw()->index = value;
+    }
+
+    void Stream::setDuration(int64_t duration) {
+        raw()->duration = duration;
     }
 
     void Stream::setStartTimePoint(int64_t msec) {
@@ -162,6 +161,10 @@ namespace fpp {
         return raw()->index;
     }
 
+    int64_t Stream::duration() const {
+        return raw()->duration;
+    }
+
     int64_t Stream::startTimePoint() const {
         return _start_time_point;
     }
@@ -179,6 +182,10 @@ namespace fpp {
             throw std::runtime_error { "stream is null" };
         }
         return raw()->codecpar;
+    }
+
+    void Stream::increaseDuration(const int64_t value) {
+        raw()->duration += value;
     }
 
     void Stream::shiftStamps(Packet& packet) {

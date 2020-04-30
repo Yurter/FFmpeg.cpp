@@ -12,9 +12,6 @@ namespace fpp {
         static std::string  set_pts(float coef);
         static std::string  keep_every_frame(int n);
 
-
-        std::string         toString() const override;
-
     protected:
 
         void                initBufferSource()  override;

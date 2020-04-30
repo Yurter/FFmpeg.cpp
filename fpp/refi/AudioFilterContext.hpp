@@ -7,7 +7,7 @@ namespace fpp {
 
     public:
 
-        std::string         toString() const override;
+        //
 
     private:
 

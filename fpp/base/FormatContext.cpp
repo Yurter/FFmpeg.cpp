@@ -118,8 +118,8 @@ namespace fpp {
         }
     }
 
-    void FormatContext::setStreams(StreamVector stream_list) {
-        _streams = stream_list;
+    void FormatContext::setStreams(StreamVector stream_vector) {
+        _streams = stream_vector;
     }
 
     void FormatContext::processPacket(Packet& packet) {
