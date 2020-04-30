@@ -28,12 +28,14 @@ namespace fpp {
         bool                timeIsOver() const;
 
         void                setIndex(int64_t value);
+        void                setDuration(int64_t duration);
         void                setStartTimePoint(int64_t msec);
         void                setEndTimePoint(int64_t msec);
 
         void                stampFromZero(bool value);
 
         int64_t             index()             const;
+        int64_t             duration()          const;
         int64_t             startTimePoint()    const;
         int64_t             endTimePoint()      const;
         int64_t             packetIndex()       const;
@@ -41,6 +43,8 @@ namespace fpp {
         AVCodecParameters*  codecpar();
 
     private:
+
+        void                increaseDuration(const int64_t value);
 
         void                shiftStamps(Packet& packet);
         void                calculatePacketDuration(Packet& packet);

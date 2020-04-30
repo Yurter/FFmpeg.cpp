@@ -14,7 +14,6 @@ namespace fpp {
     Parameters::Parameters(MediaType type)
         : MediaData(type)
         , _codec { nullptr }
-        , _duration { 0 }
         , _stream_index { INVALID_INT }
         , _time_base { DEFAULT_RATIONAL }
         , _format_flags { 0 } {
@@ -26,7 +25,6 @@ namespace fpp {
         MediaData(other.type()) {
         ffmpeg_api_strict(avcodec_parameters_copy, ptr(), other.ptr());
         _codec = other.codec();
-        _duration = other.duration();
         _stream_index = other.streamIndex();
         _time_base = other.timeBase();
         _format_flags = other.formatFlags();
@@ -37,7 +35,6 @@ namespace fpp {
         setExtradata({});
         ffmpeg_api_strict(avcodec_parameters_copy, ptr(), other.ptr());
         _codec = other.codec();
-        _duration = other.duration();
         _stream_index = other.streamIndex();
         _time_base = other.timeBase();
         _format_flags = other.formatFlags();
@@ -73,13 +70,6 @@ namespace fpp {
 
     void Parameters::setBitrate(int64_t bitrate) {
         raw().bit_rate = bitrate;
-    }
-
-    void Parameters::setDuration(int64_t duration) {
-        if ((duration - 1) == INT64_MAX) {
-            return;
-        }
-        _duration = duration;
     }
 
     void Parameters::setStreamIndex(uid_t stream_index) {
@@ -128,10 +118,6 @@ namespace fpp {
         return raw().bit_rate;
     }
 
-    int64_t Parameters::duration() const {
-         return _duration;
-    }
-
     uid_t Parameters::streamIndex() const {
         return _stream_index;
     }
@@ -152,10 +138,6 @@ namespace fpp {
         return _format_flags;
     }
 
-    void Parameters::increaseDuration(const int64_t value) {
-        _duration += value;
-    }
-
     std::string Parameters::toString() const {
         return utils::to_string(type()) + " "
             + codecName()
@@ -163,18 +145,9 @@ namespace fpp {
                 ? std::string { " " }
                     + (::av_codec_is_decoder(codec()) ? "decoder" : "encoder") + ", "
                     + (bitrate() ? std::to_string(bitrate()) : "N/A") + " bit/s, "
-                    + "dur " + std::to_string(duration()) + ", "
                     + "tb " + utils::to_string(timeBase())
                : "");
     }
-//    std::string Parameters::toString() const {
-//        return utils::to_string(type()) + " "
-//                + codecName() + " "
-//                + (::av_codec_is_decoder(codec()) ? "decoder" : "encoder") + ", "
-//                + (bitrate() ? std::to_string(bitrate()) : "N/A") + " bit/s, "
-//                + "dur " + std::to_string(duration()) + ", "
-//                + "tb " + utils::to_string(timeBase());
-//    }
 
     void Parameters::completeFrom(const SpParameters other) {
         if (extradata().second == 0)        { setExtradata(other->extradata()); }
@@ -186,7 +159,6 @@ namespace fpp {
     void Parameters::parseStream(const AVStream* avstream) {
         parseCodecpar(avstream->codecpar);
         setDecoder(codecId());
-        setDuration(avstream->duration);
         setStreamIndex(avstream->index);
         setTimeBase(avstream->time_base);
     }
