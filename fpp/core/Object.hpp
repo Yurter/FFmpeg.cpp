@@ -1,15 +1,9 @@
 #pragma once
 #include <fpp/core/Logger.hpp>
 
-#define INVALID_INT             -1
-
 #define inited_int(x)           ((x) != DEFAULT_INT)
-#define inited_ptr(x)           ((x) != nullptr)
-#define invalid_int(x)          ((x) == INVALID_INT)
 
 namespace fpp {
-
-    using uid_t = int64_t;
 
     class Object {
 

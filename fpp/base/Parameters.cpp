@@ -14,7 +14,6 @@ namespace fpp {
     Parameters::Parameters(MediaType type)
         : MediaData(type)
         , _codec { nullptr }
-        , _stream_index { INVALID_INT }
         , _time_base { DEFAULT_RATIONAL }
         , _format_flags { 0 } {
         setName("Parameters");
@@ -25,7 +24,6 @@ namespace fpp {
         MediaData(other.type()) {
         ffmpeg_api_strict(avcodec_parameters_copy, ptr(), other.ptr());
         _codec = other.codec();
-        _stream_index = other.streamIndex();
         _time_base = other.timeBase();
         _format_flags = other.formatFlags();
     }
@@ -35,7 +33,6 @@ namespace fpp {
         setExtradata({});
         ffmpeg_api_strict(avcodec_parameters_copy, ptr(), other.ptr());
         _codec = other.codec();
-        _stream_index = other.streamIndex();
         _time_base = other.timeBase();
         _format_flags = other.formatFlags();
         return *this;
@@ -70,10 +67,6 @@ namespace fpp {
 
     void Parameters::setBitrate(int64_t bitrate) {
         raw().bit_rate = bitrate;
-    }
-
-    void Parameters::setStreamIndex(uid_t stream_index) {
-        _stream_index = stream_index;
     }
 
     void Parameters::setTimeBase(AVRational time_base) {
@@ -118,10 +111,6 @@ namespace fpp {
         return raw().bit_rate;
     }
 
-    uid_t Parameters::streamIndex() const {
-        return _stream_index;
-    }
-
     AVRational Parameters::timeBase() const {
         return _time_base;
     }
@@ -159,7 +148,6 @@ namespace fpp {
     void Parameters::parseStream(const AVStream* avstream) {
         parseCodecpar(avstream->codecpar);
         setDecoder(codecId());
-        setStreamIndex(avstream->index);
         setTimeBase(avstream->time_base);
     }
 

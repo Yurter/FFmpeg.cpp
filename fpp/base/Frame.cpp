@@ -10,7 +10,8 @@ namespace fpp {
 
     Frame::Frame(MediaType type)
         : MediaData(type)
-        , _time_base { DEFAULT_RATIONAL } {
+        , _time_base { DEFAULT_RATIONAL }
+        , _stream_index { -1 } {
         setName("Frame");
     }
 
@@ -19,9 +20,9 @@ namespace fpp {
         ref(other);
     }
 
-    Frame::Frame(const AVFrame& frame, AVRational time_base, MediaType type)
+    Frame::Frame(const AVFrame& frame, MediaType type, AVRational time_base, int stream_index)
         : Frame(type) {
-        ref(frame, time_base);
+        ref(frame, time_base, stream_index);
     }
 
     Frame::~Frame() {
@@ -47,8 +48,16 @@ namespace fpp {
         _time_base = time_base;
     }
 
+    void Frame::setStreamIndex(int stream_index) {
+        _stream_index = stream_index;
+    }
+
     AVRational Frame::timeBase() const {
         return _time_base;
+    }
+
+    int Frame::streamIndex() const {
+        return _stream_index;
     }
 
     bool Frame::keyFrame() const {
@@ -123,11 +132,13 @@ namespace fpp {
     void Frame::ref(const Frame& other) {
         ffmpeg_api_strict(av_frame_ref, ptr(), other.ptr());
         setTimeBase(other.timeBase());
+        setStreamIndex(other.streamIndex());
     }
 
-    void Frame::ref(const AVFrame& other, AVRational time_base) {
+    void Frame::ref(const AVFrame& other, AVRational time_base, int stream_index) {
         ffmpeg_api_strict(av_frame_ref, ptr(), &other);
         setTimeBase(time_base);
+        setStreamIndex(stream_index);
     }
 
     void Frame::unref() {

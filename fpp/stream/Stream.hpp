@@ -27,7 +27,7 @@ namespace fpp {
         void                stampPacket(Packet& packet);
         bool                timeIsOver() const;
 
-        void                setIndex(int64_t value);
+        void                setIndex(int value);
         void                setDuration(int64_t duration);
         void                setStartTimePoint(int64_t msec);
         void                setEndTimePoint(int64_t msec);

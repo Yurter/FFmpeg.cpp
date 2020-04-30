@@ -35,7 +35,6 @@ namespace fpp {
         bool                isEncoder() const;
 
         void                setBitrate(int64_t bitrate);
-        void                setStreamIndex(uid_t stream_index);
         void                setTimeBase(AVRational time_base);
         void                setExtradata(Extradata extradata);
         void                setFormatFlags(int flags);
@@ -44,7 +43,6 @@ namespace fpp {
         std::string         codecName()     const;
         AVCodec*            codec()         const;
         int64_t             bitrate()       const;
-        uid_t               streamIndex()   const;
         AVRational          timeBase()      const;
         Extradata           extradata()     const;
         std::string         codecType()     const;
@@ -74,7 +72,6 @@ namespace fpp {
     private:
 
         AVCodec*            _codec;
-        uid_t               _stream_index;  // TODO: remove (24.04)
         AVRational          _time_base;
         int                 _format_flags;
 
