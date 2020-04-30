@@ -18,14 +18,14 @@ namespace fpp {
         setName("FilterContext");
     }
 
-    FrameList FilterContext::filter(Frame source_frame) {
+    FrameVector FilterContext::filter(Frame source_frame) {
         ffmpeg_api_strict(av_buffersrc_add_frame_flags
            , _buffersrc_ctx.get()
            , source_frame.ptr()
            , AV_BUFFERSRC_FLAG_KEEP_REF
         );
 
-        FrameList filtered_frames;
+        FrameVector filtered_frames;
         /* pull filtered frames from the filtergraph */
         auto ret { 0 };
         while (ret == 0) {

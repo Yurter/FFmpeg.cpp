@@ -1,7 +1,10 @@
 
 // Common
 void transmuxing_file();
+void transrating_file();
+void transsizing_file();
 void webcam_to_file();
+void mic_to_file();
 void record_screen_win();
 
 // YouTube stream
@@ -21,3 +24,5 @@ void text_on_video();
 void timelapase();
 
 void concatenate();
+void multiple_outputs_sequence();
+void multiple_outputs_parallel();

@@ -1,16 +1,20 @@
 #include <examples/examples.hpp>
 #include <fpp/core/FFmpegException.hpp>
 #include <fpp/core/Logger.hpp>
+#include <fpp/core/Utils.hpp>
 
 auto main() -> int {
 
     fpp::static_log_info("main", "Started");
+    fpp::static_log_info("main", "FFmpeg version ", fpp::utils::ffmpeg_version());
+    fpp::set_ffmpeg_log_level(fpp::LogLevel::Error);
 
     try {
 
         // Common
 //        transmuxing_file();
 //        webcam_to_file();
+//        mic_to_file();
 //        record_screen_win();
 
         // YouTube stream
@@ -30,6 +34,8 @@ auto main() -> int {
 //        timelapase();
 
 //        concatenate();
+//        multiple_outputs_sequence();
+//        multiple_outputs_parallel();
 
     } catch (const fpp::FFmpegException& e) {
         fpp::static_log_error("catch",  "FFmpegException: ", e.what());

@@ -7,7 +7,6 @@
 #include <Windows.h>
 #endif
 #include <ctime>
-#include <filesystem>
 #include <regex>
 #include <chrono>
 
@@ -21,11 +20,11 @@ namespace fpp {
         } } {
 //        av_log_set_callback(log_callback); //TODO later
 //        setFFmpegLogLevel(LogLevel::Info);
-        print("Logger", LogLevel::Info, "Logger opened");
+//        print("Logger", LogLevel::Info, "Logger opened");
     }
 
     Logger::~Logger() {
-        print("Logger", LogLevel::Info, "Logger closed");
+//        print("Logger", LogLevel::Info, "Logger closed");
         ::av_log_set_callback(nullptr);
     }
 
@@ -154,7 +153,13 @@ namespace fpp {
     }
 
     Logger::ConsoleHandler::ConsoleHandler(std::mutex& mutex, LogLevel log_level) :
-        _h_stdout { ::GetStdHandle(STD_OUTPUT_HANDLE) }
+        _h_stdout {
+        #ifdef _WIN32
+            ::GetStdHandle(STD_OUTPUT_HANDLE)
+        #else
+            nullptr
+        #endif
+        }
         , _lock { mutex } {
         setConsoleColor(log_level);
     }

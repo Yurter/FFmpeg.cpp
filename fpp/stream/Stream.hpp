@@ -1,12 +1,11 @@
 #pragma once
 #include <fpp/stream/VideoParameters.hpp>
 #include <fpp/stream/AudioParameters.hpp>
-#include <fpp/core/time/Chronometer.hpp>
 #include <fpp/base/Packet.hpp>
 #include <vector>
 
-#define FROM_START  0
-#define TO_END      LLONG_MAX
+constexpr auto FROM_START { 0ll       };
+constexpr auto TO_END     { LLONG_MAX };
 
 namespace fpp {
 
@@ -31,6 +30,8 @@ namespace fpp {
         void                setIndex(int64_t value);
         void                setStartTimePoint(int64_t msec);
         void                setEndTimePoint(int64_t msec);
+
+        void                stampFromZero(bool value);
 
         int64_t             index()             const;
         int64_t             startTimePoint()    const;
@@ -59,6 +60,8 @@ namespace fpp {
 
         int64_t             _start_time_point; // TODO not used 25.03
         int64_t             _end_time_point;
+
+        bool                _stamp_from_zero;
 
     public:
 

@@ -10,9 +10,9 @@ extern "C" {
 namespace fpp {
 
     InputFormatContext::InputFormatContext(const std::string_view mrl, const std::string_view format_short_name)
-        : FormatContext(mrl)
-        , _input_format { findInputFormat(format_short_name.data()) } {
+        : _input_format { findInputFormat(format_short_name.data()) } {
         setName("InFmtCtx");
+        setMediaResourceLocator(mrl);
     }
 
     InputFormatContext::~InputFormatContext() {
@@ -20,20 +20,21 @@ namespace fpp {
     }
 
     void InputFormatContext::seek(int64_t stream_index, int64_t timestamp, SeekPrecision seek_precision) {
-        auto flags { 0 };
-        switch (seek_precision) {
-            case SeekPrecision::Forward:
-                flags = 0;
-                break;
-            case SeekPrecision::Backward:
-                flags = AVSEEK_FLAG_BACKWARD;
-                break;
-            case SeekPrecision::Any:
-                flags = AVSEEK_FLAG_ANY;
-                break;
-            case SeekPrecision::Precisely:
-                throw std::runtime_error { "NOT_IMPLEMENTED" };
-        }
+        const auto flags {
+            [&]() {
+                switch (seek_precision) {
+                    case SeekPrecision::Forward:
+                        return 0;
+                    case SeekPrecision::Backward:
+                        return AVSEEK_FLAG_BACKWARD;
+                    case SeekPrecision::Any:
+                        return AVSEEK_FLAG_ANY;
+                    case SeekPrecision::Precisely:
+                        throw std::runtime_error { "NOT_IMPLEMENTED" };
+                }
+
+            }()
+        };
         if (const auto ret {
                 ::av_seek_frame(raw(), int(stream_index), timestamp, flags)
             }; ret < 0) {

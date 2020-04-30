@@ -15,9 +15,10 @@ namespace fpp {
 
     public:
 
-        FormatContext(const std::string_view mrl = {});
+        FormatContext();
 
         std::string         mediaResourceLocator()  const;
+        void                setMediaResourceLocator(const std::string_view);
         const StreamVector  streams()               const;
         StreamVector        streams();
 
@@ -83,7 +84,6 @@ namespace fpp {
 
     private:
 
-        void                setMediaResourceLocator(const std::string_view mrl);
         void                setOpened(bool opened);
         static int          interrupt_callback(void* opaque);
 

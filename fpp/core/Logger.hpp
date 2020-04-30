@@ -36,10 +36,16 @@ namespace fpp {
             if (ignoreMessage(log_level)) {
                 return;
             }
-            const auto formated_message {
-                formatMessage(caller_name, log_level, (std::forward<Args>(args), ...))
-            };
-            _print_func(log_level, formated_message);
+
+            std::stringstream ss;
+            ss << '[' << logLevelToString(log_level) << ']'
+               << '[' << threadIdFormated() << ']'
+               << '[' << currentTimeFormated() << ']'
+               << '[' << std::setw(15) << std::left << std::setfill(' ') << caller_name << ']' << ' ';
+
+            (ss << ... << std::forward<Args>(args));
+
+            _print_func(log_level, ss.str());
         }
 
     private:
@@ -69,20 +75,6 @@ namespace fpp {
 
     private:
 
-        template <typename... Args>
-        std::string formatMessage(const std::string_view caller_name, LogLevel log_level, Args&&... args) const {
-            std::stringstream ss;
-
-            ss << '[' << logLevelToString(log_level) << ']'
-               << '[' << threadIdFormated() << ']'
-               << '[' << currentTimeFormated() << ']'
-               << '[' << std::setw(15) << std::left << std::setfill(' ') << caller_name << ']' << ' ';
-
-            (ss << ... << std::forward<Args>(args));
-
-            return ss.str();
-        }
-
         bool                ignoreMessage(LogLevel message_log_level) const;
         std::string         currentTimeFormated() const;
         std::string         threadIdFormated() const;
@@ -111,19 +103,23 @@ namespace fpp {
         Logger::instance().setLogLevel(log_level);
     }
 
+    inline auto set_ffmpeg_log_level(LogLevel log_level) {
+        Logger::instance().setFFmpegLogLevel(log_level);
+    }
+
     template <typename... Args>
     inline auto static_log_info(const std::string_view caller_name, Args&&... args) {
-        Logger::instance().print(caller_name, LogLevel::Info, (std::forward<Args>(args), ...));
+        Logger::instance().print(caller_name, LogLevel::Info, std::forward<Args>(args)...);
     }
 
     template <typename... Args>
     inline auto static_log_warning(const std::string_view caller_name, Args&&... args) {
-        Logger::instance().print(caller_name, LogLevel::Warning, (std::forward<Args>(args), ...));
+        Logger::instance().print(caller_name, LogLevel::Warning, std::forward<Args>(args)...);
     }
 
     template <typename... Args>
     inline auto static_log_error(const std::string_view caller_name, Args&&... args) {
-        Logger::instance().print(caller_name, LogLevel::Error, (std::forward<Args>(args), ...));
+        Logger::instance().print(caller_name, LogLevel::Error, std::forward<Args>(args)...);
     }
 
 } // namespace fpp

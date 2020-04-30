@@ -10,10 +10,9 @@ extern "C" {
 namespace fpp {
 
     OutputFormatContext::OutputFormatContext(const std::string_view mrl)
-        : FormatContext(mrl)
-        , _output_format { nullptr } {
+        : _output_format { nullptr } {
         setName("OutFmtCtx");
-        createContext();
+        setMediaResourceLocator(mrl);
     }
 
     OutputFormatContext::~OutputFormatContext() {
@@ -22,6 +21,9 @@ namespace fpp {
 
     bool OutputFormatContext::write(Packet packet, WriteMode write_mode) {
         processPacket(packet);
+        if (packet.isEOF()) {
+            return false;
+        }
         setInterrupter(timeoutWriting());
         if (write_mode == WriteMode::Instant) {
             ffmpeg_api(av_write_frame, raw(), packet.ptr());
@@ -29,6 +31,7 @@ namespace fpp {
         else if (write_mode == WriteMode::Interleaved) {
             ffmpeg_api(av_interleaved_write_frame, raw(), packet.ptr());
         }
+        return true;
     }
 
     void OutputFormatContext::flush() {

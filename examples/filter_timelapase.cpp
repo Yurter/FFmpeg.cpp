@@ -1,5 +1,4 @@
-#include <iostream>
-#include <fstream>
+#include "examples.hpp"
 #include <fpp/context/InputFormatContext.hpp>
 #include <fpp/context/OutputFormatContext.hpp>
 #include <fpp/codec/DecoderContext.hpp>
@@ -7,9 +6,6 @@
 #include <fpp/refi/ResampleContext.hpp>
 #include <fpp/refi/RescaleContext.hpp>
 #include <fpp/refi/VideoFilterContext.hpp>
-#include <fpp/refi/VideoFilters/DrawText.hpp>
-#include <fpp/core/Utils.hpp>
-#include "examples.hpp"
 
 void timelapase() {
 
@@ -19,7 +15,9 @@ void timelapase() {
     };
 
     /* open source */
-    source.open();
+    if (!source.open()) {
+        return;
+    }
 
     /* create sink */
     fpp::OutputFormatContext sink {
@@ -58,7 +56,7 @@ void timelapase() {
     };
 
     /* create filter */
-    const auto accel { 3 };
+    constexpr auto accel { 3 };
     const auto filters_descr {
         fpp::FilterContext::keep_every_frame(accel)
             + fpp::FilterContext::Separator
@@ -76,7 +74,12 @@ void timelapase() {
     }};
 
     /* open sink */
-    sink.open();
+    if (!sink.open()) {
+        return;
+    }
+
+    /* set read timeout if endless source stream */
+    source.stream(fpp::MediaType::Video)->setEndTimePoint(60'000);
 
     fpp::Packet input_packet {
         fpp::MediaType::Unknown

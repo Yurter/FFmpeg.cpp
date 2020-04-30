@@ -1,6 +1,7 @@
 ﻿#include "FormatContext.hpp"
 #include <fpp/core/Utils.hpp>
 #include <fpp/core/Logger.hpp>
+#include <iomanip>
 
 extern "C" {
     #include <libavformat/avformat.h>
@@ -9,9 +10,8 @@ extern "C" {
 
 namespace fpp {
 
-    FormatContext::FormatContext(const std::string_view mrl)
-        : _media_resource_locator { mrl }
-        , _opened { false }
+    FormatContext::FormatContext()
+        : _opened { false }
         , _timeout_opening { 20'000 }
         , _timeout_closing { 5'000 }
         , _timeout_reading { 5'000 }
@@ -43,14 +43,13 @@ namespace fpp {
     }
 
     std::string FormatContext::toString() const {
-        auto context_info {
-            formatName() + ',' + ' '
-            + mediaResourceLocator() + ':'
-        };
+        std::stringstream ss;
+        ss << formatName() << ',' << ' ';
+        ss << std::quoted(mediaResourceLocator()) << ':';
         for (const auto& stream : streams()) {
-            context_info += '\n' + stream->toString();
+            ss << '\n' << stream->toString();
         }
-        return context_info;
+        return ss.str();
     }
 
     void FormatContext::setOpened(bool opened) {
@@ -112,6 +111,13 @@ namespace fpp {
         return _media_resource_locator;
     }
 
+    void FormatContext::setMediaResourceLocator(const std::string_view mrl) {
+        _media_resource_locator = mrl;
+        if (!_media_resource_locator.empty()) {
+            createContext();
+        }
+    }
+
     void FormatContext::setStreams(StreamVector stream_list) {
         _streams = stream_list;
     }
@@ -131,10 +137,6 @@ namespace fpp {
 
     void FormatContext::addStream(SharedStream stream) {
         _streams.push_back(stream);
-    }
-
-    void FormatContext::setMediaResourceLocator(const std::string_view mrl) {
-        _media_resource_locator = mrl;
     }
 
     int64_t FormatContext::streamNumber() const {

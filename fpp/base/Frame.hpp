@@ -1,7 +1,7 @@
 #pragma once
 #include <fpp/core/wrap/FFmpegObject.hpp>
 #include <fpp/base/MediaData.hpp>
-#include <list>
+#include <vector>
 
 extern "C" {
     #include <libavutil/frame.h>
@@ -43,6 +43,6 @@ namespace fpp {
 
     };
 
-    using FrameList = std::list<Frame>;
+    using FrameVector = std::vector<Frame>;
 
 } // namespace fpp

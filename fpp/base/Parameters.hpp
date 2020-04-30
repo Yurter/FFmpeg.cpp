@@ -2,9 +2,10 @@
 #include <fpp/core/wrap/FFmpegObject.hpp>
 #include <fpp/base/MediaData.hpp>
 #include <vector>
+#include <memory>
 
 extern "C" {
-    #include <libavcodec/avcodec.h> // TODO: move to cpp file 20.04
+    #include <libavcodec/avcodec.h> // TODO: move to cpp file (20.04)
 }
 
 constexpr auto DEFAULT_TIME_BASE { AVRational { 1, 1000 } };
@@ -16,7 +17,7 @@ namespace fpp {
 
     class Parameters;
     using SpParameters = std::shared_ptr<Parameters>;
-    using IOParams = struct { SpParameters in; SpParameters out; };
+    using InOutParams = struct InOutParams { SpParameters in; SpParameters out; };
     using Extradata = std::pair<uint8_t*,size_t>;
 
     class Parameters : public FFmpegObject<AVCodecParameters>, public MediaData {

@@ -1,15 +1,11 @@
-#include <iostream>
-#include <fstream>
+#include "examples.hpp"
 #include <fpp/context/InputFormatContext.hpp>
 #include <fpp/context/OutputFormatContext.hpp>
 #include <fpp/codec/DecoderContext.hpp>
 #include <fpp/codec/EncoderContext.hpp>
-#include <fpp/refi/ResampleContext.hpp>
 #include <fpp/refi/RescaleContext.hpp>
 #include <fpp/refi/VideoFilterContext.hpp>
 #include <fpp/refi/VideoFilters/DrawText.hpp>
-#include <fpp/core/Utils.hpp>
-#include "examples.hpp"
 
 void text_on_video() {
 
@@ -19,7 +15,9 @@ void text_on_video() {
     };
 
     /* open source */
-    source.open();
+    if (!source.open()) {
+        return;
+    }
 
     /* create sink */
     fpp::OutputFormatContext sink {
@@ -27,11 +25,7 @@ void text_on_video() {
     };
 
     /* copy only video stream to sink */
-    for (const auto& input_stream : source.streams()) {
-        if (input_stream->isVideo()) {
-            sink.copyStream(input_stream);
-        }
-    }
+    sink.copyStream(source.stream(fpp::MediaType::Video));
 
     /* create decoder */
     fpp::DecoderContext video_decoder {
@@ -78,28 +72,30 @@ void text_on_video() {
     };
 
     /* open sink */
-    sink.open();
+    if (!sink.open()) {
+        return;
+    }
 
     /* set timeout (because of endless rtsp stream) */
-    const auto one_minute { 1 * 60 * 1000 };
+    constexpr auto one_minute { 1 * 60 * 1000 };
     source.stream(fpp::MediaType::Video)->setEndTimePoint(one_minute);
 
-    fpp::Packet input_packet {
+    fpp::Packet packet {
         fpp::MediaType::Unknown
     };
     const auto read_packet {
-        [&input_packet,&source]() {
-            input_packet = source.read();
-            return !input_packet.isEOF();
+        [&packet,&source]() {
+            packet = source.read();
+            return !packet.isEOF();
         }
     };
 
     /* read and write packets */
     while (read_packet()) {
-        if (input_packet.isVideo()) {
-            for (const auto& v_frame  : video_decoder.decode(input_packet)) {
-            for (const auto& f_frame  : video_filter.filter(v_frame))       {
-            for (const auto& v_packet : video_encoder.encode(f_frame))      {
+        if (packet.isVideo()) {
+            for (const auto& v_frame  : video_decoder.decode(packet))  {
+            for (const auto& f_frame  : video_filter.filter(v_frame))  {
+            for (const auto& v_packet : video_encoder.encode(f_frame)) {
                 sink.write(v_packet);
             }}}
         }

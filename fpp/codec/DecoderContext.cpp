@@ -16,12 +16,12 @@ namespace fpp {
         init(options);
     }
 
-    FrameList DecoderContext::decode(const Packet& packet) {
+    FrameVector DecoderContext::decode(const Packet& packet) {
         sendPacket(packet);
         return receiveFrames();
     }
 
-    FrameList DecoderContext::flush() {
+    FrameVector DecoderContext::flush() {
         sendFlushPacket();
         return receiveFrames();
     }
@@ -43,8 +43,8 @@ namespace fpp {
         }
     }
 
-    FrameList DecoderContext::receiveFrames() {
-        FrameList decoded_frames;
+    FrameVector DecoderContext::receiveFrames() {
+        FrameVector decoded_frames;
         auto ret { 0 };
         while (ret == 0) {
             Frame output_frame { params->type() };

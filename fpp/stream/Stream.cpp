@@ -16,7 +16,8 @@ namespace fpp {
         , _prev_pts { NOPTS_VALUE }
         , _packet_index { 0 }
         , _start_time_point { FROM_START }
-        , _end_time_point { TO_END } {
+        , _end_time_point { TO_END }
+        , _stamp_from_zero { false } {
 
         setName("Stream");
 
@@ -71,7 +72,11 @@ namespace fpp {
             );
         }
 
-//        shiftStamps(packet);  // TODO remove & fix duration in MediaInfo 15.04
+        if (_stamp_from_zero) {
+            shiftStamps(packet);
+        } else {
+            // TODO: fix duration in MediaInfo (15.04)
+        }
 
         if (packet.duration() == 0) {
             calculatePacketDuration(packet);
@@ -147,6 +152,10 @@ namespace fpp {
             return;
         }
         _end_time_point = msec;
+    }
+
+    void Stream::stampFromZero(bool value) {
+        _stamp_from_zero = value;
     }
 
     int64_t Stream::index() const {

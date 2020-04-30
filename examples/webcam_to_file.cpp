@@ -1,5 +1,4 @@
 #include "examples.hpp"
-
 #include <fpp/context/InputFormatContext.hpp>
 #include <fpp/context/OutputFormatContext.hpp>
 #include <fpp/codec/DecoderContext.hpp>
@@ -21,7 +20,9 @@ void webcam_to_file() {
     };
 
     /* open source */
-    source.open(webcam_options);
+    if (!source.open(webcam_options)) {
+        return;
+    }
 
     /* create sink */
     fpp::OutputFormatContext sink {
@@ -65,38 +66,40 @@ void webcam_to_file() {
         , sink.stream(fpp::MediaType::Video)->params
     }};
 
-    /* create fps filter (because of bug 'vlc and variable framerate') */
+    /* create fps filter (because of bug 'vlc and h264 variable framerate') */
     fpp::VideoFilterContext filter {
         source.stream(fpp::MediaType::Video)->params
         , "fps=fps=25,setpts=400000*PTS"
     };
 
     /* open sink */
-    sink.open();
+    if (!sink.open()) {
+        return;
+    }
 
-    fpp::Packet input_packet {
+    fpp::Packet packet {
         fpp::MediaType::Unknown
     };
     const auto read_packet {
-        [&input_packet,&source]() {
-            input_packet = source.read();
-            return !input_packet.isEOF();
+        [&packet,&source]() {
+            packet = source.read();
+            return !packet.isEOF();
         }
     };
 
     /* because of endless webcam's video */
-//    source.stream(0)->setEndTimePoint(10 * 1000);
+    sink.stream(0)->setEndTimePoint(10 * 1000);
 
-    fpp::Chronometer chronometer;
+    auto stop_flag { false };
 
     /* read and write packets */
-    while (read_packet()) {
-        if (input_packet.isVideo()) {
-            for (const auto& v_frame  : video_decoder.decode(input_packet)) {
-            for (const auto& fv_frame : filter.filter(v_frame))             {
-            auto rv_frame { rescaler.scale(fv_frame) };
-            for (const auto& v_packet : video_encoder.encode(rv_frame))     {
-                sink.write(v_packet);
+    while (read_packet() && !stop_flag) {
+        if (packet.isVideo()) {
+            for (const auto& v_frame  : video_decoder.decode(packet))   {
+            for (const auto& fv_frame : filter.filter(v_frame))         {
+                 const auto& rv_frame { rescaler.scale(fv_frame) };
+            for (const auto& v_packet : video_encoder.encode(rv_frame)) {
+                stop_flag = !sink.write(v_packet);
             }}}
         }
     }

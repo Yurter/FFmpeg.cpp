@@ -11,14 +11,14 @@ namespace fpp {
 
         DecoderContext(const SpParameters params, Options options = {});
 
-        FrameList           decode(const Packet& packet);
-        FrameList           flush();
+        FrameVector         decode(const Packet& packet);
+        FrameVector         flush();
 
     private:
 
         void                sendPacket(const Packet& packet);
         void                sendFlushPacket();
-        FrameList           receiveFrames();
+        FrameVector         receiveFrames();
 
     };
 

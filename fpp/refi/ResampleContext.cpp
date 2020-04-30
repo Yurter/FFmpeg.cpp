@@ -5,7 +5,7 @@
 
 namespace fpp {
 
-    ResampleContext::ResampleContext(IOParams parameters)
+    ResampleContext::ResampleContext(InOutParams parameters)
         : params { parameters }
         , _samples_count { 0 }
         , _source_pts { 0 } {
@@ -13,7 +13,7 @@ namespace fpp {
         init();
     }
 
-    FrameList ResampleContext::resample(const Frame source_frame) {
+    FrameVector ResampleContext::resample(const Frame source_frame) {
         sendFrame(source_frame);
         return receiveFrames();
     }
@@ -104,12 +104,12 @@ namespace fpp {
         _source_pts = source_frame.pts();
     }
 
-    FrameList ResampleContext::receiveFrames() {
+    FrameVector ResampleContext::receiveFrames() {
         const auto out_param {
             std::static_pointer_cast<const AudioParameters>(params.out)
         };
 
-        FrameList resampled_frames;
+        FrameVector resampled_frames;
         while (::swr_get_out_samples(raw(), 0) >= out_param->frameSize()) {
             Frame output_frame { createFrame() };
             if (const auto ret {
