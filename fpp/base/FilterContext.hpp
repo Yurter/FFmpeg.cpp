@@ -15,7 +15,7 @@ namespace fpp {
 
         FilterContext(SpParameters parameters, const std::string& filters_descr);
 
-        FrameVector         filter(Frame source_frame);
+        FrameVector         filter(const Frame source_frame);
         std::string         description() const;
 
         std::string         toString() const override final;
