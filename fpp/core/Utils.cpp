@@ -167,7 +167,7 @@ namespace fpp {
 
     std::string utils::to_string(AVRational rational) {
         return std::to_string(rational.num)
-                + "/" +
+                + '/' +
                 std::to_string(rational.den);
     }
 

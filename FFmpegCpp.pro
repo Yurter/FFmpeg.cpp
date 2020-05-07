@@ -26,6 +26,7 @@ INCLUDEPATH += include
 SOURCES += \
     examples/adaptive_streaming.cpp \
     examples/concatenate.cpp \
+    examples/filter_complex.cpp \
     examples/filter_text_on_video.cpp \
     examples/filter_timelapase.cpp \
     examples/mic_to_file.cpp \
@@ -45,6 +46,7 @@ SOURCES += \
     examples/youtube_stream_transcode.cpp \
     examples/youtube_stream_transcode_with_silence.cpp \
     fpp/refi/BitStreamFilterContext.cpp \
+    fpp/refi/FilterGraph.cpp \
     fpp/refi/ResampleContext.cpp \
     fpp/refi/VideoFilters/Drawtext.cpp \
     main.cpp \
@@ -97,6 +99,7 @@ HEADERS += \
     fpp/core/wrap/SharedFFmpegObject.hpp \
     fpp/refi/AudioFilterContext.hpp \
     fpp/refi/BitStreamFilterContext.hpp \
+    fpp/refi/FilterGraph.hpp \
     fpp/refi/VideoFilters/DrawText.hpp \
     fpp/base/FilterContext.hpp \
     fpp/refi/ResampleContext.hpp \

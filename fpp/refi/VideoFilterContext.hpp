@@ -1,22 +1,22 @@
-#pragma once
-#include <fpp/base/FilterContext.hpp>
+//#pragma once
+//#include <fpp/base/FilterContext.hpp>
 
-namespace fpp {
+//namespace fpp {
 
-    class VideoFilterContext : public FilterContext {
+//    class VideoFilterContext : public FilterContext {
 
-    public:
+//    public:
 
-        VideoFilterContext(SpParameters parameters, const std::string/*_view*/ filters_descr);
+//        VideoFilterContext(SpParameters parameters, const std::string/*_view*/ filters_descr);
 
-        static std::string  set_pts(float coef);
-        static std::string  keep_every_frame(int n);
+//        static std::string  set_pts(float coef);
+//        static std::string  keep_every_frame(int n);
 
-    protected:
+//    protected:
 
-        void                initBufferSource()  override;
-        void                initBufferSink()    override;
+//        void                initBufferSource()  override;
+//        void                initBufferSink()    override;
 
-    };
+//    };
 
-} // namespace fpp
+//} // namespace fpp

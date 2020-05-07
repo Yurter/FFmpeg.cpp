@@ -14,7 +14,7 @@ namespace fpp {
             : _shared_object(shared_object) {
         }
 
-        void reset(std::shared_ptr<T> shared_object = {}) {
+        void reset(std::shared_ptr<T> shared_object = {}) { // TODO: fix args (05.05)
             _shared_object = shared_object;
         }
 

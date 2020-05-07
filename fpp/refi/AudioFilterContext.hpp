@@ -1,19 +1,19 @@
-#pragma once
-#include <fpp/base/FilterContext.hpp>
+//#pragma once
+//#include <fpp/base/FilterContext.hpp>
 
-namespace fpp {
+//namespace fpp {
 
-    class AudioFilterContext : public FilterContext {
+//    class AudioFilterContext : public FilterContext {
 
-    public:
+//    public:
 
-        //
+//        //
 
-    private:
+//    private:
 
-        void                initBufferSource()  override;
-        void                initBufferSink()    override;
+//        void                initBufferSource()  override;
+//        void                initBufferSink()    override;
 
-    };
+//    };
 
-} // namespace fpp
+//} // namespace fpp
