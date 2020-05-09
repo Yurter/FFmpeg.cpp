@@ -19,6 +19,7 @@ namespace fpp {
         Warning,
         /* Стандартная информация */
         Info,
+        Debug,
     };
 
     class Logger {

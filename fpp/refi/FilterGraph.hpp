@@ -36,7 +36,7 @@ namespace fpp {
 
     private:
 
-        std::string         genUniqueName();
+        std::string         genUniqueId();
 
         FilterContext       createBufferSource(const SpParameters par);
         FilterContext       createBufferSink(const SpParameters par);

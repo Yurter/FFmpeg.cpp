@@ -13,7 +13,7 @@ namespace fpp {
 
         RescaleContext(InOutParams parameters);
 
-        Frame               scale(const Frame source_frame);
+        Frame               scale(const Frame& frame);
 
         const InOutParams   params;
 

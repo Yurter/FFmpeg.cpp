@@ -35,44 +35,11 @@ namespace fpp {
 
     std::size_t FilterGraph::createInputFilterChain(const SpParameters par, std::vector<std::string> filters) {
         FilterChain filter_chain { par->type(), par->timeBase() };
-
         filter_chain.filters.emplace_back(createBufferSource(par));
         for (const auto& filter_descr : filters) {
             const auto& [name, args] { splitFilterDescription(filter_descr) };
-            const auto& unique_name  { genUniqueName() };
+            const auto unique_id { genUniqueId() };
             filter_chain.filters.emplace_back(par->type(), par->timeBase(), raw(), name, unique_name, args, nullptr);
-
-//            const AVSampleFormat smp_fmts[] {
-//                AV_SAMPLE_FMT_FLTP
-//                , AV_SAMPLE_FMT_NONE
-//            };
-
-//            const auto array_size {
-//                int(
-//                    ::av_int_list_length_for_size(
-//                        sizeof(*(smp_fmts))
-//                        , smp_fmts
-//                        , uint64_t(AV_SAMPLE_FMT_NONE)
-//                    )
-//                    * sizeof(*(smp_fmts))
-//                )
-//            };
-
-//            ffmpeg_api_strict(av_opt_set_bin
-//                , filter_chain.filters.back().raw()
-//                , "sample_fmts"
-//                , reinterpret_cast<const uint8_t*>(smp_fmts)
-//                , array_size
-//                , AV_OPT_SEARCH_CHILDREN
-//            );
-
-//            av_opt_set_int_list(
-//                filter_chain.filters.back().raw()
-//                , "sample_fmts"
-//                , ((int[]){ AV_SAMPLE_FMT_FLTP, AV_SAMPLE_FMT_NONE })
-//                , AV_SAMPLE_FMT_NONE
-//                , AV_OPT_SEARCH_CHILDREN
-//            );
         }
         linkChain(filter_chain);
         return emplaceFilterChainBack(std::move(filter_chain));
@@ -82,7 +49,7 @@ namespace fpp {
         FilterChain filter_chain { par->type(), par->timeBase() };
         for (const auto& filter_descr : filters) {
             const auto& [name, args] { splitFilterDescription(filter_descr) };
-            const auto& unique_name  { genUniqueName() };
+            const auto unique_id { genUniqueId() };
             filter_chain.filters.emplace_back(par->type(), par->timeBase(), raw(), name, unique_name, args, nullptr);
         }
         filter_chain.filters.emplace_back(createBufferSink(par));
@@ -95,7 +62,7 @@ namespace fpp {
         filter_chain.filters.emplace_back(createBufferSource(par));
         for (const auto& filter_descr : filters) {
             const auto& [name, args] { splitFilterDescription(filter_descr) };
-            const auto& unique_name  { genUniqueName() };
+            const auto unique_id { genUniqueId() };
             filter_chain.filters.emplace_back(par->type(), par->timeBase(), raw(), name, unique_name, args, nullptr);
         }
         filter_chain.filters.emplace_back(createBufferSink(par));
@@ -115,11 +82,10 @@ namespace fpp {
         static bool inited = false;
         if (!inited) {
             ffmpeg_api_strict(avfilter_graph_config, raw(), nullptr);
-            char* dump = avfilter_graph_dump(raw(), nullptr);
-                av_log(NULL, AV_LOG_ERROR, "Graph :\n%s\n", dump);
+//            char* dump = avfilter_graph_dump(raw(), nullptr);
+//                av_log(NULL, AV_LOG_ERROR, "Graph :\n%s\n", dump);
             inited = true;
         }
-        log_warning(frame.raw().format);
         _filters[input_chain_index].filters.front().write(frame);
     }
 
@@ -167,8 +133,7 @@ namespace fpp {
                 }
             }()
         };
-        log_warning("args: ", args);
-        return FilterContext { par->type(), par->timeBase(), raw(), filter_name, genUniqueName(), args, nullptr };
+        return FilterContext { par->type(), par->timeBase(), raw(), filter_name, genUniqueId(), args, nullptr };
     }
 
     FilterContext FilterGraph::createBufferSink(const SpParameters par) {
@@ -197,7 +162,7 @@ namespace fpp {
                 }
             }()
         };
-        return FilterContext { par->type(), par->timeBase(), raw(), filter_name, genUniqueName(), args, nullptr };
+        return FilterContext { par->type(), par->timeBase(), raw(), filter_name, genUniqueId(), args, nullptr };
     }
 
     std::pair<const std::string, const std::string> FilterGraph::splitFilterDescription(const std::string_view filter_descr) const {
@@ -218,7 +183,7 @@ namespace fpp {
         }
     }
 
-    std::string FilterGraph::genUniqueName() {
+    std::string FilterGraph::genUniqueId() {
         return std::to_string(_filter_uid++);
     }
 

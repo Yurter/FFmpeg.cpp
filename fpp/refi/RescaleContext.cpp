@@ -15,19 +15,20 @@ namespace fpp {
         init();
     }
 
-    Frame RescaleContext::scale(const Frame source_frame) {
+    Frame RescaleContext::scale(const Frame& frame) {
         Frame rescaled_frame { createFrame() };
         ::sws_scale(
             raw()
-            , source_frame.raw().data       /* srcSlice[]  */
-            , source_frame.raw().linesize   /* srcStride[] */
+            , frame.raw().data              /* srcSlice[]  */
+            , frame.raw().linesize          /* srcStride[] */
             , 0                             /* srcSliceY   */
-            , source_frame.raw().height     /* srcSliceH   */
+            , frame.raw().height            /* srcSliceH   */
             , rescaled_frame.raw().data     /* dst[]       */
             , rescaled_frame.raw().linesize /* dstStride[] */
         );
-        ::av_frame_copy_props(rescaled_frame.ptr(), source_frame.ptr());
-        rescaled_frame.setTimeBase(params.in->timeBase());
+        ::av_frame_copy_props(rescaled_frame.ptr(), frame.ptr());
+        rescaled_frame.setTimeBase(frame.timeBase());
+        rescaled_frame.setStreamIndex(frame.streamIndex());
         return rescaled_frame;
     }
 

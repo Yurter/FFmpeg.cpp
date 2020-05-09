@@ -108,7 +108,8 @@ namespace fpp {
                     + "width " + std::to_string(raw().width) + ", "
                     + "height " + std::to_string(raw().height) + ", "
                     + utils::to_string(AVPixelFormat(raw().format)) + ", "
-                    + "tb " + utils::to_string(timeBase());
+                    + "tb " + utils::to_string(timeBase()) + ", "
+                    + "stream index " + std::to_string(_stream_index);
             return str;
         }
         /* Audio frame: 1024 bytes, pts 425984, nb_samples 1024, channel_layout 4, sample_rate 44100 */
@@ -119,7 +120,8 @@ namespace fpp {
                     + "samples " + std::to_string(raw().nb_samples) + ", "
                     + "channel_layout " + utils::channel_layout_to_string(raw().channels, raw().channel_layout) + ", "
                     + "sample_rate " + std::to_string(raw().sample_rate) + ", "
-                    + "tb " + utils::to_string(timeBase());
+                    + "tb " + utils::to_string(timeBase()) + ", "
+                    + "stream index " + std::to_string(_stream_index);
             return str;
         }
         /* Unknown frame: -1 bytes */

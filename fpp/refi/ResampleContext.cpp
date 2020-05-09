@@ -13,9 +13,9 @@ namespace fpp {
         init();
     }
 
-    FrameVector ResampleContext::resample(const Frame source_frame) {
-        sendFrame(source_frame);
-        return receiveFrames();
+    FrameVector ResampleContext::resample(const Frame& frame) {
+        sendFrame(frame);
+        return receiveFrames(frame.timeBase(), frame.streamIndex());
     }
 
     void ResampleContext::init() {
@@ -81,9 +81,7 @@ namespace fpp {
         frame.raw().sample_rate    = int(out_param->sampleRate());
         /* Allocate the samples of the created frame. This call will make
          * sure that the audio frame can hold as many samples as specified. */
-        if (const auto ret { ::av_frame_get_buffer(frame.ptr(), 32) }; ret < 0) {
-            throw FFmpegException { "av_frame_get_buffer failed", ret };
-        }
+        ffmpeg_api_strict(av_frame_get_buffer, frame.ptr(), 32);
         return frame;
     }
 
@@ -104,7 +102,7 @@ namespace fpp {
         _source_pts = source_frame.pts();
     }
 
-    FrameVector ResampleContext::receiveFrames() {
+    FrameVector ResampleContext::receiveFrames(AVRational time_base, int64_t stream_index) {
         const auto out_param {
             std::static_pointer_cast<const AudioParameters>(params.out)
         };
@@ -126,7 +124,8 @@ namespace fpp {
                 };
             }
             stampFrame(output_frame);
-            output_frame.setTimeBase(params.in->timeBase());
+            output_frame.setTimeBase(time_base);
+            output_frame.setStreamIndex(stream_index);
             resampled_frames.push_back(output_frame);
         }
         return resampled_frames;

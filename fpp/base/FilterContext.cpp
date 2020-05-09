@@ -3,10 +3,8 @@
 #include <fpp/core/FFmpegException.hpp>
 
 extern "C" {
-    #include <libavfilter/avfilter.h>
     #include <libavfilter/buffersink.h>
     #include <libavfilter/buffersrc.h>
-    #include <libavutil/opt.h>
 }
 
 namespace fpp {
@@ -28,7 +26,6 @@ namespace fpp {
         ffmpeg_api_strict(avfilter_graph_create_filter
             , &flt_ctx
             , getFilterByName(name)
-//            , unique_name.data()
             , (std::string { name } + '_' + unique_name.data()).c_str()
             , args.data()
             , opaque
@@ -44,7 +41,7 @@ namespace fpp {
     void FilterContext::linkTo(FilterContext& other) {
         ffmpeg_api_strict(avfilter_link
             , raw()
-            , _nb_input_pads++
+            , _nb_input_pads++  // TODO: replace _nb_input_pads and _nb_output_pads ? (08.05)
             , other.raw()
             , other._nb_output_pads++
         );
@@ -55,7 +52,6 @@ namespace fpp {
         auto ret { 0 };
         while (ret == 0) {
             Frame output_frame { _type };
-            log_warning(raw()->name);
             ret = ::av_buffersink_get_frame(raw(), output_frame.ptr());
             if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
                 break;
@@ -64,6 +60,7 @@ namespace fpp {
                 throw FFmpegException { "av_buffersink_get_frame failed", ret };
             }
             output_frame.setTimeBase(_time_base);
+            output_frame.setStreamIndex(0); // TODO !!!
             filtered_frames.push_back(output_frame);
         }
         return filtered_frames;

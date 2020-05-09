@@ -30,7 +30,6 @@ namespace fpp {
 
     Parameters& Parameters::operator=(const Parameters& other) {
         setType(other.type());
-        setExtradata({}); // TODO: check it (05.05)
         ffmpeg_api_strict(avcodec_parameters_copy, ptr(), other.ptr());
         _codec = other.codec();
         _time_base = other.timeBase();

@@ -27,7 +27,6 @@ namespace fpp {
     }
 
     void EncoderContext::sendFrame(const Frame& frame) {
-        log_warning(frame.raw().linesize[0], ' ', frame.raw().nb_samples);
         if (const auto ret {
                 ::avcodec_send_frame(raw(), frame.ptr())
             }; ret != 0) {

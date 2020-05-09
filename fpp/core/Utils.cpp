@@ -327,20 +327,20 @@ namespace fpp {
 
     std::string utils::send_frame_error_to_string(int ret) {
         if (AVERROR(EAGAIN) == ret) {
-            return "avcodec_receive_frame failed: input is not accepted in "
+            return "avcodec_send_frame failed: input is not accepted in "
                     "the current state - user must read output "
                     "with avcodec_receive_packet()";
         }
         if (AVERROR_EOF == ret) {
-            return "avcodec_receive_frame failed: the encoder has been flushed, "
+            return "avcodec_send_frame failed: the encoder has been flushed, "
                     "and no new frames can be sent to it";
         }
         if (AVERROR(EINVAL) == ret) {
-            return "avcodec_receive_frame failed: codec not opened, "
+            return "avcodec_send_frame failed: codec not opened, "
                     "refcounted_frames not set, it is a decoder, or requires flush";
         }
         if (AVERROR(ENOMEM) == ret) {
-            return "avcodec_receive_frame failed: failed to add packet "
+            return "avcodec_send_frame failed: failed to add packet "
                     "to internal queue, or similar other errors: "
                     "legitimate decoding errors";
         }
@@ -349,15 +349,15 @@ namespace fpp {
 
     std::string utils::receive_packet_error_to_string(int ret) {
         if (AVERROR(EAGAIN) == ret) {
-            return "avcodec_receive_frame failed: output is not available "
+            return "avcodec_receive_packet failed: output is not available "
                     "in the current state - user must try to send input";
         }
         if (AVERROR_EOF == ret) {
-            return "avcodec_receive_frame failed: the encoder has been "
+            return "avcodec_receive_packet failed: the encoder has been "
                     "fully flushed, and there will be no more output packets";
         }
         if (AVERROR(EAGAIN) == ret) {
-            return "avcodec_receive_frame failed: codec not opened, "
+            return "avcodec_receive_packet failed: codec not opened, "
                     "or it is an encoder other errors: "
                     "lgitimate decoding errors";
         }

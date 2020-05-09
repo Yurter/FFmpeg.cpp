@@ -15,7 +15,7 @@ namespace fpp {
 
         ResampleContext(InOutParams parameters);
 
-        FrameVector         resample(const Frame source_frame);
+        FrameVector         resample(const Frame& frame);
 
         const InOutParams   params;
 
@@ -24,7 +24,7 @@ namespace fpp {
         void                init();
         Frame               createFrame() const;
         void                sendFrame(const Frame source_frame);
-        FrameVector         receiveFrames();
+        FrameVector         receiveFrames(AVRational time_base, int64_t stream_index);
         void                stampFrame(Frame& output_frame);
 
     private:
