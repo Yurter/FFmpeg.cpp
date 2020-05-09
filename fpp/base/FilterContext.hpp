@@ -17,7 +17,7 @@ namespace fpp {
                       , AVRational time_base
                       , AVFilterGraph* graph
                       , const std::string_view name
-                      , const std::string_view unique_name
+                      , const std::string_view unique_id
                       , const std::string_view args
                       , void* opaque);
 

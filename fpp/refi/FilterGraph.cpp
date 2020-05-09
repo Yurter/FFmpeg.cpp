@@ -39,7 +39,7 @@ namespace fpp {
         for (const auto& filter_descr : filters) {
             const auto& [name, args] { splitFilterDescription(filter_descr) };
             const auto unique_id { genUniqueId() };
-            filter_chain.filters.emplace_back(par->type(), par->timeBase(), raw(), name, unique_name, args, nullptr);
+            filter_chain.filters.emplace_back(par->type(), par->timeBase(), raw(), name, unique_id, args, nullptr);
         }
         linkChain(filter_chain);
         return emplaceFilterChainBack(std::move(filter_chain));
@@ -50,7 +50,7 @@ namespace fpp {
         for (const auto& filter_descr : filters) {
             const auto& [name, args] { splitFilterDescription(filter_descr) };
             const auto unique_id { genUniqueId() };
-            filter_chain.filters.emplace_back(par->type(), par->timeBase(), raw(), name, unique_name, args, nullptr);
+            filter_chain.filters.emplace_back(par->type(), par->timeBase(), raw(), name, unique_id, args, nullptr);
         }
         filter_chain.filters.emplace_back(createBufferSink(par));
         linkChain(filter_chain);
@@ -63,7 +63,7 @@ namespace fpp {
         for (const auto& filter_descr : filters) {
             const auto& [name, args] { splitFilterDescription(filter_descr) };
             const auto unique_id { genUniqueId() };
-            filter_chain.filters.emplace_back(par->type(), par->timeBase(), raw(), name, unique_name, args, nullptr);
+            filter_chain.filters.emplace_back(par->type(), par->timeBase(), raw(), name, unique_id, args, nullptr);
         }
         filter_chain.filters.emplace_back(createBufferSink(par));
         linkChain(filter_chain);

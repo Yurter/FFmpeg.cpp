@@ -13,7 +13,7 @@ namespace fpp {
                                  , AVRational time_base
                                  , AVFilterGraph* graph
                                  , const std::string_view name
-                                 , const std::string_view unique_name
+                                 , const std::string_view unique_id
                                  , const std::string_view args
                                  , void* opaque)
         : _type { type }
@@ -26,7 +26,7 @@ namespace fpp {
         ffmpeg_api_strict(avfilter_graph_create_filter
             , &flt_ctx
             , getFilterByName(name)
-            , (std::string { name } + '_' + unique_name.data()).c_str()
+            , (std::string { name } + '_' + unique_id.data()).c_str()
             , args.data()
             , opaque
             , graph
