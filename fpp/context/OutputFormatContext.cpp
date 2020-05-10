@@ -133,7 +133,7 @@ namespace fpp {
         if (!(outputFormat()->flags & AVFMT_NOFILE)) {
             ffmpeg_api_strict(avio_close, raw()->pb);
         }
-        _output_format = nullptr;
+        setOutputFormat(nullptr);
     }
 
     void OutputFormatContext::createStream(SpParameters params) {
