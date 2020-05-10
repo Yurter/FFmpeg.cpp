@@ -19,7 +19,7 @@ namespace fpp {
 
     public:
 
-        Stream(AVStream* avstream);
+        explicit Stream(AVStream* avstream);
         Stream(AVStream* avstream, const SpParameters parameters);
 
         std::string         toString() const override final;
@@ -41,6 +41,8 @@ namespace fpp {
         int64_t             packetIndex()       const;
 
         AVCodecParameters*  codecpar();
+
+        void                addMetadata(const std::string_view key, const std::string_view value);
 
     private:
 

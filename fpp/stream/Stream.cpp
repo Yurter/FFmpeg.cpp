@@ -1,6 +1,7 @@
 #include "Stream.hpp"
 #include <fpp/core/Utils.hpp>
 #include <fpp/core/Logger.hpp>
+#include <fpp/core/FFmpegException.hpp>
 
 extern "C" {
     #include <libavformat/avformat.h>
@@ -182,6 +183,10 @@ namespace fpp {
             throw std::runtime_error { "stream is null" };
         }
         return raw()->codecpar;
+    }
+
+    void Stream::addMetadata(const std::string_view key, const std::string_view value) {
+        ffmpeg_api_strict(av_dict_set, &raw()->metadata, key.data(), value.data(), 0);
     }
 
     void Stream::increaseDuration(const int64_t value) {
