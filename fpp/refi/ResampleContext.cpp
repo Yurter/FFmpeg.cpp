@@ -3,6 +3,10 @@
 #include <fpp/core/Logger.hpp>
 #include <fpp/core/Utils.hpp>
 
+extern "C" {
+    #include <libswresample/swresample.h>
+}
+
 namespace fpp {
 
     ResampleContext::ResampleContext(InOutParams parameters)
@@ -28,14 +32,14 @@ namespace fpp {
 
         reset(std::shared_ptr<SwrContext> {
             ::swr_alloc_set_opts(
-                nullptr   /* existing Swr context   */
+                nullptr   /* existing Swr context */
                 , int64_t(out_param->channelLayout())
                 , out_param->sampleFormat()
-                , int(out_param->sampleRate())
+                , out_param->sampleRate()
                 , int64_t(in_param->channelLayout())
                 , in_param->sampleFormat()
-                , int(in_param->sampleRate())
-                , 0       /* logging level offset   */
+                , in_param->sampleRate()
+                , 0       /* logging level offset */
                 , nullptr /* parent logging context */
             )
             , [](auto* ctx) { ::swr_free(&ctx); }
@@ -81,16 +85,17 @@ namespace fpp {
         frame.raw().sample_rate    = int(out_param->sampleRate());
         /* Allocate the samples of the created frame. This call will make
          * sure that the audio frame can hold as many samples as specified. */
-        ffmpeg_api_strict(av_frame_get_buffer, frame.ptr(), 32);
+        constexpr auto align { 32 };
+        ffmpeg_api_strict(av_frame_get_buffer, frame.ptr(), align);
         return frame;
     }
 
-    void ResampleContext::sendFrame(const Frame source_frame) {
+    void ResampleContext::sendFrame(const Frame& frame) {
         if (const auto ret {
                 ::swr_convert_frame(
-                    raw()                   /* swr    */
-                    , nullptr               /* output */
-                    , source_frame.ptr()    /* input  */
+                    raw()         /* swr    */
+                    , nullptr     /* output */
+                    , frame.ptr() /* input  */
                 )
             }; ret != 0) {
             throw FFmpegException {
@@ -99,22 +104,22 @@ namespace fpp {
                 , ret
             };
         }
-        _source_pts = source_frame.pts();
+        _source_pts = frame.pts();
     }
 
-    FrameVector ResampleContext::receiveFrames(AVRational time_base, int64_t stream_index) {
+    FrameVector ResampleContext::receiveFrames(AVRational time_base, int stream_index) {
         const auto out_param {
             std::static_pointer_cast<const AudioParameters>(params.out)
         };
 
         FrameVector resampled_frames;
         while (::swr_get_out_samples(raw(), 0) >= out_param->frameSize()) {
-            Frame output_frame { createFrame() };
+            Frame frame { createFrame() };
             if (const auto ret {
                 ::swr_convert_frame(
-                    raw()                   /* swr    */
-                    , output_frame.ptr()    /* output */
-                    , nullptr               /* input  */
+                    raw()         /* swr    */
+                    , frame.ptr() /* output */
+                    , nullptr     /* input  */
                 )
             }; ret < 0) {
                 throw FFmpegException {
@@ -123,15 +128,15 @@ namespace fpp {
                     , ret
                 };
             }
-            stampFrame(output_frame);
-            output_frame.setTimeBase(time_base);
-            output_frame.setStreamIndex(stream_index);
-            resampled_frames.push_back(output_frame);
+            stampFrame(frame);
+            frame.setTimeBase(time_base);
+            frame.setStreamIndex(stream_index);
+            resampled_frames.push_back(frame);
         }
         return resampled_frames;
     }
 
-    void ResampleContext::stampFrame(Frame& output_frame) {
+    void ResampleContext::stampFrame(Frame& frame) {
         if (_source_pts != NOPTS_VALUE) {
             const auto in_param {
                 std::static_pointer_cast<const AudioParameters>(params.in)
@@ -147,11 +152,11 @@ namespace fpp {
                     , in_param->timeBase()
                 )
             };
-            output_frame.setPts(out_pts);
+            frame.setPts(out_pts);
         } else {
-            output_frame.setPts(NOPTS_VALUE);
+            frame.setPts(NOPTS_VALUE);
         }
-        _samples_count += output_frame.nbSamples();
+        _samples_count += frame.nbSamples();
     }
 
 } // namespace fpp

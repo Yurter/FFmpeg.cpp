@@ -54,15 +54,15 @@ namespace fpp {
 
         log_info("Inited "
             , "from "
-                , "[" , in_param->width()
-                , "x"  , in_param->height()
+                , '[' ,  in_param->width()
+                , 'x'  , in_param->height()
                 , ", " , in_param->pixelFormat()
                 , "] "
             , "to "
-                , "[" , out_param->width()
-                , "x"  , out_param->height()
+                , '[' ,  out_param->width()
+                , 'x'  , out_param->height()
                 , ", " , out_param->pixelFormat()
-                , "]"
+                , ']'
         );
     }
 
@@ -72,8 +72,8 @@ namespace fpp {
             std::static_pointer_cast<const VideoParameters>(params.out)
         };
         frame.raw().format = output_params->pixelFormat();
-        frame.raw().width  = int(output_params->width());
-        frame.raw().height = int(output_params->height());
+        frame.raw().width  = output_params->width();
+        frame.raw().height = output_params->height();
         constexpr auto align { 32 };
         ffmpeg_api_strict(av_frame_get_buffer, frame.ptr(), align);
         return frame;

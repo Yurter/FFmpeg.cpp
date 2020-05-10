@@ -3,9 +3,7 @@
 #include <fpp/stream/AudioParameters.hpp>
 #include <fpp/base/Frame.hpp>
 
-extern "C" {
-    #include <libswresample/swresample.h>
-}
+struct SwrContext;
 
 namespace fpp {
 
@@ -13,7 +11,7 @@ namespace fpp {
 
     public:
 
-        ResampleContext(InOutParams parameters);
+        explicit ResampleContext(InOutParams parameters);
 
         FrameVector         resample(const Frame& frame);
 
@@ -23,9 +21,9 @@ namespace fpp {
 
         void                init();
         Frame               createFrame() const;
-        void                sendFrame(const Frame source_frame);
-        FrameVector         receiveFrames(AVRational time_base, int64_t stream_index);
-        void                stampFrame(Frame& output_frame);
+        void                sendFrame(const Frame& frame);
+        FrameVector         receiveFrames(AVRational time_base, int stream_index);
+        void                stampFrame(Frame& frame);
 
     private:
 
