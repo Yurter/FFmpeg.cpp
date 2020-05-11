@@ -24,7 +24,7 @@ void complex() {
         }
     }
 
-    /* create output stream with input params */
+    /* create output params based on 1st source's params */
     const auto inpar {
         sources[0].stream(fpp::MediaType::Audio)->params
     };
@@ -39,28 +39,42 @@ void complex() {
         , fpp::DecoderContext { sources[1].stream(fpp::MediaType::Audio)->params }
         , fpp::DecoderContext { sources[2].stream(fpp::MediaType::Audio)->params }
     };
-    fpp::EncoderContext audio_encoder { outpar };
+    fpp::EncoderContext encoder { outpar };
 
-    /* create filter graph */
+    /* create filter graph with 3 input chains and 1 output */
     fpp::ComplexFilterGraph graph;
-
-    const std::array<std::size_t, N> input_chain {
+    const std::array<std::size_t, N> input_chain_index {
           graph.createInputFilterChain(sources[0].stream(fpp::MediaType::Audio)->params, { "adelay=1000" })
         , graph.createInputFilterChain(sources[1].stream(fpp::MediaType::Audio)->params, { "adelay=2000", "volume=1" })
         , graph.createInputFilterChain(sources[2].stream(fpp::MediaType::Audio)->params, { "volume=3" })
     };
+    const auto output_chain_index {
+        graph.createOutputFilterChain(outpar, { "amix=inputs=3:dropout_transition=0" })
+    };
+    graph.link({ input_chain_index[0], input_chain_index[1], input_chain_index[2] }, { output_chain_index });
+    graph.init();
 
-    const auto output_chain { graph.createOutputFilterChain(outpar, { "amix=inputs=3:dropout_transition=0" })};
-
-    graph.link({ input_chain[0], input_chain[1], input_chain[2] }, { output_chain });
-
-    fpp::ResampleContext resampler {{ inpar, outpar }};
+    std::array<fpp::ResampleContext,N> resampler {
+          fpp::ResampleContext {{
+            sources[0].stream(fpp::MediaType::Audio)->params
+            , outpar
+        }}
+        , fpp::ResampleContext {{
+            sources[1].stream(fpp::MediaType::Audio)->params
+            , outpar
+        }}
+        , fpp::ResampleContext {{
+            sources[2].stream(fpp::MediaType::Audio)->params
+            , outpar
+        }}
+    };
 
     /* create sink */
     fpp::OutputFormatContext sink {
         "mixed_audio.mp3"
     };
 
+    /* create output stream */
     sink.createStream(outpar);
 
     /* open sink */
@@ -73,15 +87,21 @@ void complex() {
 
         auto all_empty { true };
         for (std::size_t i { 0 }; i < sources.size(); ++i) {
+            if (i!=2) continue;
             const auto packet { sources[i].read() };
             if (!packet.isEOF()) {
                 all_empty = false;
 
-                for (const auto& a_frame  : decoders[i].decode(packet))     {
-                graph.write(a_frame, input_chain[i]);
-                for (const auto& fa_frame : graph.read(output_chain))       {
-                for (const auto& ra_frame : resampler.resample(fa_frame))   {
-                for (const auto& a_packet : audio_encoder.encode(ra_frame)) {
+                for (const auto& a_frame  : decoders[i].decode(packet))      {
+                fpp::static_log_info("test", " a_frame: ", a_frame.toString());
+                graph.write(a_frame, input_chain_index[i]);
+                for (const auto& fa_frame : graph.read(output_chain_index))  {
+                    fpp::static_log_info("test", " i: ", i);
+                    fpp::static_log_info("test", fa_frame.toString());
+                    fpp::static_log_info("test", resampler[i].params.in->toString());
+                    fpp::static_log_info("test", sources[2].stream(fpp::MediaType::Audio)->params->toString());
+                for (const auto& ra_frame : resampler[i].resample(fa_frame)) {
+                for (const auto& a_packet : encoder.encode(ra_frame))        {
                     sink.write(a_packet);
                 }}}}
             }
