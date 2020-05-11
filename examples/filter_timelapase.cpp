@@ -59,7 +59,7 @@ void timelapase() {
     constexpr auto accel { 3 };
     const std::vector<std::string> filters {
         "select='not(mod(n," + std::to_string(accel) + "))'"
-        , "setpts=" + std::to_string(accel) + "*PTS"
+        , "setpts=" + std::to_string(1.0 / accel) + "*PTS"
     };
     fpp::LinearFilterGraph filter_graph {
         source.stream(fpp::MediaType::Video)->params
@@ -78,26 +78,29 @@ void timelapase() {
     }
 
     /* set read timeout if endless source stream */
-    source.stream(fpp::MediaType::Video)->setEndTimePoint(60'000);
+    constexpr auto one_minute { 60'000 };
+    source.stream(fpp::MediaType::Video)->setEndTimePoint(one_minute);
 
-    fpp::Packet input_packet {
+    fpp::Packet packet {
         fpp::MediaType::Unknown
     };
     const auto read_video_packet {
-        [&input_packet,&source]() {
+        [&packet,&source]() {
             do {
-                input_packet = source.read();
-            } while (!input_packet.isVideo() && !input_packet.isEOF());
-            return !input_packet.isEOF();
+                packet = source.read();
+            } while (!packet.isVideo() && !packet.isEOF());
+            return !packet.isEOF();
         }
     };
 
     /* read and write packet */
     while (read_video_packet()) {
-        for (const auto& v_frame  : video_decoder.decode(input_packet)) {
-        for (const auto& f_frame  : filter_graph.filter(v_frame))       {
+        for (const auto& v_frame  : video_decoder.decode(packet)) {
+        for (const auto& f_frame  : filter_graph.filter(v_frame)) {
         const auto r_frame { rescaler.scale(f_frame) };
-        for (const auto& v_packet : video_encoder.encode(r_frame))      {
+        for (auto& v_packet : video_encoder.encode(r_frame))      {
+            v_packet.setStreamIndex(0);
+            v_packet.setTimeBase(in_params->timeBase());
             sink.write(v_packet);
         }}}
     }
