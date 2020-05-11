@@ -4,7 +4,7 @@
 #include <fpp/codec/DecoderContext.hpp>
 #include <fpp/codec/EncoderContext.hpp>
 #include <fpp/refi/RescaleContext.hpp>
-#include <fpp/refi/VideoFilterContext.hpp>
+#include <fpp/refi/LinearFilterGraph.hpp>
 
 void webcam_to_file() {
 
@@ -67,9 +67,9 @@ void webcam_to_file() {
     }};
 
     /* create fps filter (because of bug 'vlc and h264 variable framerate') */
-    fpp::VideoFilterContext filter {
+    fpp::LinearFilterGraph graph {
         source.stream(fpp::MediaType::Video)->params
-        , "fps=fps=25,setpts=400000*PTS"
+        , { "fps=fps=25", "setpts=400000*PTS" }
     };
 
     /* open sink */
@@ -94,14 +94,12 @@ void webcam_to_file() {
 
     /* read and write packets */
     while (read_packet() && !stop_flag) {
-        if (packet.isVideo()) {
-            for (const auto& v_frame  : video_decoder.decode(packet))   {
-            for (const auto& fv_frame : filter.filter(v_frame))         {
-                 const auto& rv_frame { rescaler.scale(fv_frame) };
-            for (const auto& v_packet : video_encoder.encode(rv_frame)) {
-                stop_flag = !sink.write(v_packet);
-            }}}
-        }
+        for (const auto& v_frame  : video_decoder.decode(packet))   {
+        for (const auto& fv_frame : graph.filter(v_frame))          {
+             const auto& rv_frame { rescaler.scale(fv_frame) };
+        for (const auto& v_packet : video_encoder.encode(rv_frame)) {
+            stop_flag = !sink.write(v_packet);
+        }}}
     }
 
     /* explicitly close contexts */
