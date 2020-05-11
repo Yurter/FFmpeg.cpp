@@ -106,7 +106,7 @@ namespace fpp {
         return OK;
     }
 
-    std::string FormatContext::mediaResourceLocator() const {
+    const std::string_view FormatContext::mediaResourceLocator() const {
         return _media_resource_locator;
     }
 

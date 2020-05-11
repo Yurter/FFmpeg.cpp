@@ -80,7 +80,7 @@ namespace fpp {
             , &fmt_ctx
             , outputFormat()
             , format_short_name.data()
-            , mediaResourceLocator().c_str()
+            , mediaResourceLocator().data()
         );
         setOutputFormat(fmt_ctx->oformat);
         reset(std::shared_ptr<AVFormatContext> {
@@ -112,9 +112,9 @@ namespace fpp {
 //        }
         if (!(raw()->flags & AVFMT_NOFILE)) {
             ffmpeg_api(avio_open
-                , &raw()->pb                     /* AVIOContext */
-                , mediaResourceLocator().c_str() /* url         */
-                , AVIO_FLAG_WRITE                /* flags       */
+                , &raw()->pb                    /* AVIOContext */
+                , mediaResourceLocator().data() /* url         */
+                , AVIO_FLAG_WRITE               /* flags       */
             );
         }
         writeHeader();
@@ -151,9 +151,9 @@ namespace fpp {
     void OutputFormatContext::guessOutputFromat() {
         const auto out_fmt {
             ::av_guess_format(
-                nullptr                          /* short_name */
-                , mediaResourceLocator().c_str() /* filename   */
-                , nullptr                        /* mime_type  */
+                nullptr                         /* short_name */
+                , mediaResourceLocator().data() /* filename   */
+                , nullptr                       /* mime_type  */
             )
         };
         if (!out_fmt) {

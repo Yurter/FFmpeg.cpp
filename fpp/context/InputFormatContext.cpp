@@ -54,8 +54,8 @@ namespace fpp {
                 return Packet { MediaType::EndOF };
             }
             throw FFmpegException {
-                "Cannot read source: \'"
-                    + mediaResourceLocator() + "\'"
+                "Cannot read source: "
+                    + utils::quoted(mediaResourceLocator())
             };
         }
         processPacket(packet);
@@ -73,7 +73,7 @@ namespace fpp {
         if (const auto ret {
                 ::avformat_open_input(
                     &fmt_ctx
-                    , mediaResourceLocator().c_str()
+                    , mediaResourceLocator().data()
                     , inputFormat()
                     , dictionary.get()
                 )
