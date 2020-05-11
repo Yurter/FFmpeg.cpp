@@ -39,7 +39,7 @@ namespace fpp {
     }
 
     FilterContext& FilterChain::firstFilter() {
-        return _chain.back();
+        return _chain.front();
     }
 
     FilterContext& FilterChain::lastFilter() {
