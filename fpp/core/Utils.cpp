@@ -235,7 +235,7 @@ namespace fpp {
         }_;
     }
 
-    const char* utils::guess_format_short_name(const std::string_view media_resurs_locator) {
+    const std::string_view utils::guess_format_short_name(const std::string_view media_resurs_locator) {
         if (media_resurs_locator.find("rtsp://") != std::string_view::npos) {
             return "rtsp";
         }

@@ -79,7 +79,7 @@ namespace fpp {
         ffmpeg_api_strict(avformat_alloc_output_context2
             , &fmt_ctx
             , outputFormat()
-            , format_short_name
+            , format_short_name.data()
             , mediaResourceLocator().c_str()
         );
         setOutputFormat(fmt_ctx->oformat);
