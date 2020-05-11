@@ -1,6 +1,5 @@
 #include "Dictionary.hpp"
 #include <fpp/core/FFmpegException.hpp>
-#include <fpp/core/Logger.hpp>
 
 extern "C" {
     #include <libavutil/dict.h>

@@ -45,8 +45,11 @@ SOURCES += \
     examples/youtube_stream_copy_with_silence.cpp \
     examples/youtube_stream_transcode.cpp \
     examples/youtube_stream_transcode_with_silence.cpp \
+    fpp/base/FilterChain.cpp \
+    fpp/base/FilterGraph.cpp \
     fpp/refi/BitStreamFilterContext.cpp \
-    fpp/refi/FilterGraph.cpp \
+    fpp/refi/ComplexFilterGraph.cpp \
+    fpp/refi/LinearFilterGraph.cpp \
     fpp/refi/ResampleContext.cpp \
     fpp/refi/VideoFilters/Drawtext.cpp \
     main.cpp \
@@ -64,10 +67,8 @@ SOURCES += \
     fpp/core/Logger.cpp \
     fpp/core/Object.cpp \
     fpp/core/Utils.cpp \
-    fpp/refi/AudioFilterContext.cpp \
     fpp/base/FilterContext.cpp \
     fpp/refi/RescaleContext.cpp \
-    fpp/refi/VideoFilterContext.cpp \
     fpp/stream/AudioParameters.cpp \
     fpp/stream/Stream.cpp \
     fpp/stream/VideoParameters.cpp
@@ -76,6 +77,8 @@ HEADERS += \
     examples/examples.hpp \
     fpp/base/CodecContext.hpp \
     fpp/base/Dictionary.hpp \
+    fpp/base/FilterChain.hpp \
+    fpp/base/FilterGraph.hpp \
     fpp/base/FormatContext.hpp \
     fpp/base/Frame.hpp \
     fpp/base/MediaData.hpp \
@@ -97,14 +100,13 @@ HEADERS += \
     fpp/core/time/Timer.hpp \
     fpp/core/wrap/FFmpegObject.hpp \
     fpp/core/wrap/SharedFFmpegObject.hpp \
-    fpp/refi/AudioFilterContext.hpp \
     fpp/refi/BitStreamFilterContext.hpp \
-    fpp/refi/FilterGraph.hpp \
+    fpp/refi/ComplexFilterGraph.hpp \
+    fpp/refi/LinearFilterGraph.hpp \
     fpp/refi/VideoFilters/DrawText.hpp \
     fpp/base/FilterContext.hpp \
     fpp/refi/ResampleContext.hpp \
     fpp/refi/RescaleContext.hpp \
-    fpp/refi/VideoFilterContext.hpp \
     fpp/stream/AudioParameters.hpp \
     fpp/stream/Stream.hpp \
     fpp/stream/VideoParameters.hpp

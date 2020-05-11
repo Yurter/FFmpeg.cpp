@@ -12,7 +12,7 @@ namespace fpp {
 
     public:
 
-        OutputFormatContext(const std::string_view mrl = {});
+        explicit OutputFormatContext(const std::string_view mrl = {});
         ~OutputFormatContext() override;
 
         void                createStream(SpParameters params);

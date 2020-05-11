@@ -1,9 +1,5 @@
 #include "FFmpegException.hpp"
 
-extern "C" {
-    #include <libavutil/error.h>
-}
-
 namespace fpp {
 
     FFmpegException::FFmpegException(const std::string& error_message, int ret)

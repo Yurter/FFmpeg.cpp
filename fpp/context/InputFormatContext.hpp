@@ -14,7 +14,7 @@ namespace fpp {
 
     public:
 
-        InputFormatContext(const std::string_view mrl = {}, const std::string_view format_short_name = {});
+        explicit InputFormatContext(const std::string_view mrl = {}, const std::string_view format_short_name = {});
         ~InputFormatContext() override;
 
         void                seek(int64_t stream_index, int64_t timestamp, SeekPrecision seek_precision = SeekPrecision::Forward);

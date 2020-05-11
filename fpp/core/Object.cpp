@@ -1,4 +1,5 @@
 #include "Object.hpp"
+#include <cassert>
 
 namespace fpp {
 
@@ -8,6 +9,7 @@ namespace fpp {
     }
 
     void Object::setName(const std::string& name) {
+        assert(name.size() < 16);
         _name = name;
     }
 

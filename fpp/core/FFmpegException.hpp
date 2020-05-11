@@ -8,7 +8,7 @@ namespace fpp {
 
     public:
 
-        FFmpegException(const std::string& error_message, int ret = 0);
+        explicit FFmpegException(const std::string& error_message, int ret = 0);
 
         const char*         what()  const noexcept override;
         int                 ret()   const noexcept;
@@ -46,6 +46,7 @@ namespace fpp {
 //        }\
 //    } while (false)
 
+// TODO: replace with lambda (11.05)
 #define ffmpeg_api_strict(foo,...) \
     do {\
         if (const auto ret { foo(__VA_ARGS__) }; ret < 0) {\

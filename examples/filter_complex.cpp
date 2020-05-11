@@ -4,7 +4,7 @@
 #include <fpp/codec/DecoderContext.hpp>
 #include <fpp/codec/EncoderContext.hpp>
 #include <fpp/refi/ResampleContext.hpp>
-#include <fpp/refi/FilterGraph.hpp>
+#include <fpp/refi/ComplexFilterGraph.hpp>
 #include <array>
 
 void complex() {
@@ -35,24 +35,26 @@ void complex() {
 
     /* create codecs */
     std::array<fpp::DecoderContext,N> decoders {
-          sources[0].stream(fpp::MediaType::Audio)->params
-        , sources[1].stream(fpp::MediaType::Audio)->params
-        , sources[2].stream(fpp::MediaType::Audio)->params
+          fpp::DecoderContext { sources[0].stream(fpp::MediaType::Audio)->params }
+        , fpp::DecoderContext { sources[1].stream(fpp::MediaType::Audio)->params }
+        , fpp::DecoderContext { sources[2].stream(fpp::MediaType::Audio)->params }
     };
-    fpp::EncoderContext video_encoder { outpar };
+    fpp::EncoderContext audio_encoder { outpar };
 
     /* create filter graph */
-    fpp::FilterGraph graph;
+    fpp::ComplexFilterGraph graph;
 
     const std::array<std::size_t, N> input_chain {
           graph.createInputFilterChain(sources[0].stream(fpp::MediaType::Audio)->params, { "adelay=1000" })
         , graph.createInputFilterChain(sources[1].stream(fpp::MediaType::Audio)->params, { "adelay=2000", "volume=1" })
-        , graph.createInputFilterChain(sources[2].stream(fpp::MediaType::Audio)->params, { "adelay=0|0",  "volume=3" })
+        , graph.createInputFilterChain(sources[2].stream(fpp::MediaType::Audio)->params, { "volume=3" })
     };
 
     const auto output_chain { graph.createOutputFilterChain(outpar, { "amix=inputs=3:dropout_transition=0" })};
 
     graph.link({ input_chain[0], input_chain[1], input_chain[2] }, { output_chain });
+
+    fpp::ResampleContext resampler {{ inpar, outpar }};
 
     /* create sink */
     fpp::OutputFormatContext sink {
@@ -78,13 +80,17 @@ void complex() {
                 for (const auto& a_frame  : decoders[i].decode(packet))     {
                 graph.write(a_frame, input_chain[i]);
                 for (const auto& fa_frame : graph.read(output_chain))       {
-                for (const auto& a_packet : video_encoder.encode(fa_frame)) {
+                for (const auto& ra_frame : resampler.resample(fa_frame))   {
+                for (const auto& a_packet : audio_encoder.encode(ra_frame)) {
                     sink.write(a_packet);
-                }}}
+                }}}}
             }
             else {
                 continue;
             }
+        }
+        if (all_empty) {
+            break;
         }
     }
 

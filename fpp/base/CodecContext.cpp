@@ -1,6 +1,5 @@
 #include "CodecContext.hpp"
 #include <fpp/core/Utils.hpp>
-#include <fpp/core/Logger.hpp>
 #include <fpp/core/FFmpegException.hpp>
 
 extern "C" {

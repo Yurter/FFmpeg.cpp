@@ -1,7 +1,6 @@
 #include "Parameters.hpp"
 #include <fpp/core/FFmpegException.hpp>
 #include <fpp/core/Utils.hpp>
-#include <fpp/core/Logger.hpp>
 
 extern "C" {
     #include <libavformat/avformat.h>

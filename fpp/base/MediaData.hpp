@@ -13,11 +13,11 @@ namespace fpp {
         EndOF,
     };
 
-    class MediaData {
+    class MediaData { // TODO: rename class (remove 'Data' from name) (10.05)
 
     public:
 
-        MediaData(MediaType type)
+        explicit MediaData(MediaType type)
             : _type(type) {
         }
 

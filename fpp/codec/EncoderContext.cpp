@@ -1,18 +1,14 @@
 #include "EncoderContext.hpp"
-#include <fpp/core/Logger.hpp>
-#include <fpp/core/FFmpegException.hpp>
 #include <fpp/core/Utils.hpp>
+#include <fpp/core/FFmpegException.hpp>
+#include <cassert>
 
 namespace fpp {
 
     EncoderContext::EncoderContext(const SpParameters params, Options options)
         : CodecContext(params) {
+        assert(params->isEncoder());
         setName("EncCtx");
-        if (!params->isEncoder()) {
-            throw std::runtime_error {
-                "Encoder cannot be initialized with decoder parameters"
-            };
-        }
         init(options);
     }
 

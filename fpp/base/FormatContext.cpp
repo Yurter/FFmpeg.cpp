@@ -1,6 +1,5 @@
 ﻿#include "FormatContext.hpp"
 #include <fpp/core/Utils.hpp>
-#include <fpp/core/Logger.hpp>
 #include <iomanip>
 
 extern "C" {
