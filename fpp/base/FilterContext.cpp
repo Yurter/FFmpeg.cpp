@@ -25,10 +25,10 @@ namespace fpp {
             , opaque
             , graph
         );
-        reset({
+        reset(
             flt_ctx
             , [](auto* ctx) { ::avfilter_free(ctx); }
-        });
+        );
     }
 
     void FilterContext::linkTo(FilterContext& other) {

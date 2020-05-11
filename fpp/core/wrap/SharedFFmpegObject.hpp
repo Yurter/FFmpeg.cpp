@@ -1,6 +1,5 @@
 #pragma once
 #include <fpp/core/Object.hpp>
-#include <fpp/core/FFmpegException.hpp>
 #include <memory>
 
 namespace fpp {
@@ -10,12 +9,13 @@ namespace fpp {
 
     public:
 
-        SharedFFmpegObject(std::shared_ptr<T> shared_object = {})
-            : _shared_object(shared_object) {
+        template<typename D>
+        void reset(T* raw_pointer, D dtor) {
+            _shared_object = { raw_pointer, std::move(dtor) };
         }
 
-        void reset(std::shared_ptr<T> shared_object = {}) { // TODO: fix args (05.05)
-            _shared_object = shared_object;
+        void reset() {
+            _shared_object.reset();
         }
 
         auto raw() {

@@ -1,6 +1,7 @@
 #include "FilterGraph.hpp"
 #include <fpp/stream/VideoParameters.hpp>
 #include <fpp/stream/AudioParameters.hpp>
+#include <fpp/core/FFmpegException.hpp>
 #include <cassert>
 
 extern "C" {
@@ -19,10 +20,10 @@ namespace fpp {
             log_error("avfilter_graph_alloc failed!");
         }
         else {
-            reset({
+            reset(
                 raw_ptr
                 , [](auto* graph) { ::avfilter_graph_free(&graph); }
-            });
+            );
             Dictionary dictionary { options };
             ffmpeg_api_strict(av_opt_set_dict, raw(), dictionary.get());
         }

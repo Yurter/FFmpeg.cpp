@@ -80,10 +80,10 @@ namespace fpp {
             }; ret < 0) {
             return false;
         }
-        reset(std::shared_ptr<AVFormatContext> {
+        reset(
             fmt_ctx
             , [](auto* ctx) { /*::avformat_free_context(ctx);*/ } // TODO avformat_close_input free context 10.04
-        });
+        );
         setInputFormat(raw()->iformat);
         if (const auto ret {
                 ::avformat_find_stream_info(raw(), nullptr)

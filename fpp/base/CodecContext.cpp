@@ -15,12 +15,12 @@ namespace fpp {
     }
 
     void CodecContext::init(Options options) {
-        reset({
+        reset(
             ::avcodec_alloc_context3(codec())
             , [](auto* codec_ctx) {
                  ::avcodec_free_context(&codec_ctx);
             }
-        });
+        );
         setName(name() + " " + codec()->name);
         open(options);
     }

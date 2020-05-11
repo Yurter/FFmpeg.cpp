@@ -39,7 +39,7 @@ namespace fpp {
             std::static_pointer_cast<const VideoParameters>(params.out)
         };
 
-        reset(std::shared_ptr<SwsContext> {
+        reset(
             ::sws_getContext(
                 int(in_param->width()), int(in_param->height()), in_param->pixelFormat()
                 , int(out_param->width()), int(out_param->height()), out_param->pixelFormat()
@@ -49,7 +49,7 @@ namespace fpp {
                 , nullptr     /* param     */
             )
             , [](auto* ctx) { ::sws_freeContext(ctx); }
-        });
+        );
 
         log_info("Inited "
             , "from "

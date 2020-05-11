@@ -83,10 +83,10 @@ namespace fpp {
             , mediaResourceLocator().data()
         );
         setOutputFormat(fmt_ctx->oformat);
-        reset(std::shared_ptr<AVFormatContext> {
+        reset(
             fmt_ctx
             , [](auto* ctx) { ::avformat_free_context(ctx); }
-        });
+        );
     }
 
     bool OutputFormatContext::openContext(Options options) {

@@ -18,7 +18,7 @@ namespace fpp {
     public:
 
         explicit MediaData(MediaType type)
-            : _type(type) {
+            : _type { type } {
         }
 
         MediaType           type() const { return _type; }

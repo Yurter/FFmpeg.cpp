@@ -170,10 +170,6 @@ namespace fpp {
                 codec_context->extradata_size = 0;
             }
         }
-
-//        codec_context->time_base = timeBase();
-//        codec_context->time_base = AVRational { 1, framerate };
-
     }
 
     void Parameters::parseCodecContext(const AVCodecContext* codec_context) {

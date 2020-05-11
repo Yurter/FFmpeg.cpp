@@ -1,4 +1,5 @@
 #include "BitStreamFilterContext.hpp"
+#include <fpp/core/FFmpegException.hpp>
 
 extern "C" {
     #include <libavcodec/avcodec.h>
@@ -27,12 +28,12 @@ namespace fpp {
 
         ffmpeg_api_strict(::av_bsf_init, bfs_ctx); // TODO: memory leak on failure (28.04)
 
-        reset({
+        reset(
             bfs_ctx, [](AVBSFContext* ctx) {
                 ::av_bsf_flush(ctx);
                 ::av_bsf_free(&ctx);
             }
-        });
+        );
     }
 
     Packet BitStreamFilterContext::filter(Packet packet) {

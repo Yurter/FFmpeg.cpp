@@ -29,7 +29,7 @@ namespace fpp {
             std::static_pointer_cast<const AudioParameters>(params.out)
         };
 
-        reset(std::shared_ptr<SwrContext> {
+        reset(
             ::swr_alloc_set_opts(
                 nullptr   /* existing Swr context */
                 , int64_t(out_param->channelLayout())
@@ -42,7 +42,7 @@ namespace fpp {
                 , nullptr /* parent logging context */
             )
             , [](auto* ctx) { ::swr_free(&ctx); }
-        });
+        );
 
         ffmpeg_api_strict(swr_init, raw());
 

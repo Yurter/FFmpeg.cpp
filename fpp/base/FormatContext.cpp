@@ -24,7 +24,7 @@ namespace fpp {
         }
         setInterrupter(timeoutClosing());
         closeContext();
-        reset(nullptr);
+        reset();
         setStreams({});
         setOpened(false);
     }
@@ -84,10 +84,10 @@ namespace fpp {
     }
 
     void FormatContext::createContext() {
-        reset(std::shared_ptr<AVFormatContext> {
+        reset(
             ::avformat_alloc_context()
             , [](auto* ctx) { ::avformat_free_context(ctx); }
-        });
+        );
     }
 
     int FormatContext::interrupt_callback(void* opaque) {
