@@ -8,7 +8,7 @@ namespace fpp {
     }
 
     void Object::setName(const std::string& name) {
-        assert(name.size() < 16);
+//        assert(name.size() < 16); // TODO: may break code in case of long codec name
         _name = name;
     }
 

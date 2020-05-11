@@ -35,7 +35,10 @@ namespace fpp {
 
     private:
 
-        /*const*/ std::string   _name;
+        /*const*/ std::string   _name; // TODO: change type to smth less heavy (40 bytes) (11.05)
+//                                        maybe std::array<char,15> _name2; - 15 bytes
+//                                        or const char* _name3; - 8 bytes
+//                                        or std::string_view _name4; - 16 bytes
 
     };
 
