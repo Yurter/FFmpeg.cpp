@@ -11,7 +11,7 @@ namespace fpp {
 
     public:
 
-        LinearFilterGraph(const SpParameters par, const std::vector<std::string>& filters);
+        LinearFilterGraph(const SpParameters par, const std::vector<std::string>& filters, const Options& options = {});
 
         FrameVector         filter(const Frame& frame);
 

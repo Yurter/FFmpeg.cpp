@@ -4,7 +4,8 @@
 
 namespace fpp {
 
-    ComplexFilterGraph::ComplexFilterGraph() {
+    ComplexFilterGraph::ComplexFilterGraph(const Options& options)
+        : FilterGraph(options) {
         setName("CompFilterGraph");
     }
 

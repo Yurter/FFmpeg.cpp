@@ -5,11 +5,12 @@
 
 extern "C" {
     #include <libavfilter/avfilter.h>
+    #include <libavutil/opt.h>
 }
 
 namespace fpp {
 
-    FilterGraph::FilterGraph()
+    FilterGraph::FilterGraph(const Options& options)
         : _filter_uid { 0 } {
         setName("FilterGraph");
         if (const auto raw_ptr {
@@ -18,13 +19,12 @@ namespace fpp {
             log_error("avfilter_graph_alloc failed!");
         }
         else {
-            { /* Костыль на количество потоков */ // TODO словарик 12.02
-                raw_ptr->nb_threads = 1;
-            }
             reset({
                 raw_ptr
                 , [](auto* graph) { ::avfilter_graph_free(&graph); }
             });
+            Dictionary dictionary { options };
+            ffmpeg_api_strict(av_opt_set_dict, raw(), dictionary.get());
         }
     }
 

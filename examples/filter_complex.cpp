@@ -42,7 +42,10 @@ void complex() {
     fpp::EncoderContext encoder { outpar };
 
     /* create filter graph with 3 input chains and 1 output */
-    fpp::ComplexFilterGraph graph;
+    const fpp::Options graph_opt {
+        { "threads", "1" }
+    };
+    fpp::ComplexFilterGraph graph { graph_opt };
     const std::array<std::size_t, N> input_chain_index {
           graph.createInputFilterChain(sources[0].stream(fpp::MediaType::Audio)->params, { "adelay=1000" })
         , graph.createInputFilterChain(sources[1].stream(fpp::MediaType::Audio)->params, { "adelay=2000", "volume=1" })

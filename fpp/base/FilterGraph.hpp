@@ -1,6 +1,7 @@
 #pragma once
 #include <fpp/base/FilterChain.hpp>
 #include <fpp/base/Parameters.hpp>
+#include <fpp/base/Dictionary.hpp>
 
 struct AVFilterGraph;
 
@@ -10,7 +11,7 @@ namespace fpp {
 
     public:
 
-        FilterGraph();
+        FilterGraph(const Options& options);
 
         void                init();
 

@@ -11,7 +11,7 @@ namespace fpp {
 
     public:
 
-        ComplexFilterGraph();
+        explicit ComplexFilterGraph(const Options& options = {});
 
         std::size_t         createInputFilterChain (const SpParameters par, const std::vector<std::string>& filters);
         std::size_t         createOutputFilterChain(const SpParameters par, const std::vector<std::string>& filters);
