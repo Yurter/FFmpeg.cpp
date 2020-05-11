@@ -11,7 +11,7 @@ namespace fpp {
 
     public:
 
-        FilterGraph(const Options& options);
+        explicit FilterGraph(const Options& options);
 
         void                init();
 
