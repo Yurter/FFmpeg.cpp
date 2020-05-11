@@ -6,7 +6,7 @@ namespace fpp {
         setName("LineFilterGraph");
         FilterChain chain { par->type() };
         chain.add(createBufferSource(par));
-        chain.add(createFilterContexts(par, filters));
+        chain.add(createFilterContexts(filters));
         chain.add(createBufferSink(par));
         chain.linkFilters();
         emplaceFilterChainBack(chain);

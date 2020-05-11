@@ -11,25 +11,25 @@ namespace fpp {
     std::size_t ComplexFilterGraph::createInputFilterChain(const SpParameters par, const std::vector<std::string>& filters) {
         FilterChain chain { par->type() };
         chain.add(createBufferSource(par));
-        chain.add(createFilterContexts(par, filters));
+        chain.add(createFilterContexts(filters));
         chain.linkFilters();
         return emplaceFilterChainBack(chain);
     }
 
     std::size_t ComplexFilterGraph::createOutputFilterChain(const SpParameters par, const std::vector<std::string>& filters) {
         FilterChain chain { par->type() };
-        chain.add(createFilterContexts(par, filters));
+        chain.add(createFilterContexts(filters));
         chain.add(createBufferSink(par));
         chain.linkFilters();
         return emplaceFilterChainBack(chain);
     }
 
-//    std::size_t ComplexFilterGraph::createFilterChain(const std::vector<std::string>& filters) {
-//        FilterChain chain { par->type(), par->timeBase() };
-//        chain.add(createFilterContexts(par, filters));
-//        chain.linkFilters();
-//        return emplaceFilterChainBack(chain);
-//    }
+    std::size_t ComplexFilterGraph::createFilterChain(const SpParameters par, const std::vector<std::string>& filters) {
+        FilterChain chain { par->type() };
+        chain.add(createFilterContexts(filters));
+        chain.linkFilters();
+        return emplaceFilterChainBack(chain);
+    }
 
     void ComplexFilterGraph::link(const std::vector<std::size_t>& in, const std::vector<std::size_t>& out) {
         for (const auto& idx_in : in) {

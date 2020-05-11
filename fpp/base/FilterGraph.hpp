@@ -27,7 +27,7 @@ namespace fpp {
         std::pair<const std::string, const std::string>
         extractNameArgs(const std::string_view filter_descr) const;
 
-        std::vector<FilterContext> createFilterContexts(const SpParameters par, const std::vector<std::string>& filters);
+        std::vector<FilterContext> createFilterContexts(const std::vector<std::string>& filters);
 
     private:
 

@@ -125,7 +125,7 @@ namespace fpp {
         return { std::string { filter_descr }, std::string {} };
     }
 
-    std::vector<FilterContext> FilterGraph::createFilterContexts(const SpParameters par, const std::vector<std::string>& filters) {
+    std::vector<FilterContext> FilterGraph::createFilterContexts(const std::vector<std::string>& filters) {
         std::vector<FilterContext> result;
         for (const std::string& filter_descr : filters) {
             const auto& [name, args] { extractNameArgs(filter_descr) };

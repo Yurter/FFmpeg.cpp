@@ -15,7 +15,7 @@ namespace fpp {
 
         std::size_t         createInputFilterChain (const SpParameters par, const std::vector<std::string>& filters);
         std::size_t         createOutputFilterChain(const SpParameters par, const std::vector<std::string>& filters);
-//        std::size_t         createFilterChain(const std::vector<std::string>& filters);
+        std::size_t         createFilterChain(const SpParameters par, const std::vector<std::string>& filters);
 
         void                link(const std::vector<std::size_t>& in, const std::vector<std::size_t>& out);
 
