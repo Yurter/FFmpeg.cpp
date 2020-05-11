@@ -4,7 +4,7 @@
 #include <fpp/codec/DecoderContext.hpp>
 #include <fpp/codec/EncoderContext.hpp>
 #include <fpp/refi/RescaleContext.hpp>
-#include <fpp/refi/VideoFilterContext.hpp>
+#include <fpp/refi/LinearFilterGraph.hpp>
 #include <fpp/refi/VideoFilters/DrawText.hpp>
 
 void text_on_video() {
@@ -66,9 +66,9 @@ void text_on_video() {
     };
 
     /* create filter */
-    fpp::VideoFilterContext video_filter {
+    fpp::LinearFilterGraph filter_graph {
         source.stream(fpp::MediaType::Video)->params
-        , drow_text
+        , { drow_text }
     };
 
     /* open sink */
@@ -94,7 +94,7 @@ void text_on_video() {
     while (read_packet()) {
         if (packet.isVideo()) {
             for (const auto& v_frame  : video_decoder.decode(packet))  {
-            for (const auto& f_frame  : video_filter.filter(v_frame))  {
+            for (const auto& f_frame  : filter_graph.filter(v_frame))  {
             for (const auto& v_packet : video_encoder.encode(f_frame)) {
                 sink.write(v_packet);
             }}}
