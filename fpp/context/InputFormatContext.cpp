@@ -41,7 +41,6 @@ namespace fpp {
                 "Failed to seek timestamp "
                     + utils::time_to_string(timestamp, DEFAULT_TIME_BASE)
                     + " in stream " + std::to_string(stream_index)
-                , ret
             };
         }
         log_info("Success seek to ", utils::time_to_string(timestamp, DEFAULT_TIME_BASE));
@@ -57,7 +56,6 @@ namespace fpp {
             throw FFmpegException {
                 "Cannot read source: \'"
                     + mediaResourceLocator() + "\'"
-                , ret
             };
         }
         processPacket(packet);
@@ -92,7 +90,6 @@ namespace fpp {
             }; ret < 0 ) {
             throw FFmpegException {
                 "Failed to retrieve input stream information"
-                , ret
             };
         }
         setStreams(parseFormatContext());

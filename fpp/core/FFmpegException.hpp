@@ -8,10 +8,9 @@ namespace fpp {
 
     public:
 
-        explicit FFmpegException(const std::string& error_message, int ret = 0);
+        explicit FFmpegException(const std::string& error_message);
 
         const char*         what()  const noexcept override;
-        int                 ret()   const noexcept;
 
     protected:
 

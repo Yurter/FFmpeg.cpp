@@ -28,7 +28,6 @@ namespace fpp {
             }; ret != 0) {
             throw FFmpegException {
                 utils::send_frame_error_to_string(ret)
-                , ret
             };
         }
     }
@@ -39,7 +38,6 @@ namespace fpp {
             }; ret != 0) {
             throw FFmpegException {
                 utils::send_frame_error_to_string(ret)
-                , ret
             };
         }
     }
@@ -56,7 +54,6 @@ namespace fpp {
             if (ret < 0) {
                 throw FFmpegException {
                     utils::receive_packet_error_to_string(ret)
-                    , ret
                 };
             }
             packet.setStreamIndex(stream_index);

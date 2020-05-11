@@ -100,7 +100,6 @@ namespace fpp {
             throw FFmpegException {
                 "swr_convert_frame failed: "
                     + utils::swr_convert_frame_error_to_string(ret)
-                , ret
             };
         }
         _source_pts = frame.pts();
@@ -124,7 +123,6 @@ namespace fpp {
                 throw FFmpegException {
                     "swr_convert_frame failed: "
                         + utils::swr_convert_frame_error_to_string(ret)
-                    , ret
                 };
             }
             stampFrame(frame);

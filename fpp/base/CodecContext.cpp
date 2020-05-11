@@ -36,7 +36,6 @@ namespace fpp {
                     + utils::to_string(raw()->codec_type) + " "
                     + params->codecType() + " "
                     + codec()->name
-                , ret
             };
         }
         params->parseCodecContext(raw());

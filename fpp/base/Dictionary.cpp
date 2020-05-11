@@ -37,9 +37,9 @@ namespace fpp {
     }
 
     void Dictionary::free() {
-        AVDictionaryEntry* entry { nullptr };
         if (_dictionary) {
             // iterate over all entries in dictionary
+            AVDictionaryEntry* entry { nullptr };
             while ((entry = ::av_dict_get(_dictionary, "", entry, AV_DICT_IGNORE_SUFFIX))) {
                 static_log_warning(
                     "Dictionary"
@@ -63,7 +63,6 @@ namespace fpp {
                 std::string("Setting option - ")
                     + value.data() + " " + key.data()
                     + " failed"
-                , ret
             };
         }
     }
@@ -81,7 +80,6 @@ namespace fpp {
                 std::string("Setting option - ")
                     + key.data() + " " + std::to_string(value)
                     + " failed"
-                , ret
             };
         }
     }

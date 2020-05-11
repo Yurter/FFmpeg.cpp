@@ -34,7 +34,9 @@ namespace fpp {
         if (const auto ret {
                 ::avcodec_send_packet(raw(), nullptr)
             }; ret != 0) {
-            throw FFmpegException { utils::send_packet_error_to_string(ret), ret };
+            throw FFmpegException {
+                utils::send_packet_error_to_string(ret)
+            };
         }
     }
 
@@ -49,7 +51,7 @@ namespace fpp {
                 break;
             if (ret < 0) {
                 throw FFmpegException {
-                    utils::receive_frame_error_to_string(ret), ret
+                    utils::receive_frame_error_to_string(ret)
                 };
             }
             output_frame.setTimeBase(time_base);
