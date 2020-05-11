@@ -69,9 +69,10 @@ namespace fpp {
                     ss << "time_base=" << apar->timeBase().num
                                        << '/'
                                        << apar->timeBase().den;
-                    ss << ":sample_rate=" << apar->sampleRate();
-                    ss << ":sample_fmt=" << apar->sampleFormat();
+                    ss << ":sample_rate="    << apar->sampleRate();
+                    ss << ":sample_fmt="     << apar->sampleFormat();
                     ss << ":channel_layout=" << apar->channelLayout();
+                    ss << ":channels="       << apar->channels();
                     return ss.str();
                 }
             }()
