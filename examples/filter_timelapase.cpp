@@ -5,7 +5,7 @@
 #include <fpp/codec/EncoderContext.hpp>
 #include <fpp/refi/ResampleContext.hpp>
 #include <fpp/refi/RescaleContext.hpp>
-#include <fpp/refi/VideoFilterContext.hpp>
+#include <fpp/refi/LinearFilterGraph.hpp>
 
 void timelapase() {
 
@@ -57,14 +57,13 @@ void timelapase() {
 
     /* create filter */
     constexpr auto accel { 3 };
-    const auto filters_descr {
-        fpp::FilterContext::keep_every_frame(accel)
-            + fpp::FilterContext::Separator
-            + fpp::FilterContext::set_pts(1.f / accel)
+    const std::vector<std::string> filters {
+        "select='not(mod(n," + std::to_string(accel) + "))'"
+        , "setpts=" + std::to_string(accel) + "*PTS"
     };
-    fpp::VideoFilterContext filter {
+    fpp::LinearFilterGraph filter_graph {
         source.stream(fpp::MediaType::Video)->params
-        , filters_descr
+        , filters
     };
 
     /* create rescaler */
@@ -96,7 +95,7 @@ void timelapase() {
     /* read and write packet */
     while (read_video_packet()) {
         for (const auto& v_frame  : video_decoder.decode(input_packet)) {
-        for (const auto& f_frame  : filter.filter(v_frame))             {
+        for (const auto& f_frame  : filter_graph.filter(v_frame))       {
         const auto r_frame { rescaler.scale(f_frame) };
         for (const auto& v_packet : video_encoder.encode(r_frame))      {
             sink.write(v_packet);
