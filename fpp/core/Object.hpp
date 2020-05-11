@@ -1,8 +1,6 @@
 #pragma once
 #include <fpp/core/Logger.hpp>
 
-#define inited_int(x)           ((x) != DEFAULT_INT)
-
 namespace fpp {
 
     class Object {
@@ -17,16 +15,6 @@ namespace fpp {
         bool                is(const std::string& name) const;
 
         virtual std::string toString()      const;
-
-        friend std::ostream& operator<<(std::ostream& os, const Object& object) {
-            os << object.toString();
-            return os;
-        }
-
-        friend std::ostream& operator<<(std::ostream& os, const Object*& object) {
-            os << object->toString();
-            return os;
-        }
 
     protected:
 
@@ -48,7 +36,6 @@ namespace fpp {
     private:
 
         /*const*/ std::string   _name;
-        bool                _inited;
 
     };
 

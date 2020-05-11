@@ -3,9 +3,8 @@
 
 namespace fpp {
 
-    Object::Object()
-        : _name { "Object" }
-        , _inited { false } {
+    Object::Object() {
+        setName("Object");
     }
 
     void Object::setName(const std::string& name) {
