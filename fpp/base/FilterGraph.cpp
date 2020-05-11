@@ -93,7 +93,7 @@ namespace fpp {
                         std::static_pointer_cast<const VideoParameters>(par)
                     };
                     std::stringstream ss;
-                    ss << "pix_fmt=" << vpar->pixelFormat();
+                    ss << "pix_fmts=" << vpar->pixelFormat();
                     return ss.str();
                 } else {
                     return std::string {};
