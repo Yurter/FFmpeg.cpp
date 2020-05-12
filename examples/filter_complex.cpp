@@ -47,9 +47,9 @@ void complex() {
     };
     fpp::ComplexFilterGraph graph { graph_opt };
     const std::array<std::size_t, N> input_chain_index {
-          graph.createInputFilterChain(sources[0].stream(fpp::MediaType::Audio)->params, { "adelay=1000" })
-        , graph.createInputFilterChain(sources[1].stream(fpp::MediaType::Audio)->params, { "adelay=2000", "volume=1" })
-        , graph.createInputFilterChain(sources[2].stream(fpp::MediaType::Audio)->params, { "volume=3" })
+          graph.createInputFilterChain(outpar, { "adelay=1000" })
+        , graph.createInputFilterChain(outpar, { "adelay=2000", "volume=1" })
+        , graph.createInputFilterChain(outpar, { "volume=3" })
     };
     const auto output_chain_index {
         graph.createOutputFilterChain(outpar, { "amix=inputs=3:dropout_transition=0" })
@@ -90,21 +90,19 @@ void complex() {
 
         auto all_empty { true };
         for (std::size_t i { 0 }; i < sources.size(); ++i) {
-            if (i!=2) continue;
             const auto packet { sources[i].read() };
             if (!packet.isEOF()) {
                 all_empty = false;
 
-                for (const auto& a_frame  : decoders[i].decode(packet))      {
-                fpp::static_log_info("test", " a_frame: ", a_frame.toString());
-                graph.write(a_frame, input_chain_index[i]);
-                for (const auto& fa_frame : graph.read(output_chain_index))  {
-                    fpp::static_log_info("test", " i: ", i);
-                    fpp::static_log_info("test", fa_frame.toString());
-                    fpp::static_log_info("test", resampler[i].params.in->toString());
-                    fpp::static_log_info("test", sources[2].stream(fpp::MediaType::Audio)->params->toString());
-                for (const auto& ra_frame : resampler[i].resample(fa_frame)) {
-                for (const auto& a_packet : encoder.encode(ra_frame))        {
+                for (const auto& a_frame  : decoders[i].decode(packet))     {
+                for (const auto& ra_frame : resampler[i].resample(a_frame)) {
+                    fpp::static_log_info("nb_samples1", ra_frame.toString());
+                graph.write(ra_frame, input_chain_index[i]);
+                for (const auto& fa_frame : graph.read(output_chain_index)) {
+                    fpp::static_log_info("nb_samples2", fa_frame.toString());
+                for (/*const*/ auto& a_packet : encoder.encode(fa_frame))       {
+                    a_packet.setStreamIndex(0);
+                    a_packet.setTimeBase(inpar->timeBase());
                     sink.write(a_packet);
                 }}}}
             }

@@ -45,6 +45,7 @@ SOURCES += \
     examples/youtube_stream_copy_with_silence.cpp \
     examples/youtube_stream_transcode.cpp \
     examples/youtube_stream_transcode_with_silence.cpp \
+    fpp/base/AudioBufferSink.cpp \
     fpp/base/FilterChain.cpp \
     fpp/base/FilterGraph.cpp \
     fpp/refi/BitStreamFilterContext.cpp \
@@ -75,6 +76,7 @@ SOURCES += \
 
 HEADERS += \
     examples/examples.hpp \
+    fpp/base/AudioBufferSink.hpp \
     fpp/base/CodecContext.hpp \
     fpp/base/Dictionary.hpp \
     fpp/base/FilterChain.hpp \

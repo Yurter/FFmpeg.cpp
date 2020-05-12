@@ -36,8 +36,7 @@ namespace fpp {
         std::string         formatName() const override;
         void                closeContext() override;
 
-        [[nodiscard]]
-        StreamVector        parseFormatContext() override;
+        void                retrieveStreams();
 
         void                guessInputFromat();
         AVInputFormat*      findInputFormat(const std::string_view short_name) const;

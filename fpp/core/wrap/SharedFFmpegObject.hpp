@@ -44,6 +44,10 @@ namespace fpp {
             return _shared_object.get();
         }
 
+        bool isNull() const {
+            return !_shared_object;
+        }
+
     private:
 
         std::shared_ptr<T> _shared_object;

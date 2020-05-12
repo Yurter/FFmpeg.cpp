@@ -61,7 +61,7 @@ namespace fpp {
             return false;
         }
         if (!openContext(options)) {
-            log_error("Could not open ", mediaResourceLocator());
+            log_error("Could not open ", utils::quoted(mediaResourceLocator()));
             return false;
         }
         setOpened(true);

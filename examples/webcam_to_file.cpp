@@ -90,14 +90,16 @@ void webcam_to_file() {
     /* because of endless webcam's video */
     sink.stream(0)->setEndTimePoint(10 * 1000);
 
-    auto stop_flag { false };
+    auto stop_flag { false }; // TODO: use lambda and return instead of flag and break (12.05)
 
     /* read and write packets */
     while (read_packet() && !stop_flag) {
         for (const auto& v_frame  : video_decoder.decode(packet))   {
         for (const auto& fv_frame : graph.filter(v_frame))          {
              const auto& rv_frame { rescaler.scale(fv_frame) };
-        for (const auto& v_packet : video_encoder.encode(rv_frame)) {
+        for (/*const*/ auto& v_packet : video_encoder.encode(rv_frame)) {
+            v_packet.setStreamIndex(0);
+            v_packet.setTimeBase(in_params->timeBase());
             stop_flag = !sink.write(v_packet);
         }}}
     }

@@ -76,9 +76,6 @@ namespace fpp {
         virtual void        closeContext() = 0;
         virtual std::string formatName() const = 0;
 
-        [[nodiscard]]
-        virtual StreamVector parseFormatContext() = 0;
-
         void                addStream(SharedStream stream);
         void                setStreams(StreamVector stream_vector);
 

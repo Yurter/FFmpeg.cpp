@@ -11,6 +11,7 @@ namespace fpp {
         chain.add(createBufferSink(par));
         chain.linkFilters();
         emplaceFilterChainBack(chain);
+        init();
     }
 
     FrameVector LinearFilterGraph::filter(const Frame& frame) {

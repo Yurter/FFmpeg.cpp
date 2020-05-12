@@ -31,6 +31,7 @@ namespace fpp {
 
     void FilterGraph::init() {
         ffmpeg_api_strict(avfilter_graph_config, raw(), nullptr);
+        log_warning('\n', avfilter_graph_dump(raw(), 0));
     }
 
     std::string FilterGraph::genUniqueId() {
@@ -78,7 +79,8 @@ namespace fpp {
                 }
             }()
         };
-        return FilterContext { raw(), filter_name, genUniqueId(), args, nullptr };
+        constexpr void* opaque { nullptr };
+        return FilterContext { raw(), filter_name, genUniqueId(), args, opaque };
     }
 
     FilterContext FilterGraph::createBufferSink(const SpParameters par) {
@@ -88,21 +90,9 @@ namespace fpp {
                 return par->isVideo() ? "buffersink" : "abuffersink";
             }()
         };
-        const auto args {
-            [&]() {
-                if (par->isVideo()) {
-                    const auto vpar {
-                        std::static_pointer_cast<const VideoParameters>(par)
-                    };
-                    std::stringstream ss;
-                    ss << "pix_fmts=" << vpar->pixelFormat();
-                    return ss.str();
-                } else {
-                    return std::string {};
-                }
-            }()
-        };
-        return FilterContext { raw(), filter_name, genUniqueId(), args, nullptr };
+        constexpr auto args { "" };
+        constexpr void* opaque { nullptr };
+        return FilterContext { raw(), filter_name, genUniqueId(), args, opaque };
     }
 
     std::size_t FilterGraph::emplaceFilterChainBack(FilterChain chain) {
@@ -132,7 +122,8 @@ namespace fpp {
         for (const std::string& filter_descr : filters) {
             const auto& [name, args] { extractNameArgs(filter_descr) };
             const auto unique_id { genUniqueId() };
-            result.emplace_back(raw(), name, unique_id, args, nullptr);
+            constexpr void* opaque { nullptr };
+            result.emplace_back(raw(), name, unique_id, args, opaque);
         }
         return result;
     }

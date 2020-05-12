@@ -30,9 +30,6 @@ namespace fpp {
         std::string         formatName() const override;
         void                closeContext() override;
 
-        [[nodiscard]]
-        StreamVector        parseFormatContext() override;
-
         void                guessOutputFromat();
         void                writeHeader();
         void                writeTrailer();

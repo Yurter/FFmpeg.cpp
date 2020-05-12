@@ -32,7 +32,7 @@ auto main() -> int {
         // Filters
 //        text_on_video();
 //        timelapase();
-//        complex();
+        complex();
 
 //        concatenate();
 //        multiple_outputs_sequence();

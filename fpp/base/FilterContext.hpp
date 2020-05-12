@@ -26,6 +26,7 @@ namespace fpp {
     private:
 
         const AVFilter*     getFilterByName(const std::string_view name) const;
+        Frame               createFrame() const;
 
     private:
 

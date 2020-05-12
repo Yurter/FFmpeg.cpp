@@ -266,7 +266,7 @@ namespace fpp {
         if (media_resurs_locator.find("concat") != std::string_view::npos) {
             return "concat";
         }
-        return nullptr;
+        return {};
     }
 
     std::string utils::option_set_error_to_string(int ret) {

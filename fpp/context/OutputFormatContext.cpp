@@ -164,10 +164,6 @@ namespace fpp {
         setOutputFormat(out_fmt);
     }
 
-    StreamVector OutputFormatContext::parseFormatContext() {
-        throw std::logic_error { "OutputFormatContext::parseFormatContext()" };
-    }
-
     void OutputFormatContext::writeHeader() { // TODO use options 09.04
         ::avformat_write_header(
             raw()
