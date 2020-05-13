@@ -11,6 +11,13 @@ struct AVStream;
 
 namespace fpp {
 
+    enum class TimeoutProcess {
+          Opening
+        , Closing
+        , Reading
+        , Writing
+    };
+
     class FormatContext : public SharedFFmpegObject<AVFormatContext> {
 
     public:
@@ -22,10 +29,7 @@ namespace fpp {
         const StreamVector  streams()               const;
         StreamVector        streams();
 
-        void                setTimeoutOpening(int64_t ms);
-        void                setTimeoutClosing(int64_t ms);
-        void                setTimeoutReading(int64_t ms);
-        void                setTimeoutWriting(int64_t ms);
+        void                setTimeout(TimeoutProcess process, int64_t ms);
 
         int64_t             timeoutOpening() const;
         int64_t             timeoutClosing() const;

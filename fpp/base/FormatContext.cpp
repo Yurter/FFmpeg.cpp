@@ -146,20 +146,25 @@ namespace fpp {
         return _streams;
     }
 
-    void FormatContext::setTimeoutOpening(int64_t ms) {
-        _timeout_opening = ms;
-    }
-
-    void FormatContext::setTimeoutClosing(int64_t ms) {
-        _timeout_closing = ms;
-    }
-
-    void FormatContext::setTimeoutReading(int64_t ms) {
-        _timeout_reading = ms;
-    }
-
-    void FormatContext::setTimeoutWriting(int64_t ms) {
-        _timeout_writing = ms;
+    void FormatContext::setTimeout(TimeoutProcess process, int64_t ms) {
+        switch (process) {
+            case TimeoutProcess::Opening: {
+                _timeout_opening = ms;
+                return;
+            }
+            case TimeoutProcess::Closing: {
+                _timeout_closing = ms;
+                return;
+            }
+            case TimeoutProcess::Reading: {
+                _timeout_reading = ms;
+                return;
+            }
+            case TimeoutProcess::Writing: {
+                _timeout_writing = ms;
+                return;
+            }
+        }
     }
 
     int64_t FormatContext::timeoutOpening() const {
