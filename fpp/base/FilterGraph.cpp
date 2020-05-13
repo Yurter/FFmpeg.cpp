@@ -60,7 +60,14 @@ namespace fpp {
         };
         constexpr auto args { "" };
         constexpr void* opaque { nullptr };
-        return FilterContext { raw(), filter_name, genUniqueId(), args, opaque };
+        auto ctx { FilterContext { raw(), filter_name, genUniqueId(), args, opaque } };
+        if (par->isAudio()) {
+            const auto apar {
+                std::static_pointer_cast<const AudioParameters>(par)
+            };
+            ctx.setAudioBufferSinkFrameSize(apar->frameSize());
+        }
+        return ctx;
     }
 
     std::size_t FilterGraph::emplaceFilterChainBack(FilterChain chain) {

@@ -17,7 +17,7 @@ namespace fpp {
         FrameVector         read();
         void                write(const Frame& frame);
 
-//    private:
+    private:
 
         FilterContext&      firstFilter();
         FilterContext&      lastFilter();

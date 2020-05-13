@@ -27,12 +27,6 @@ namespace fpp {
         chain.add(createFilterContexts(filters));
         chain.add(createBufferSink(par));
         chain.linkFilters();
-
-        const auto apar {
-            std::static_pointer_cast<const AudioParameters>(par)
-        };
-
-        chain.lastFilter().setAudioBufferSinkFrameSize(apar->frameSize());
         return emplaceFilterChainBack(chain);
     }
 

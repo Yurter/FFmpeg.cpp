@@ -26,7 +26,6 @@ namespace fpp {
         if (const auto ret {
                 ::avcodec_send_frame(raw(), frame.ptr())
             }; ret != 0) {
-            log_error("-----------------> ", raw()->frame_size);
             throw FFmpegException {
                 utils::send_frame_error_to_string(ret)
             };
