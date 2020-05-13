@@ -1,11 +1,4 @@
 #include "ComplexFilterGraph.hpp"
-#include <fpp/stream/VideoParameters.hpp>
-#include <fpp/stream/AudioParameters.hpp>
-
-extern "C" {
-    #include <libavutil/opt.h>
-    #include <libavfilter/avfilter.h>
-}
 
 namespace fpp {
 
