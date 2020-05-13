@@ -9,12 +9,19 @@ extern "C" {
 
 namespace fpp {
 
+    constexpr auto default_opening_timeout_ms { 20'000 };
+    constexpr auto default_closing_timeout_ms { 5'000  };
+    constexpr auto default_reading_timeout_ms { 5'000  };
+    constexpr auto default_writing_timeout_ms { 1'000  };
+
     FormatContext::FormatContext()
         : _opened { false }
-        , _timeout_opening { 20'000 }
-        , _timeout_closing { 5'000 }
-        , _timeout_reading { 5'000 }
-        , _timeout_writing { 1'000 } {
+        , _timeouts {
+              default_opening_timeout_ms
+            , default_closing_timeout_ms
+            , default_reading_timeout_ms
+            , default_writing_timeout_ms
+        } {
         setName("FormatContext");
     }
 
@@ -147,41 +154,11 @@ namespace fpp {
     }
 
     void FormatContext::setTimeout(TimeoutProcess process, int64_t ms) {
-        switch (process) {
-            case TimeoutProcess::Opening: {
-                _timeout_opening = ms;
-                return;
-            }
-            case TimeoutProcess::Closing: {
-                _timeout_closing = ms;
-                return;
-            }
-            case TimeoutProcess::Reading: {
-                _timeout_reading = ms;
-                return;
-            }
-            case TimeoutProcess::Writing: {
-                _timeout_writing = ms;
-                return;
-            }
-        }
+        _timeouts[std::size_t(process)] = ms;
     }
 
     int64_t FormatContext::getTimeout(TimeoutProcess process) const {
-        switch (process) {
-            case TimeoutProcess::Opening: {
-                return _timeout_opening;
-            }
-            case TimeoutProcess::Closing: {
-                return _timeout_closing;
-            }
-            case TimeoutProcess::Reading: {
-                return _timeout_reading;
-            }
-            case TimeoutProcess::Writing: {
-                return _timeout_writing;
-            }
-        }
+        return _timeouts[std::size_t(process)];
     }
 
     const StreamVector FormatContext::streams() const {

@@ -3,6 +3,7 @@
 #include <fpp/core/time/Chronometer.hpp>
 #include <fpp/base/Dictionary.hpp>
 #include <fpp/stream/Stream.hpp>
+#include <array>
 
 struct AVFormatContext;
 struct AVOutputFormat;
@@ -16,6 +17,7 @@ namespace fpp {
         , Closing
         , Reading
         , Writing
+        , EnumSize
     };
 
     class FormatContext : public SharedFFmpegObject<AVFormatContext> {
@@ -89,12 +91,10 @@ namespace fpp {
         std::string         _media_resource_locator;
         bool                _opened;
         StreamVector        _streams;
-        Interrupter         _interrupter;
 
-        int64_t             _timeout_opening;
-        int64_t             _timeout_closing;
-        int64_t             _timeout_reading;
-        int64_t             _timeout_writing;
+        using TimeoutsArray = std::array<int64_t,std::size_t(TimeoutProcess::EnumSize)>;
+        TimeoutsArray       _timeouts;
+        Interrupter         _interrupter;
 
     };
 
