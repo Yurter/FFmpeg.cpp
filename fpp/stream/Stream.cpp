@@ -58,6 +58,10 @@ namespace fpp {
                 + params->toString();
     }
 
+    void Stream::initCodecpar() {
+        params->initCodecpar(codecpar());
+    }
+
     void Stream::stampPacket(Packet& packet) {
 
         if (packet.timeBase() != DEFAULT_RATIONAL) {

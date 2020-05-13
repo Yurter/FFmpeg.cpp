@@ -23,6 +23,7 @@ namespace fpp {
         Stream(AVStream* avstream, const SpParameters parameters);
 
         std::string         toString() const override final;
+        void                initCodecpar();
 
         void                stampPacket(Packet& packet);
         bool                timeIsOver() const;

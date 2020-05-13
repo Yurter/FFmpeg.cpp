@@ -166,9 +166,9 @@ namespace fpp {
         ffmpeg_api_strict(av_write_trailer, raw());
     }
 
-    void OutputFormatContext::initStreamsCodecpar() { // TODO refactor 16.04
+    void OutputFormatContext::initStreamsCodecpar() {
         for (const auto& stream : streams()) {
-            stream->params->initCodecpar(stream->codecpar());
+            stream->initCodecpar();
         }
     }
 
