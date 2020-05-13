@@ -61,8 +61,8 @@ SOURCES += \
     fpp/base/Parameters.cpp \
     fpp/codec/DecoderContext.cpp \
     fpp/codec/EncoderContext.cpp \
-    fpp/context/InputFormatContext.cpp \
-    fpp/context/OutputFormatContext.cpp \
+    fpp/format/InputFormatContext.cpp \
+    fpp/format/OutputFormatContext.cpp \
     fpp/core/FFmpegException.cpp \
     fpp/core/Logger.cpp \
     fpp/core/Object.cpp \
@@ -86,8 +86,8 @@ HEADERS += \
     fpp/base/Parameters.hpp \
     fpp/codec/DecoderContext.hpp \
     fpp/codec/EncoderContext.hpp \
-    fpp/context/InputFormatContext.hpp \
-    fpp/context/OutputFormatContext.hpp \
+    fpp/format/InputFormatContext.hpp \
+    fpp/format/OutputFormatContext.hpp \
     fpp/core/FFmpegException.hpp \
     fpp/core/Logger.hpp \
     fpp/core/Object.hpp \
