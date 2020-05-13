@@ -4,7 +4,7 @@
 #include <fpp/codec/DecoderContext.hpp>
 #include <fpp/codec/EncoderContext.hpp>
 #include <fpp/refi/RescaleContext.hpp>
-#include <fpp/refi/LinearFilterGraph.hpp>
+#include <fpp/filter/LinearFilterGraph.hpp>
 #include <fpp/refi/VideoFilters/DrawText.hpp>
 
 void text_on_video() {

@@ -47,9 +47,9 @@ SOURCES += \
     examples/youtube_stream_transcode_with_silence.cpp \
     fpp/base/FilterChain.cpp \
     fpp/base/FilterGraph.cpp \
-    fpp/refi/BitStreamFilterContext.cpp \
-    fpp/refi/ComplexFilterGraph.cpp \
-    fpp/refi/LinearFilterGraph.cpp \
+    fpp/filter/BitStreamFilterContext.cpp \
+    fpp/filter/ComplexFilterGraph.cpp \
+    fpp/filter/LinearFilterGraph.cpp \
     fpp/refi/ResampleContext.cpp \
     fpp/refi/VideoFilters/Drawtext.cpp \
     main.cpp \
@@ -100,9 +100,9 @@ HEADERS += \
     fpp/core/time/Timer.hpp \
     fpp/core/wrap/FFmpegObject.hpp \
     fpp/core/wrap/SharedFFmpegObject.hpp \
-    fpp/refi/BitStreamFilterContext.hpp \
-    fpp/refi/ComplexFilterGraph.hpp \
-    fpp/refi/LinearFilterGraph.hpp \
+    fpp/filter/BitStreamFilterContext.hpp \
+    fpp/filter/ComplexFilterGraph.hpp \
+    fpp/filter/LinearFilterGraph.hpp \
     fpp/refi/VideoFilters/DrawText.hpp \
     fpp/base/FilterContext.hpp \
     fpp/refi/ResampleContext.hpp \

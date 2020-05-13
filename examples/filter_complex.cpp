@@ -3,7 +3,7 @@
 #include <fpp/context/OutputFormatContext.hpp>
 #include <fpp/codec/DecoderContext.hpp>
 #include <fpp/codec/EncoderContext.hpp>
-#include <fpp/refi/ComplexFilterGraph.hpp>
+#include <fpp/filter/ComplexFilterGraph.hpp>
 #include <array>
 
 void complex() {
