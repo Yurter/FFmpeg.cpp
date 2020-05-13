@@ -103,8 +103,7 @@ namespace fpp {
     }
 
     void Packet::ref(const Packet& other) {
-        ffmpeg_api_strict(av_packet_ref, ptr(), other.ptr());
-        setTimeBase(other.timeBase());
+        ref(other.raw(), other.timeBase());
     }
 
     void Packet::ref(const AVPacket& other, AVRational time_base) {
