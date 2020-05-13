@@ -22,7 +22,7 @@ namespace fpp {
         if (closed()) {
             return;
         }
-        setInterruptTimeout(timeoutClosing());
+        setInterruptTimeout(getTimeout(TimeoutProcess::Closing));
         closeContext();
         reset();
         setStreams({});
@@ -167,20 +167,21 @@ namespace fpp {
         }
     }
 
-    int64_t FormatContext::timeoutOpening() const {
-        return _timeout_opening;
-    }
-
-    int64_t FormatContext::timeoutClosing() const {
-        return _timeout_closing;
-    }
-
-    int64_t FormatContext::timeoutReading() const {
-        return _timeout_reading;
-    }
-
-    int64_t FormatContext::timeoutWriting() const {
-        return _timeout_writing;
+    int64_t FormatContext::getTimeout(TimeoutProcess process) const {
+        switch (process) {
+            case TimeoutProcess::Opening: {
+                return _timeout_opening;
+            }
+            case TimeoutProcess::Closing: {
+                return _timeout_closing;
+            }
+            case TimeoutProcess::Reading: {
+                return _timeout_reading;
+            }
+            case TimeoutProcess::Writing: {
+                return _timeout_writing;
+            }
+        }
     }
 
     const StreamVector FormatContext::streams() const {

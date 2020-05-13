@@ -23,7 +23,7 @@ namespace fpp {
         if (packet.isEOF()) {
             return false;
         }
-        setInterruptTimeout(timeoutWriting());
+        setInterruptTimeout(getTimeout(TimeoutProcess::Writing));
         if (write_mode == WriteMode::Instant) {
             ffmpeg_api(av_write_frame, raw(), packet.ptr());
         }

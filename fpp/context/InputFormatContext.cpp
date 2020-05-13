@@ -47,7 +47,7 @@ namespace fpp {
     }
 
     Packet InputFormatContext::read() {
-        setInterruptTimeout(timeoutReading());
+        setInterruptTimeout(getTimeout(TimeoutProcess::Reading));
         Packet packet { MediaType::Unknown };
         if (const auto ret { ::av_read_frame(raw(), packet.ptr()) }; ret < 0) {
             if (ret == AVERROR_EOF) {
@@ -72,7 +72,7 @@ namespace fpp {
                     ::avformat_alloc_context()
                 };
                 setInterruptCallback(fmt_ctx);
-                setInterruptTimeout(timeoutOpening());
+                setInterruptTimeout(getTimeout(TimeoutProcess::Opening));
                 Dictionary dictionary { options };
                 if (const auto ret {
                         ::avformat_open_input(

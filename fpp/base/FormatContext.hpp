@@ -30,11 +30,7 @@ namespace fpp {
         StreamVector        streams();
 
         void                setTimeout(TimeoutProcess process, int64_t ms);
-
-        int64_t             timeoutOpening() const;
-        int64_t             timeoutClosing() const;
-        int64_t             timeoutReading() const;
-        int64_t             timeoutWriting() const;
+        int64_t             getTimeout(TimeoutProcess process) const;
 
         bool                open(Options options = {});
         bool                open(const std::string_view mrl, Options options = {});
