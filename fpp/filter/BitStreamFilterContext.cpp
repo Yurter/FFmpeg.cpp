@@ -9,27 +9,28 @@ namespace fpp {
 
     BitStreamFilterContext::BitStreamFilterContext(const fpp::SpParameters param, const std::string_view filter_name) {
         setName("BSFContext");
-
-        const auto bfs {
-            ::av_bsf_get_by_name(filter_name.data())
-        };
-        if (!bfs) {
-            throw FFmpegException {
-                "no such bitstream filter exists: "
-                + std::string { filter_name }
-            };
-        }
-
-        AVBSFContext* bfs_ctx { nullptr };
-        ffmpeg_api_strict(::av_bsf_alloc, bfs, &bfs_ctx);
-
-        param->initCodecpar(bfs_ctx->par_in);
-        bfs_ctx->time_base_in = param->timeBase();
-
-        ffmpeg_api_strict(::av_bsf_init, bfs_ctx); // TODO: memory leak on failure (28.04)
-
         reset(
-            bfs_ctx, [](AVBSFContext* ctx) {
+            [&]() {
+                const auto bfs {
+                    ::av_bsf_get_by_name(filter_name.data())
+                };
+                if (!bfs) {
+                    throw FFmpegException {
+                        "No such bitstream filter exists: "
+                        + std::string { filter_name }
+                    };
+                }
+
+                AVBSFContext* bfs_ctx { nullptr };
+                ffmpeg_api_strict(::av_bsf_alloc, bfs, &bfs_ctx);
+
+                param->initCodecpar(bfs_ctx->par_in);
+                bfs_ctx->time_base_in = param->timeBase();
+
+                ffmpeg_api_strict(::av_bsf_init, bfs_ctx); // TODO: memory leak on failure (28.04)
+                return bfs_ctx;
+            }()
+            , [](AVBSFContext* ctx) {
                 ::av_bsf_flush(ctx);
                 ::av_bsf_free(&ctx);
             }
