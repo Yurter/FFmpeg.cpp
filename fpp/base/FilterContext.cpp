@@ -39,7 +39,11 @@ namespace fpp {
             , _nb_output_pads++
             , other.raw()
             , other._nb_input_pads++
-        );
+                          );
+    }
+
+    void FilterContext::setAudioBufferSinkFrameSize(unsigned frame_size) {
+        ::av_buffersink_set_frame_size(raw(), frame_size);
     }
 
     FrameVector FilterContext::read() {
@@ -74,27 +78,6 @@ namespace fpp {
             };
         }
         return filter;
-    }
-
-    Frame FilterContext::createFrame() const {
-        Frame frame { MediaType::Audio };
-        const auto out_param {
-            std::static_pointer_cast<const AudioParameters>(params.out)
-        };
-        /* Set the frame's parameters, especially its size and format.
-         * av_frame_get_buffer needs this to allocate memory for the
-         * audio samples of the frame.
-         * Default channel layouts based on the number of channels
-         * are assumed for simplicity. */
-        frame.raw().nb_samples     = int(out_param->frameSize());
-        frame.raw().channel_layout = out_param->channelLayout();
-        frame.raw().format         = out_param->sampleFormat();
-        frame.raw().sample_rate    = int(out_param->sampleRate());
-        /* Allocate the samples of the created frame. This call will make
-         * sure that the audio frame can hold as many samples as specified. */
-        constexpr auto align { 32 };
-        ffmpeg_api_strict(av_frame_get_buffer, frame.ptr(), align);
-        return frame;
     }
 
 } // namespace fpp

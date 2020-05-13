@@ -57,9 +57,6 @@ namespace fpp {
 
         static bool         compare_float(float a, float b);
 
-        static bool         compatible_with_pixel_format(const AVCodec* codec, AVPixelFormat pixel_format);
-        static bool         compatible_with_sample_format(const AVCodec* codec, AVSampleFormat sample_format);
-
         static const std::string_view guess_format_short_name(const std::string_view media_resurs_locator);
 
         /* FFmpeg's error codes explanation */

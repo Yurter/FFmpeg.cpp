@@ -2,6 +2,11 @@
 #include <fpp/stream/VideoParameters.hpp>
 #include <fpp/stream/AudioParameters.hpp>
 
+extern "C" {
+    #include <libavutil/opt.h>
+    #include <libavfilter/avfilter.h>
+}
+
 namespace fpp {
 
     ComplexFilterGraph::ComplexFilterGraph(const Options& options)
@@ -22,6 +27,12 @@ namespace fpp {
         chain.add(createFilterContexts(filters));
         chain.add(createBufferSink(par));
         chain.linkFilters();
+
+        const auto apar {
+            std::static_pointer_cast<const AudioParameters>(par)
+        };
+
+        chain.lastFilter().setAudioBufferSinkFrameSize(apar->frameSize());
         return emplaceFilterChainBack(chain);
     }
 

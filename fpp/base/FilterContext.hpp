@@ -19,6 +19,7 @@ namespace fpp {
                       , void* opaque);
 
         void                linkTo(FilterContext& other);
+        void                setAudioBufferSinkFrameSize(unsigned frame_size);
 
         FrameVector         read();
         void                write(const Frame& frame);
@@ -26,7 +27,6 @@ namespace fpp {
     private:
 
         const AVFilter*     getFilterByName(const std::string_view name) const;
-        Frame               createFrame() const;
 
     private:
 

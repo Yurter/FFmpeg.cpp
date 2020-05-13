@@ -31,7 +31,6 @@ namespace fpp {
 
     void FilterGraph::init() {
         ffmpeg_api_strict(avfilter_graph_config, raw(), nullptr);
-        log_warning('\n', avfilter_graph_dump(raw(), 0));
     }
 
     std::string FilterGraph::genUniqueId() {
@@ -41,45 +40,14 @@ namespace fpp {
     FilterContext FilterGraph::createBufferSource(const SpParameters par) {
         assert(par->isVideo() || par->isAudio());
         const auto filter_name {
-            [&]() {
-                return par->isVideo() ? "buffer" : "abuffer";
-            }()
+            par->isVideo() ? "buffer" : "abuffer"
         };
         const auto args {
-            [&]() {
-                if (par->isVideo()) {
-                    const auto vpar {
-                        std::static_pointer_cast<const VideoParameters>(par)
-                    };
-                    std::stringstream ss;
-                    ss << "video_size=" << vpar->width()
-                                        << 'x'
-                                        << vpar->height();
-                    ss << ":pix_fmt=" << vpar->pixelFormat();
-                    ss << ":time_base=" << vpar->timeBase().num
-                                        << '/'
-                                        << vpar->timeBase().den;
-                    ss << ":pixel_aspect=" << vpar->sampleAspectRatio().num
-                                           << '/'
-                                           << vpar->sampleAspectRatio().den;
-                    return ss.str();
-                } else {
-                    const auto apar {
-                        std::static_pointer_cast<const AudioParameters>(par)
-                    };
-                    std::stringstream ss;
-                    ss << "time_base=" << apar->timeBase().num
-                                       << '/'
-                                       << apar->timeBase().den;
-                    ss << ":sample_rate="    << apar->sampleRate();
-                    ss << ":sample_fmt="     << apar->sampleFormat();
-                    ss << ":channel_layout=" << apar->channelLayout();
-                    ss << ":channels="       << apar->channels();
-                    return ss.str();
-                }
-            }()
+            par->isVideo() ? createVideoArgs(par) : createAudioArgs(par)
         };
-        constexpr void* opaque { nullptr };
+        constexpr void* opaque {
+            nullptr
+        };
         return FilterContext { raw(), filter_name, genUniqueId(), args, opaque };
     }
 
@@ -126,6 +94,39 @@ namespace fpp {
             result.emplace_back(raw(), name, unique_id, args, opaque);
         }
         return result;
+    }
+
+    std::string FilterGraph::createVideoArgs(const SpParameters par) const {
+        const auto vpar {
+            std::static_pointer_cast<const VideoParameters>(par)
+        };
+        std::stringstream ss;
+        ss << "video_size=" << vpar->width()
+                            << 'x'
+                            << vpar->height();
+        ss << ":pix_fmt=" << vpar->pixelFormat();
+        ss << ":time_base=" << vpar->timeBase().num
+                            << '/'
+                            << vpar->timeBase().den;
+        ss << ":pixel_aspect=" << vpar->sampleAspectRatio().num
+                               << '/'
+                               << vpar->sampleAspectRatio().den;
+        return ss.str();
+    }
+
+    std::string FilterGraph::createAudioArgs(const SpParameters par) const {
+        const auto apar {
+            std::static_pointer_cast<const AudioParameters>(par)
+        };
+        std::stringstream ss;
+        ss << "time_base=" << apar->timeBase().num
+                           << '/'
+                           << apar->timeBase().den;
+        ss << ":sample_rate="    << apar->sampleRate();
+        ss << ":sample_fmt="     << apar->sampleFormat();
+        ss << ":channel_layout=" << apar->channelLayout();
+        ss << ":channels="       << apar->channels();
+        return ss.str();
     }
 
 } // namespace fpp

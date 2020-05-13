@@ -78,10 +78,10 @@ namespace fpp {
          * audio samples of the frame.
          * Default channel layouts based on the number of channels
          * are assumed for simplicity. */
-        frame.raw().nb_samples     = int(out_param->frameSize());
+        frame.raw().nb_samples     = out_param->frameSize();
         frame.raw().channel_layout = out_param->channelLayout();
         frame.raw().format         = out_param->sampleFormat();
-        frame.raw().sample_rate    = int(out_param->sampleRate());
+        frame.raw().sample_rate    = out_param->sampleRate();
         /* Allocate the samples of the created frame. This call will make
          * sure that the audio frame can hold as many samples as specified. */
         constexpr auto align { 32 };
@@ -98,8 +98,7 @@ namespace fpp {
                 )
             }; ret != 0) {
             throw FFmpegException {
-                "swr_convert_frame failed: "
-                    + utils::swr_convert_frame_error_to_string(ret)
+                utils::swr_convert_frame_error_to_string(ret)
             };
         }
         _source_pts = frame.pts();

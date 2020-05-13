@@ -32,6 +32,11 @@ namespace fpp {
 
     private:
 
+        std::string         createVideoArgs(const SpParameters par) const;
+        std::string         createAudioArgs(const SpParameters par) const;
+
+    private:
+
         using FilterChainVector = std::vector<FilterChain>;
 
         FilterChainVector   _filters;
