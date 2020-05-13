@@ -102,7 +102,6 @@ namespace fpp {
         std::string str = utils::to_string(type()) + " frame: ";
         if (isVideo()) {
             str += std::to_string(size()) + " bytes, "
-//                    + (keyFrame() ? "[I]" : "[_]") + ", "
                     + '[' + ::av_get_picture_type_char(raw().pict_type) +']' + ", "
                     + "pts " + utils::pts_to_string(raw().pts) + ", "
                     + "width " + std::to_string(raw().width) + ", "
@@ -132,9 +131,7 @@ namespace fpp {
     }
 
     void Frame::ref(const Frame& other) {
-        ffmpeg_api_strict(av_frame_ref, ptr(), other.ptr());
-        setTimeBase(other.timeBase());
-        setStreamIndex(other.streamIndex());
+        ref(other.raw(), other.timeBase(), other.streamIndex());
     }
 
     void Frame::ref(const AVFrame& other, AVRational time_base, int stream_index) {
