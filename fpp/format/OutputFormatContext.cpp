@@ -94,26 +94,19 @@ namespace fpp {
             };
         }
         initStreamsCodecpar();
-//        Dictionary dictionary { options }; // TODO: avio_open2 (24.03)
-//        if (!(raw()->flags & AVFMT_NOFILE)) {
-//            if (const auto ret {
-//                    ::avio_open2(
-//                        &raw()->pb                       /* AVIOContext */
-//                        , mediaResourceLocator().c_str() /* url         */
-//                        , AVIO_FLAG_WRITE                /* flags       */
-//                        , nullptr                        /* int_cb */
-//                        , dictionary.get()
-//                    )
-//                }; ret < 0) {
-//                return false;
-//            }
-//        }
+        Dictionary dictionary { options };
         if (!(raw()->flags & AVFMT_NOFILE)) {
-            ffmpeg_api(avio_open
-                , &raw()->pb                    /* AVIOContext */
-                , mediaResourceLocator().data() /* url         */
-                , AVIO_FLAG_WRITE               /* flags       */
-            );
+            if (const auto ret {
+                    ::avio_open2(
+                        &raw()->pb                      /* AVIOContext */
+                        , mediaResourceLocator().data() /* url         */
+                        , AVIO_FLAG_WRITE               /* flags       */
+                        , nullptr                       /* int_cb      */
+                        , dictionary.get()
+                    )
+                }; ret < 0) {
+                return false;
+            }
         }
         writeHeader();
         parseStreamsTimeBase();
