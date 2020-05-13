@@ -3,7 +3,6 @@
 #include <fpp/context/OutputFormatContext.hpp>
 #include <fpp/codec/DecoderContext.hpp>
 #include <fpp/codec/EncoderContext.hpp>
-#include <fpp/resample/ResampleContext.hpp>
 #include <fpp/scale/RescaleContext.hpp>
 #include <fpp/filter/LinearFilterGraph.hpp>
 
@@ -24,12 +23,11 @@ void timelapase() {
         "timelapse.flv"
     };
 
+    const auto in_params  { source.stream(fpp::MediaType::Video)->params };
     const auto out_params { fpp::VideoParameters::make_shared() };
     out_params->setEncoder(AVCodecID::AV_CODEC_ID_H264);
     out_params->setPixelFormat(AVPixelFormat::AV_PIX_FMT_YUV420P);
     out_params->setGopSize(24);
-
-    const auto in_params { source.stream(fpp::MediaType::Video)->params };
     out_params->completeFrom(in_params);
 
     /* create video stream with predefined params */
