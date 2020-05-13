@@ -68,7 +68,7 @@ SOURCES += \
     fpp/core/Object.cpp \
     fpp/core/Utils.cpp \
     fpp/base/FilterContext.cpp \
-    fpp/refi/RescaleContext.cpp \
+    fpp/scale/RescaleContext.cpp \
     fpp/stream/AudioParameters.cpp \
     fpp/stream/Stream.cpp \
     fpp/stream/VideoParameters.cpp
@@ -106,7 +106,7 @@ HEADERS += \
     fpp/refi/VideoFilters/DrawText.hpp \
     fpp/base/FilterContext.hpp \
     fpp/refi/ResampleContext.hpp \
-    fpp/refi/RescaleContext.hpp \
+    fpp/scale/RescaleContext.hpp \
     fpp/stream/AudioParameters.hpp \
     fpp/stream/Stream.hpp \
     fpp/stream/VideoParameters.hpp
