@@ -3,8 +3,8 @@
 #include <fpp/context/OutputFormatContext.hpp>
 #include <fpp/codec/DecoderContext.hpp>
 #include <fpp/codec/EncoderContext.hpp>
-#include <fpp/refi/ResampleContext.hpp>
-#include <fpp/refi/RescaleContext.hpp>
+#include <fpp/resample/ResampleContext.hpp>
+#include <fpp/scale/RescaleContext.hpp>
 #include <fpp/core/Utils.hpp>
 
 void rtp_video_and_audio_stream() {

@@ -3,7 +3,7 @@
 #include <fpp/context/OutputFormatContext.hpp>
 #include <fpp/codec/DecoderContext.hpp>
 #include <fpp/codec/EncoderContext.hpp>
-#include <fpp/refi/ResampleContext.hpp>
+#include <fpp/resample/ResampleContext.hpp>
 #include <fpp/core/Utils.hpp>
 
 void youtube_stream_copy_with_silence() {

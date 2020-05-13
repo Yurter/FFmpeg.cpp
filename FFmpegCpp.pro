@@ -50,7 +50,7 @@ SOURCES += \
     fpp/filter/BitStreamFilterContext.cpp \
     fpp/filter/ComplexFilterGraph.cpp \
     fpp/filter/LinearFilterGraph.cpp \
-    fpp/refi/ResampleContext.cpp \
+    fpp/resample/ResampleContext.cpp \
     fpp/refi/VideoFilters/Drawtext.cpp \
     main.cpp \
     fpp/base/CodecContext.cpp \
@@ -105,7 +105,7 @@ HEADERS += \
     fpp/filter/LinearFilterGraph.hpp \
     fpp/refi/VideoFilters/DrawText.hpp \
     fpp/base/FilterContext.hpp \
-    fpp/refi/ResampleContext.hpp \
+    fpp/resample/ResampleContext.hpp \
     fpp/scale/RescaleContext.hpp \
     fpp/stream/AudioParameters.hpp \
     fpp/stream/Stream.hpp \
