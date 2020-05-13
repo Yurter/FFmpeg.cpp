@@ -69,7 +69,7 @@ namespace fpp {
         };
 
         void                setInterruptCallback(AVFormatContext* ctx);
-        void                setInterrupter(int64_t timeout_ms);
+        void                setInterruptTimeout(int64_t timeout_ms);
 
         virtual void        createContext();
         virtual bool        openContext(Options options) = 0;

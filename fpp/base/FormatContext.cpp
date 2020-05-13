@@ -22,7 +22,7 @@ namespace fpp {
         if (closed()) {
             return;
         }
-        setInterrupter(timeoutClosing());
+        setInterruptTimeout(timeoutClosing());
         closeContext();
         reset();
         setStreams({});
@@ -79,7 +79,7 @@ namespace fpp {
         ctx->interrupt_callback.opaque   = &_interrupter;
     }
 
-    void FormatContext::setInterrupter(int64_t timeout_ms) {
+    void FormatContext::setInterruptTimeout(int64_t timeout_ms) {
         _interrupter.set(timeout_ms);
     }
 
