@@ -164,11 +164,16 @@ namespace fpp {
             codec_context->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
         }
 
-        if (isEncoder()) { // TODO: check it, do not write extradata of input stream to encoder if stream transcoded (27.04)
-            if (codec_context->extradata) {
-                ::av_freep(&codec_context->extradata);
-                codec_context->extradata_size = 0;
-            }
+        if (isEncoder()) {
+            const auto ignore_input_extradata {
+                [&]() {
+                    if (codec_context->extradata) {
+                        ::av_freep(&codec_context->extradata);
+                        codec_context->extradata_size = 0;
+                    }
+                }
+            };
+            ignore_input_extradata();
         }
     }
 
