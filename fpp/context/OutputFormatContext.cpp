@@ -34,9 +34,7 @@ namespace fpp {
     }
 
     void OutputFormatContext::flush() {
-        if (const auto ret { ::av_write_frame(raw(), nullptr) }; ret != 1) { // TODO check ret value meaning and use ffmpeg_api_strict macro 09.04
-            throw FFmpegException { "OutputFormatContext flush failed" };
-        }
+        ffmpeg_api_strict(av_write_frame, raw(), nullptr);
     }
 
     std::string OutputFormatContext::sdp() {
