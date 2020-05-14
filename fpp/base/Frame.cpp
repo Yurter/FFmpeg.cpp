@@ -12,7 +12,6 @@ namespace fpp {
         : MediaData(type)
         , _time_base { DEFAULT_RATIONAL }
         , _stream_index { -1 } {
-        setName("Frame");
     }
 
     Frame::Frame(const Frame& other)

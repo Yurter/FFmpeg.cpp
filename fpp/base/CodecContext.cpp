@@ -11,7 +11,6 @@ namespace fpp {
     CodecContext::CodecContext(const SpParameters params)
         : MediaData(params->type())
         , params { params } {
-        setName("CodecContext");
     }
 
     void CodecContext::init(Options options) {
@@ -21,7 +20,6 @@ namespace fpp {
                  ::avcodec_free_context(&codec_ctx);
             }
         );
-        setName(name() + " " + codec()->name);
         open(options);
     }
 

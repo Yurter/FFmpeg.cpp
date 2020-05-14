@@ -10,7 +10,6 @@ namespace fpp {
 
     RescaleContext::RescaleContext(InOutParams parameters)
         : params { parameters } {
-        setName("Rescaler");
         init();
     }
 

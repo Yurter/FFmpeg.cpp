@@ -42,7 +42,7 @@ namespace fpp {
             ss << '[' << logLevelToString(log_level) << ']'
                << '[' << threadIdFormated() << ']'
                << '[' << currentTimeFormated() << ']'
-               << '[' << std::setw(15) << std::left << std::setfill(' ') << caller_name << ']' << ' ';
+               << '[' /*<< std::setw(15) << std::left << std::setfill(' ')*/ << caller_name << ']' << ' ';
 
             (ss << ... << std::forward<Args>(args));
 

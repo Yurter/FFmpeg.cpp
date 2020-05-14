@@ -15,7 +15,6 @@ namespace fpp {
                                  , void* opaque)
         : _nb_input_pads  { 0 }
         , _nb_output_pads { 0 } {
-        setName("FilterContext");        
         reset(
             [&]() {
                 AVFilterContext* flt_ctx { nullptr };

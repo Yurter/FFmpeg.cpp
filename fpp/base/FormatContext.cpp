@@ -22,7 +22,6 @@ namespace fpp {
             , default_reading_timeout_ms
             , default_writing_timeout_ms
         } {
-        setName("FormatContext");
     }
 
     void FormatContext::close() {

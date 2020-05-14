@@ -18,32 +18,23 @@ namespace fpp {
         , _start_time_point { FROM_START }
         , _end_time_point { TO_END }
         , _stamp_from_zero { false } {
-
-        setName("Stream");
         if (duration() == NOPTS_VALUE) {
             setDuration(0);
         }
-
     }
 
     // input stream
     Stream::Stream(AVStream* avstream)
         : Stream(avstream, utils::to_media_type(avstream->codecpar->codec_type)) {
-
-        setName("In" + utils::to_string(type()) + "Stream");
         params = utils::make_params(type());
         params->parseStream(avstream);
-
     }
 
     // output stream
     Stream::Stream(AVStream* avstream, const SpParameters parameters)
         : Stream(avstream, parameters->type()) {
-
-        setName("Out" + utils::to_string(type()) + "Stream");
         params = parameters;
         params->initCodecpar(codecpar());
-
     }
 
     std::string Stream::toString() const {

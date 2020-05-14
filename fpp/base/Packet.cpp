@@ -7,7 +7,6 @@ namespace fpp {
     Packet::Packet(MediaType type)
         : MediaData(type)
         , _time_base { DEFAULT_RATIONAL } {
-        setName("Packet");
     }
 
     Packet::Packet(const Packet& other)

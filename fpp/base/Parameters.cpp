@@ -15,7 +15,6 @@ namespace fpp {
         , _codec { nullptr }
         , _time_base { DEFAULT_RATIONAL }
         , _format_flags { 0 } {
-        setName("Parameters");
         reset();
     }
 

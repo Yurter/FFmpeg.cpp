@@ -12,7 +12,6 @@ namespace fpp {
         : params { parameters }
         , _samples_count { 0 }
         , _source_pts { 0 } {
-        setName("Resampler");
         init();
     }
 

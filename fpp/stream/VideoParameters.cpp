@@ -14,7 +14,6 @@ namespace fpp {
         : Parameters(MediaType::Video)
         , _gop_size { 0 }
         , _frame_rate { DEFAULT_RATIONAL } {
-        setName("VideoParameters");
     }
 
     void VideoParameters::setWidth(int width) {

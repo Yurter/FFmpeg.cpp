@@ -14,7 +14,6 @@ namespace fpp {
 
     AudioParameters::AudioParameters()
         : Parameters(MediaType::Audio) {
-        setName("AudioParameters");
     }
 
     void AudioParameters::setSampleRate(int sample_rate) {

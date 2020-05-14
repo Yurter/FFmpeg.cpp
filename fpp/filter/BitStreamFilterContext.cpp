@@ -8,7 +8,6 @@ extern "C" {
 namespace fpp {
 
     BitStreamFilterContext::BitStreamFilterContext(const fpp::SpParameters param, const std::string_view filter_name) {
-        setName("BSFContext");
         reset(
             [&]() {
                 const auto bfs {

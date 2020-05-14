@@ -4,7 +4,6 @@ namespace fpp {
 
     ComplexFilterGraph::ComplexFilterGraph(const Options& options)
         : FilterGraph(options) {
-        setName("CompFilterGraph");
     }
 
     std::size_t ComplexFilterGraph::createInputFilterChain(const SpParameters par, const std::vector<std::string>& filters) {

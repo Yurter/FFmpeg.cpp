@@ -9,7 +9,6 @@ namespace fpp {
 
     Dictionary::Dictionary(const Options& options)
         : _dictionary { alloc(options) } {
-        setName("Dictionary");
     }
 
     Dictionary::~Dictionary() {

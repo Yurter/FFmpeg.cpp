@@ -8,7 +8,6 @@ namespace fpp {
     EncoderContext::EncoderContext(const SpParameters params, Options options)
         : CodecContext(params) {
         assert(params->isEncoder());
-        setName("EncCtx");
         init(options);
     }
 

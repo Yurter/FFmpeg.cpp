@@ -8,7 +8,6 @@ namespace fpp {
     DecoderContext::DecoderContext(const SpParameters params, Options options)
         : CodecContext(params) {
         assert(params->isDecoder());
-        setName("DecCtx");
         init(options);
     }
 
