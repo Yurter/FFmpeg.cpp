@@ -99,10 +99,9 @@ namespace fpp {
             )
         };
         if (actual_duration >= planned_duration) {
-            log_info(
-                "Time is over: "
-                , utils::time_to_string(actual_duration, DEFAULT_TIME_BASE)
-            );
+            log_info()
+                << "Time is over: "
+                << utils::time_to_string(actual_duration, DEFAULT_TIME_BASE);
             return true;
         }
         return false;
@@ -116,33 +115,33 @@ namespace fpp {
         raw()->duration = duration;
     }
 
-    void Stream::setStartTimePoint(int64_t msec) {
+    void Stream::setStartTimePoint(int64_t msec) { // TODO (18.05)
         if (_start_time_point == msec) {
             return;
         }
         if ((msec != FROM_START) && (msec < 0)) {
-            log_warning("Cannot set start time point less then zero: ", msec, ", ignored");
+//            log_warning("Cannot set start time point less then zero: ", msec, ", ignored");
             return;
         }
         if ((_end_time_point != TO_END) && (msec > _end_time_point)) {
-            log_warning("Cannot set start time point more then end time point "
-                        , _end_time_point,  ": ", msec, ", ignored");
+//            log_warning("Cannot set start time point more then end time point "
+//                        , _end_time_point,  ": ", msec, ", ignored");
             return;
         }
         _start_time_point = msec;
     }
 
-    void Stream::setEndTimePoint(int64_t msec) {
+    void Stream::setEndTimePoint(int64_t msec) { // TODO (18.05)
         if (_end_time_point == msec) {
             return;
         }
         if ((msec != TO_END) && (msec < 0)) {
-            log_warning("Cannot set end time point less then zero: ", msec, ", ignored");
+//            log_warning("Cannot set end time point less then zero: ", msec, ", ignored");
             return;
         }
         if ((_start_time_point != FROM_START) && (msec < _start_time_point)) {
-            log_warning("Cannot set end time point less then start time point "
-                        , _start_time_point,  ": ", msec, ", ignored");
+//            log_warning("Cannot set end time point less then start time point "
+//                        , _start_time_point,  ": ", msec, ", ignored");
             return;
         }
         _end_time_point = msec;

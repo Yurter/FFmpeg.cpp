@@ -6,6 +6,7 @@
 #include <fpp/resample/ResampleContext.hpp>
 #include <fpp/scale/RescaleContext.hpp>
 #include <fpp/core/Utils.hpp>
+#include <fstream>
 
 void rtp_video_and_audio_stream() {
 

@@ -16,7 +16,7 @@ namespace fpp {
         if (const auto raw_ptr {
             ::avfilter_graph_alloc()
         }; !raw_ptr) {
-            log_error("avfilter_graph_alloc failed!");
+            log_error() << "avfilter_graph_alloc failed!";
         }
         else {
             reset(

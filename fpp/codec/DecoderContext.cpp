@@ -25,7 +25,7 @@ namespace fpp {
         if (const auto ret {
                 ::avcodec_send_packet(raw(), &packet.raw())
             }; ret != 0) {
-            log_error(utils::send_packet_error_to_string(ret));
+            log_error() << utils::send_packet_error_to_string(ret);
         }
     }
 
@@ -39,7 +39,7 @@ namespace fpp {
         }
     }
 
-    FrameVector DecoderContext::receiveFrames(AVRational time_base, int64_t stream_index) {
+    FrameVector DecoderContext::receiveFrames(AVRational time_base, int stream_index) {
         FrameVector decoded_frames;
         auto ret { 0 };
         while (ret == 0) {

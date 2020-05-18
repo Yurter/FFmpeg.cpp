@@ -32,7 +32,7 @@ namespace fpp {
         int64_t             duration()      const;
         AVRational          timeBase()      const;
         int64_t             pos()           const;
-        int64_t             streamIndex()   const;
+        int                 streamIndex()   const;
         bool                keyFrame()      const;
 
         size_t              size()          const;

@@ -4,6 +4,7 @@
 #include <fpp/codec/DecoderContext.hpp>
 #include <fpp/codec/EncoderContext.hpp>
 #include <fpp/scale/RescaleContext.hpp>
+#include <fstream>
 
 void rtp_video_stream_transcoded() {
 

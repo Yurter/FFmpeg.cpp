@@ -42,7 +42,7 @@ namespace fpp {
                     + " in stream " + std::to_string(stream_index)
             };
         }
-        log_info("Success seek to ", utils::time_to_string(timestamp, DEFAULT_TIME_BASE));
+        log_info() << "Success seek to " << utils::time_to_string(timestamp, DEFAULT_TIME_BASE);
     }
 
     Packet InputFormatContext::read() {

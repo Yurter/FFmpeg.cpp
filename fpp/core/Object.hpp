@@ -16,20 +16,9 @@ namespace fpp {
 
     protected:
 
-        template <typename... Args>
-        auto log_info(Args&&... args) const {
-            Logger::instance().print(name(), LogLevel::Info, std::forward<Args>(args)...);
-        }
-
-        template <typename... Args>
-        auto log_warning(Args&&... args) const {
-            Logger::instance().print(name(), LogLevel::Warning, std::forward<Args>(args)...);
-        }
-
-        template <typename... Args>
-        auto log_error(Args&&... args) const {
-            Logger::instance().print(name(), LogLevel::Error, std::forward<Args>(args)...);
-        }
+        MessageHandler      log_info()    const;
+        MessageHandler      log_warning() const;
+        MessageHandler      log_error()   const;
 
     };
 

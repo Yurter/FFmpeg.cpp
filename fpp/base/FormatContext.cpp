@@ -63,15 +63,15 @@ namespace fpp {
 
     bool FormatContext::open(Options options) {
         if (opened()) {
-            log_error("Context already opened");
+            log_error() << "Context already opened";
             return false;
         }
         if (!openContext(options)) {
-            log_error("Could not open ", utils::quoted(mediaResourceLocator()));
+            log_error() << "Could not open " << utils::quoted(mediaResourceLocator());
             return false;
         }
         setOpened(true);
-        log_info(toString());
+        log_info() << toString();
         return true;
     }
 
@@ -103,10 +103,9 @@ namespace fpp {
             reinterpret_cast<const Interrupter*>(opaque)
         };
         if (interrupter->isTimeout()) {
-            static_log_error(
-                "interrupt_callback"
-                , "Timed out: ", interrupter->timeout_ms
-            );
+            static_log_error()
+                << "interrupt_callback: "
+                << "Timed out: " << interrupter->timeout_ms;
             return FAIL;
         }
         return OK;

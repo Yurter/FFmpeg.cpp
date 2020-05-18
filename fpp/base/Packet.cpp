@@ -74,8 +74,8 @@ namespace fpp {
         return raw().pos;
     }
 
-    int64_t Packet::streamIndex() const {
-        return int64_t(raw().stream_index);
+    int Packet::streamIndex() const {
+        return raw().stream_index;
     }
 
     bool Packet::keyFrame() const {

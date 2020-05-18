@@ -19,4 +19,16 @@ namespace fpp {
         return "[" + name() + ":" + std::to_string(int64_t(this)) + "]";
     }
 
+    MessageHandler Object::log_info() const {
+        return MessageHandler { name(), LogLevel::Info };
+    }
+
+    MessageHandler Object::log_warning() const {
+        return MessageHandler { name(), LogLevel::Warning };
+    }
+
+    MessageHandler Object::log_error() const {
+        return MessageHandler { name(), LogLevel::Error };
+    }
+
 } // namespace fpp

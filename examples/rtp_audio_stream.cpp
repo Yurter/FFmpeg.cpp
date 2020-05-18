@@ -4,6 +4,7 @@
 #include <fpp/codec/DecoderContext.hpp>
 #include <fpp/codec/EncoderContext.hpp>
 #include <fpp/resample/ResampleContext.hpp>
+#include <fstream>
 
 void rtp_audio_stream() {
 

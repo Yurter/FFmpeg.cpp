@@ -40,10 +40,7 @@ namespace fpp {
             // iterate over all entries in dictionary
             AVDictionaryEntry* entry { nullptr };
             while ((entry = ::av_dict_get(_dictionary, "", entry, AV_DICT_IGNORE_SUFFIX))) {
-                static_log_warning(
-                    "Dictionary"
-                    , "Unused option: ", entry->key, " ", entry->value
-                );
+                static_log_warning() << "Unused option: " << entry->key << ' ' << entry->value;
             }
             ::av_dict_free(&_dictionary);
         }
