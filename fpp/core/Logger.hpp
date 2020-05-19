@@ -17,6 +17,11 @@ namespace fpp {
 
     public:
 
+        MessageHandler(const MessageHandler&) = delete;
+        MessageHandler(MessageHandler&&) = delete;
+        MessageHandler& operator=(const MessageHandler&) = delete;
+        MessageHandler& operator=(MessageHandler&&) = delete;
+
         explicit MessageHandler(LogLevel log_level);
         MessageHandler(const std::string_view caller_name, LogLevel log_level);
         ~MessageHandler();
