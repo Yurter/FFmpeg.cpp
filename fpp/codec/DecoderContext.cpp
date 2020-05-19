@@ -16,7 +16,7 @@ namespace fpp {
         return receiveFrames(packet.timeBase(), packet.streamIndex());
     }
 
-    FrameVector DecoderContext::flush(AVRational time_base, int64_t stream_index) {
+    FrameVector DecoderContext::flush(AVRational time_base, int stream_index) {
         sendFlushPacket();
         return receiveFrames(time_base, stream_index);
     }

@@ -12,7 +12,7 @@ namespace fpp {
         explicit DecoderContext(const SpParameters params, Options options = {});
 
         FrameVector         decode(const Packet& packet);
-        FrameVector         flush(AVRational time_base, int64_t stream_index);
+        FrameVector         flush(AVRational time_base, int stream_index);
 
     private:
 
