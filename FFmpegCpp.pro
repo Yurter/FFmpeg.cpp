@@ -92,12 +92,7 @@ HEADERS += \
     fpp/core/Logger.hpp \
     fpp/core/Object.hpp \
     fpp/core/Utils.hpp \
-    fpp/core/async/AsyncList.hpp \
-    fpp/core/async/AsyncObject.hpp \
-    fpp/core/async/AsyncQueue.hpp \
-    fpp/core/async/AsyncVector.hpp \
     fpp/core/time/Chronometer.hpp \
-    fpp/core/time/Timer.hpp \
     fpp/core/wrap/FFmpegObject.hpp \
     fpp/core/wrap/SharedFFmpegObject.hpp \
     fpp/filter/BitStreamFilterContext.hpp \
