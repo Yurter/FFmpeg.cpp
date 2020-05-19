@@ -1,6 +1,5 @@
 #include "CodecContext.hpp"
 #include <fpp/core/Utils.hpp>
-#include <fpp/core/Logger.hpp>
 #include <fpp/core/FFmpegException.hpp>
 
 extern "C" {
@@ -12,17 +11,15 @@ namespace fpp {
     CodecContext::CodecContext(const SpParameters params)
         : MediaData(params->type())
         , params { params } {
-        setName("CodecContext");
     }
 
     void CodecContext::init(Options options) {
-        reset({
+        reset(
             ::avcodec_alloc_context3(codec())
             , [](auto* codec_ctx) {
                  ::avcodec_free_context(&codec_ctx);
             }
-        });
-        setName(name() + " " + codec()->name);
+        );
         open(options);
     }
 
@@ -37,7 +34,6 @@ namespace fpp {
                     + utils::to_string(raw()->codec_type) + " "
                     + params->codecType() + " "
                     + codec()->name
-                , ret
             };
         }
         params->parseCodecContext(raw());

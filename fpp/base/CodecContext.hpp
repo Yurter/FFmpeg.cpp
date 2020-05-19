@@ -11,7 +11,7 @@ namespace fpp {
 
     public:
 
-        CodecContext(const SpParameters params);
+        explicit CodecContext(const SpParameters params);
 
         std::string         toString() const override final;
 

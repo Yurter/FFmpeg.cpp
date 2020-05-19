@@ -9,16 +9,16 @@ namespace fpp {
 
     public:
 
-        DecoderContext(const SpParameters params, Options options = {});
+        explicit DecoderContext(const SpParameters params, Options options = {});
 
         FrameVector         decode(const Packet& packet);
-        FrameVector         flush();
+        FrameVector         flush(AVRational time_base, int stream_index);
 
     private:
 
         void                sendPacket(const Packet& packet);
         void                sendFlushPacket();
-        FrameVector         receiveFrames();
+        FrameVector         receiveFrames(AVRational time_base, int stream_index);
 
     };
 

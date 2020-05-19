@@ -1,6 +1,6 @@
 #include "examples.hpp"
-#include <fpp/context/InputFormatContext.hpp>
-#include <fpp/context/OutputFormatContext.hpp>
+#include <fpp/format/InputFormatContext.hpp>
+#include <fpp/format/OutputFormatContext.hpp>
 #include <array>
 
 void multiple_outputs_parallel() {

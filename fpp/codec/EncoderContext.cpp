@@ -1,18 +1,13 @@
 #include "EncoderContext.hpp"
-#include <fpp/core/Logger.hpp>
-#include <fpp/core/FFmpegException.hpp>
 #include <fpp/core/Utils.hpp>
+#include <fpp/core/FFmpegException.hpp>
+#include <cassert>
 
 namespace fpp {
 
     EncoderContext::EncoderContext(const SpParameters params, Options options)
         : CodecContext(params) {
-        setName("EncCtx");
-        if (!params->isEncoder()) {
-            throw std::runtime_error {
-                "Encoder cannot be initialized with decoder parameters"
-            };
-        }
+        assert(params->isEncoder());
         init(options);
     }
 
@@ -28,11 +23,10 @@ namespace fpp {
 
     void EncoderContext::sendFrame(const Frame& frame) {
         if (const auto ret {
-                ::avcodec_send_frame(raw(), &frame.raw())
+                ::avcodec_send_frame(raw(), frame.ptr())
             }; ret != 0) {
             throw FFmpegException {
                 utils::send_frame_error_to_string(ret)
-                , ret
             };
         }
     }
@@ -43,7 +37,6 @@ namespace fpp {
             }; ret != 0) {
             throw FFmpegException {
                 utils::send_frame_error_to_string(ret)
-                , ret
             };
         }
     }
@@ -60,7 +53,6 @@ namespace fpp {
             if (ret < 0) {
                 throw FFmpegException {
                     utils::receive_packet_error_to_string(ret)
-                    , ret
                 };
             }
             packet.setStreamIndex(stream_index);

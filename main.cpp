@@ -5,8 +5,8 @@
 
 auto main() -> int {
 
-    fpp::static_log_info("main", "Started");
-    fpp::static_log_info("main", "FFmpeg version ", fpp::utils::ffmpeg_version());
+    fpp::static_log_info() << "Started";
+    fpp::static_log_info() << "FFmpeg version " << fpp::utils::ffmpeg_version();
     fpp::set_ffmpeg_log_level(fpp::LogLevel::Error);
 
     try {
@@ -32,20 +32,21 @@ auto main() -> int {
         // Filters
 //        text_on_video();
 //        timelapase();
+//        complex();
 
 //        concatenate();
 //        multiple_outputs_sequence();
 //        multiple_outputs_parallel();
 
     } catch (const fpp::FFmpegException& e) {
-        fpp::static_log_error("catch",  "FFmpegException: ", e.what());
+        fpp::static_log_error() << "FFmpegException: " << e.what();
     } catch (const std::exception& e) {
-        fpp::static_log_error("catch",  "Exception: ", e.what());
+        fpp::static_log_error() << "Exception: " << e.what();
     } catch (...) {
-        fpp::static_log_error("catch",  "Unknown exception");
+        fpp::static_log_error() << "Unknown exception";
     }
 
-    fpp::static_log_info("main", "Finished");
+    fpp::static_log_info() << "Finished";
     return 0;
 
 }

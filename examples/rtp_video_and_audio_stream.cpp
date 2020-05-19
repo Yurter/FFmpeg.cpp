@@ -1,11 +1,12 @@
 #include "examples.hpp"
-#include <fpp/context/InputFormatContext.hpp>
-#include <fpp/context/OutputFormatContext.hpp>
+#include <fpp/format/InputFormatContext.hpp>
+#include <fpp/format/OutputFormatContext.hpp>
 #include <fpp/codec/DecoderContext.hpp>
 #include <fpp/codec/EncoderContext.hpp>
-#include <fpp/refi/ResampleContext.hpp>
-#include <fpp/refi/RescaleContext.hpp>
+#include <fpp/resample/ResampleContext.hpp>
+#include <fpp/scale/RescaleContext.hpp>
 #include <fpp/core/Utils.hpp>
+#include <fstream>
 
 void rtp_video_and_audio_stream() {
 

@@ -1,15 +1,6 @@
-#include <iostream>
-#include <fstream>
-#include <fpp/context/InputFormatContext.hpp>
-#include <fpp/context/OutputFormatContext.hpp>
-#include <fpp/codec/DecoderContext.hpp>
-#include <fpp/codec/EncoderContext.hpp>
-#include <fpp/refi/ResampleContext.hpp>
-#include <fpp/refi/RescaleContext.hpp>
-#include <fpp/refi/VideoFilterContext.hpp>
-#include <fpp/refi/VideoFilters/DrawText.hpp>
-#include <fpp/core/Utils.hpp>
 #include "examples.hpp"
+#include <fpp/format/InputFormatContext.hpp>
+#include <fpp/format/OutputFormatContext.hpp>
 
 void concatenate() { // TODO doesn't work 15.04
 
@@ -20,7 +11,9 @@ void concatenate() { // TODO doesn't work 15.04
     };
 
     /* open source */
-    source.open();
+    if (!source.open()) {
+        return;
+    }
 
     /* create sink */
     fpp::OutputFormatContext sink {
@@ -33,21 +26,23 @@ void concatenate() { // TODO doesn't work 15.04
     }
 
     /* open sink */
-    sink.open();
+    if (!sink.open()) {
+        return;
+    }
 
-    fpp::Packet input_packet {
+    fpp::Packet packet {
         fpp::MediaType::Unknown
     };
     const auto read_packet {
-        [&input_packet,&source]() {
-            input_packet = source.read();
-            return !input_packet.isEOF();
+        [&packet,&source]() {
+            packet = source.read();
+            return !packet.isEOF();
         }
     };
 
     /* read and write packets */
     while (read_packet()) {
-        sink.write(input_packet);
+        sink.write(packet);
     }
 
     /* explicitly close contexts */

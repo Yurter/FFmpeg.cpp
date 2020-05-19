@@ -22,6 +22,7 @@ void rtp_video_stream_transcoded();
 // Filters
 void text_on_video();
 void timelapase();
+void complex();
 
 void concatenate();
 void multiple_outputs_sequence();

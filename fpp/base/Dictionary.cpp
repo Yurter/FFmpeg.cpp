@@ -1,6 +1,5 @@
 #include "Dictionary.hpp"
 #include <fpp/core/FFmpegException.hpp>
-#include <fpp/core/Logger.hpp>
 
 extern "C" {
     #include <libavutil/dict.h>
@@ -10,7 +9,6 @@ namespace fpp {
 
     Dictionary::Dictionary(const Options& options)
         : _dictionary { alloc(options) } {
-        setName("Dictionary");
     }
 
     Dictionary::~Dictionary() {
@@ -38,14 +36,11 @@ namespace fpp {
     }
 
     void Dictionary::free() {
-        AVDictionaryEntry* entry { nullptr };
         if (_dictionary) {
             // iterate over all entries in dictionary
+            AVDictionaryEntry* entry { nullptr };
             while ((entry = ::av_dict_get(_dictionary, "", entry, AV_DICT_IGNORE_SUFFIX))) {
-                static_log_warning(
-                    "Dictionary"
-                    , "Unused option: ", entry->key, " ", entry->value
-                );
+                static_log_warning() << "Unused option: " << entry->key << ' ' << entry->value;
             }
             ::av_dict_free(&_dictionary);
         }
@@ -64,7 +59,6 @@ namespace fpp {
                 std::string("Setting option - ")
                     + value.data() + " " + key.data()
                     + " failed"
-                , ret
             };
         }
     }
@@ -82,7 +76,6 @@ namespace fpp {
                 std::string("Setting option - ")
                     + key.data() + " " + std::to_string(value)
                     + " failed"
-                , ret
             };
         }
     }

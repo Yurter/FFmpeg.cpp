@@ -3,6 +3,7 @@
 #include <fpp/core/time/Chronometer.hpp>
 #include <fpp/base/Dictionary.hpp>
 #include <fpp/stream/Stream.hpp>
+#include <array>
 
 struct AVFormatContext;
 struct AVOutputFormat;
@@ -11,26 +12,27 @@ struct AVStream;
 
 namespace fpp {
 
+    enum class TimeoutProcess {
+          Opening
+        , Closing
+        , Reading
+        , Writing
+        , EnumSize
+    };
+
     class FormatContext : public SharedFFmpegObject<AVFormatContext> {
 
     public:
 
         FormatContext();
 
-        std::string         mediaResourceLocator()  const;
+        const std::string_view mediaResourceLocator() const;
         void                setMediaResourceLocator(const std::string_view);
         const StreamVector  streams()               const;
         StreamVector        streams();
 
-        void                setTimeoutOpening(int64_t ms);
-        void                setTimeoutClosing(int64_t ms);
-        void                setTimeoutReading(int64_t ms);
-        void                setTimeoutWriting(int64_t ms);
-
-        int64_t             timeoutOpening() const;
-        int64_t             timeoutClosing() const;
-        int64_t             timeoutReading() const;
-        int64_t             timeoutWriting() const;
+        void                setTimeout(TimeoutProcess process, int64_t ms);
+        int64_t             getTimeout(TimeoutProcess process) const;
 
         bool                open(Options options = {});
         bool                open(const std::string_view mrl, Options options = {});
@@ -69,15 +71,12 @@ namespace fpp {
         };
 
         void                setInterruptCallback(AVFormatContext* ctx);
-        void                setInterrupter(int64_t timeout_ms);
+        void                setInterruptTimeout(int64_t timeout_ms);
 
         virtual void        createContext();
         virtual bool        openContext(Options options) = 0;
         virtual void        closeContext() = 0;
         virtual std::string formatName() const = 0;
-
-        [[nodiscard]]
-        virtual StreamVector parseFormatContext() = 0;
 
         void                addStream(SharedStream stream);
         void                setStreams(StreamVector stream_vector);
@@ -92,12 +91,10 @@ namespace fpp {
         std::string         _media_resource_locator;
         bool                _opened;
         StreamVector        _streams;
-        Interrupter         _interrupter;
 
-        int64_t             _timeout_opening;
-        int64_t             _timeout_closing;
-        int64_t             _timeout_reading;
-        int64_t             _timeout_writing;
+        using TimeoutsArray = std::array<int64_t,std::size_t(TimeoutProcess::EnumSize)>;
+        TimeoutsArray       _timeouts;
+        Interrupter         _interrupter;
 
     };
 

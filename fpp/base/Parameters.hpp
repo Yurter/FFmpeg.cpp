@@ -24,7 +24,7 @@ namespace fpp {
 
     public:
 
-        Parameters(MediaType type);
+        explicit Parameters(MediaType type);
         Parameters(const Parameters& other);
         Parameters& operator=(const Parameters& other);
 
