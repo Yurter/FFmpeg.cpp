@@ -67,17 +67,18 @@ namespace fpp {
         void                setFFmpegLogLevel(LogLevel log_level) const;
         void                setPrintCallback(std::function<void(LogLevel,const std::string&)> foo);
 
-        void print(LogLevel log_level, const std::string_view message) const;
-        void print(const std::string_view caller_name, LogLevel log_level, const std::string_view message) const;
+        void                print(const std::string_view caller_name, LogLevel log_level, const std::string_view message) const;
+        void                print(LogLevel log_level, const std::string_view message) const;
 
     private:
 
         Logger();
         ~Logger();
 
-        Logger(Logger const&)            = delete;
-        Logger(Logger const&&)           = delete;
-        Logger& operator=(Logger const&) = delete;
+        Logger(const Logger&)            = delete;
+        Logger(Logger&&)                 = delete;
+        Logger& operator=(const Logger&) = delete;
+        Logger& operator=(Logger&&)      = delete;
 
     private:
 
