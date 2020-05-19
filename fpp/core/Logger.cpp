@@ -1,14 +1,15 @@
 #include "Logger.hpp"
 #include <fpp/core/Utils.hpp>
-#include <string>
 #include <iostream>
+#include <string>
 #include <thread>
+#include <regex>
+#include <ctime>
+#include <chrono>
+
 #ifdef _WIN32
 #include <Windows.h>
 #endif
-#include <ctime>
-#include <regex>
-#include <chrono>
 
 namespace fpp {
 
@@ -132,12 +133,6 @@ namespace fpp {
         case LogLevel::Error:
             ::av_log_set_level(AV_LOG_ERROR);
             break;
-//        case LogLevel::Debug:
-//            ::av_log_set_level(AV_LOG_DEBUG);
-//            break;
-//        case LogLevel::Trace:
-//            ::av_log_set_level(AV_LOG_TRACE);
-//            break;
         case LogLevel::Quiet:
             ::av_log_set_level(AV_LOG_QUIET);
             break;
@@ -148,27 +143,31 @@ namespace fpp {
         _print_func = foo;
     }
 
-    void Logger::print(LogLevel log_level, const std::string_view message) const {
-        //
-    }
-
     void Logger::print(const std::string_view caller_name, LogLevel log_level, const std::string_view message) const {
         if (ignoreMessage(log_level)) {
             return;
         }
 
-        std::string TODO {
-            caller_name.empty()
-                    ? " "
-                    : '[' + std::string { caller_name } + ']' + ' '
-        };
+        std::stringstream ss;
+        ss << '[' << logLevelToString(log_level) << ']'
+           << '[' << threadIdFormated()          << ']'
+           << '[' << currentTimeFormated()       << ']'
+           << '[' << caller_name                 << ']'
+           << ' ' << message;
+
+        _print_func(log_level, ss.str());
+    }
+
+    void Logger::print(LogLevel log_level, const std::string_view message) const {
+        if (ignoreMessage(log_level)) {
+            return;
+        }
 
         std::stringstream ss;
         ss << '[' << logLevelToString(log_level) << ']'
            << '[' << threadIdFormated()          << ']'
            << '[' << currentTimeFormated()       << ']'
-           << TODO
-           << message;
+           << ' ' << message;
 
         _print_func(log_level, ss.str());
     }
@@ -238,19 +237,36 @@ namespace fpp {
         , _log_level { log_level } {
     }
 
-    MessageHandler::~MessageHandler() {
-        switch (_log_level) {
-            case LogLevel::Info:
-                Logger::instance().print(_caller_name, LogLevel::Info,    _ss.str());
-                return;
-            case LogLevel::Warning:
-                Logger::instance().print(_caller_name, LogLevel::Warning, _ss.str());
-                return;
-            case LogLevel::Error:
-                Logger::instance().print(_caller_name, LogLevel::Error,   _ss.str());
-                return;
-            case LogLevel::Quiet:
-                return;
+    MessageHandler::~MessageHandler() { // TODO: refactor (19.05)
+        if (_caller_name.empty()) {
+            switch (_log_level) {
+                case LogLevel::Info:
+                    Logger::instance().print(LogLevel::Info,    _ss.str());
+                    return;
+                case LogLevel::Warning:
+                    Logger::instance().print(LogLevel::Warning, _ss.str());
+                    return;
+                case LogLevel::Error:
+                    Logger::instance().print(LogLevel::Error,   _ss.str());
+                    return;
+                case LogLevel::Quiet:
+                    return;
+            }
+        }
+        else {
+            switch (_log_level) {
+                case LogLevel::Info:
+                    Logger::instance().print(_caller_name, LogLevel::Info,    _ss.str());
+                    return;
+                case LogLevel::Warning:
+                    Logger::instance().print(_caller_name, LogLevel::Warning, _ss.str());
+                    return;
+                case LogLevel::Error:
+                    Logger::instance().print(_caller_name, LogLevel::Error,   _ss.str());
+                    return;
+                case LogLevel::Quiet:
+                    return;
+            }
         }
     }
 
