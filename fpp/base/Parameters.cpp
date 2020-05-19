@@ -1,7 +1,6 @@
 #include "Parameters.hpp"
 #include <fpp/core/FFmpegException.hpp>
 #include <fpp/core/Utils.hpp>
-#include <fpp/core/Logger.hpp>
 
 extern "C" {
     #include <libavformat/avformat.h>
@@ -14,11 +13,8 @@ namespace fpp {
     Parameters::Parameters(MediaType type)
         : MediaData(type)
         , _codec { nullptr }
-        , _duration { 0 }
-        , _stream_index { INVALID_INT }
         , _time_base { DEFAULT_RATIONAL }
         , _format_flags { 0 } {
-        setName("Parameters");
         reset();
     }
 
@@ -26,19 +22,14 @@ namespace fpp {
         MediaData(other.type()) {
         ffmpeg_api_strict(avcodec_parameters_copy, ptr(), other.ptr());
         _codec = other.codec();
-        _duration = other.duration();
-        _stream_index = other.streamIndex();
         _time_base = other.timeBase();
         _format_flags = other.formatFlags();
     }
 
     Parameters& Parameters::operator=(const Parameters& other) {
         setType(other.type());
-        setExtradata({});
         ffmpeg_api_strict(avcodec_parameters_copy, ptr(), other.ptr());
         _codec = other.codec();
-        _duration = other.duration();
-        _stream_index = other.streamIndex();
         _time_base = other.timeBase();
         _format_flags = other.formatFlags();
         return *this;
@@ -73,17 +64,6 @@ namespace fpp {
 
     void Parameters::setBitrate(int64_t bitrate) {
         raw().bit_rate = bitrate;
-    }
-
-    void Parameters::setDuration(int64_t duration) {
-        if ((duration - 1) == INT64_MAX) {
-            return;
-        }
-        _duration = duration;
-    }
-
-    void Parameters::setStreamIndex(uid_t stream_index) {
-        _stream_index = stream_index;
     }
 
     void Parameters::setTimeBase(AVRational time_base) {
@@ -128,14 +108,6 @@ namespace fpp {
         return raw().bit_rate;
     }
 
-    int64_t Parameters::duration() const {
-         return _duration;
-    }
-
-    uid_t Parameters::streamIndex() const {
-        return _stream_index;
-    }
-
     AVRational Parameters::timeBase() const {
         return _time_base;
     }
@@ -152,10 +124,6 @@ namespace fpp {
         return _format_flags;
     }
 
-    void Parameters::increaseDuration(const int64_t value) {
-        _duration += value;
-    }
-
     std::string Parameters::toString() const {
         return utils::to_string(type()) + " "
             + codecName()
@@ -163,18 +131,9 @@ namespace fpp {
                 ? std::string { " " }
                     + (::av_codec_is_decoder(codec()) ? "decoder" : "encoder") + ", "
                     + (bitrate() ? std::to_string(bitrate()) : "N/A") + " bit/s, "
-                    + "dur " + std::to_string(duration()) + ", "
                     + "tb " + utils::to_string(timeBase())
                : "");
     }
-//    std::string Parameters::toString() const {
-//        return utils::to_string(type()) + " "
-//                + codecName() + " "
-//                + (::av_codec_is_decoder(codec()) ? "decoder" : "encoder") + ", "
-//                + (bitrate() ? std::to_string(bitrate()) : "N/A") + " bit/s, "
-//                + "dur " + std::to_string(duration()) + ", "
-//                + "tb " + utils::to_string(timeBase());
-//    }
 
     void Parameters::completeFrom(const SpParameters other) {
         if (extradata().second == 0)        { setExtradata(other->extradata()); }
@@ -186,8 +145,6 @@ namespace fpp {
     void Parameters::parseStream(const AVStream* avstream) {
         parseCodecpar(avstream->codecpar);
         setDecoder(codecId());
-        setDuration(avstream->duration);
-        setStreamIndex(avstream->index);
         setTimeBase(avstream->time_base);
     }
 
@@ -206,16 +163,17 @@ namespace fpp {
             codec_context->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
         }
 
-        if (isEncoder()) { // TODO: check it, do not write extradata of input stream to encoder if stream transcoded (27.04)
-            if (codec_context->extradata) {
-                ::av_freep(&codec_context->extradata);
-                codec_context->extradata_size = 0;
-            }
+        if (isEncoder()) {
+            const auto ignore_input_extradata {
+                [&]() {
+                    if (codec_context->extradata) {
+                        ::av_freep(&codec_context->extradata);
+                        codec_context->extradata_size = 0;
+                    }
+                }
+            };
+            ignore_input_extradata();
         }
-
-//        codec_context->time_base = timeBase();
-//        codec_context->time_base = AVRational { 1, framerate };
-
     }
 
     void Parameters::parseCodecContext(const AVCodecContext* codec_context) {

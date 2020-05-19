@@ -19,28 +19,35 @@ namespace fpp {
 
     public:
 
-        Stream(AVStream* avstream);
+        explicit Stream(AVStream* avstream);
         Stream(AVStream* avstream, const SpParameters parameters);
 
         std::string         toString() const override final;
+        void                initCodecpar();
 
         void                stampPacket(Packet& packet);
         bool                timeIsOver() const;
 
-        void                setIndex(int64_t value);
+        void                setIndex(int value);
+        void                setDuration(int64_t duration);
         void                setStartTimePoint(int64_t msec);
         void                setEndTimePoint(int64_t msec);
 
         void                stampFromZero(bool value);
 
         int64_t             index()             const;
+        int64_t             duration()          const;
         int64_t             startTimePoint()    const;
         int64_t             endTimePoint()      const;
         int64_t             packetIndex()       const;
 
         AVCodecParameters*  codecpar();
 
+        void                addMetadata(const std::string_view key, const std::string_view value);
+
     private:
+
+        void                increaseDuration(const int64_t value);
 
         void                shiftStamps(Packet& packet);
         void                calculatePacketDuration(Packet& packet);

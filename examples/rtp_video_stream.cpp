@@ -1,6 +1,7 @@
 #include "examples.hpp"
-#include <fpp/context/InputFormatContext.hpp>
-#include <fpp/context/OutputFormatContext.hpp>
+#include <fpp/format/InputFormatContext.hpp>
+#include <fpp/format/OutputFormatContext.hpp>
+#include <fstream>
 
 void rtp_video_stream() {
 

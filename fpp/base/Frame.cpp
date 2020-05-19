@@ -10,8 +10,8 @@ namespace fpp {
 
     Frame::Frame(MediaType type)
         : MediaData(type)
-        , _time_base { DEFAULT_RATIONAL } {
-        setName("Frame");
+        , _time_base { DEFAULT_RATIONAL }
+        , _stream_index { -1 } {
     }
 
     Frame::Frame(const Frame& other)
@@ -19,9 +19,9 @@ namespace fpp {
         ref(other);
     }
 
-    Frame::Frame(const AVFrame& frame, AVRational time_base, MediaType type)
+    Frame::Frame(const AVFrame& frame, MediaType type, AVRational time_base, int stream_index)
         : Frame(type) {
-        ref(frame, time_base);
+        ref(frame, time_base, stream_index);
     }
 
     Frame::~Frame() {
@@ -47,8 +47,16 @@ namespace fpp {
         _time_base = time_base;
     }
 
+    void Frame::setStreamIndex(int stream_index) {
+        _stream_index = stream_index;
+    }
+
     AVRational Frame::timeBase() const {
         return _time_base;
+    }
+
+    int Frame::streamIndex() const {
+        return _stream_index;
     }
 
     bool Frame::keyFrame() const {
@@ -93,13 +101,13 @@ namespace fpp {
         std::string str = utils::to_string(type()) + " frame: ";
         if (isVideo()) {
             str += std::to_string(size()) + " bytes, "
-//                    + (keyFrame() ? "[I]" : "[_]") + ", "
                     + '[' + ::av_get_picture_type_char(raw().pict_type) +']' + ", "
                     + "pts " + utils::pts_to_string(raw().pts) + ", "
                     + "width " + std::to_string(raw().width) + ", "
                     + "height " + std::to_string(raw().height) + ", "
                     + utils::to_string(AVPixelFormat(raw().format)) + ", "
-                    + "tb " + utils::to_string(timeBase());
+                    + "tb " + utils::to_string(timeBase()) + ", "
+                    + "stream index " + std::to_string(_stream_index);
             return str;
         }
         /* Audio frame: 1024 bytes, pts 425984, nb_samples 1024, channel_layout 4, sample_rate 44100 */
@@ -110,7 +118,8 @@ namespace fpp {
                     + "samples " + std::to_string(raw().nb_samples) + ", "
                     + "channel_layout " + utils::channel_layout_to_string(raw().channels, raw().channel_layout) + ", "
                     + "sample_rate " + std::to_string(raw().sample_rate) + ", "
-                    + "tb " + utils::to_string(timeBase());
+                    + "tb " + utils::to_string(timeBase()) + ", "
+                    + "stream index " + std::to_string(_stream_index);
             return str;
         }
         /* Unknown frame: -1 bytes */
@@ -121,13 +130,13 @@ namespace fpp {
     }
 
     void Frame::ref(const Frame& other) {
-        ffmpeg_api_strict(av_frame_ref, ptr(), other.ptr());
-        setTimeBase(other.timeBase());
+        ref(other.raw(), other.timeBase(), other.streamIndex());
     }
 
-    void Frame::ref(const AVFrame& other, AVRational time_base) {
+    void Frame::ref(const AVFrame& other, AVRational time_base, int stream_index) {
         ffmpeg_api_strict(av_frame_ref, ptr(), &other);
         setTimeBase(time_base);
+        setStreamIndex(stream_index);
     }
 
     void Frame::unref() {

@@ -1,6 +1,5 @@
 #include "InputFormatContext.hpp"
 #include <fpp/core/Utils.hpp>
-#include <fpp/core/Logger.hpp>
 #include <fpp/core/FFmpegException.hpp>
 
 extern "C" {
@@ -10,8 +9,7 @@ extern "C" {
 namespace fpp {
 
     InputFormatContext::InputFormatContext(const std::string_view mrl, const std::string_view format_short_name)
-        : _input_format { findInputFormat(format_short_name.data()) } {
-        setName("InFmtCtx");
+        : _input_format { findInputFormat(format_short_name) } {
         setMediaResourceLocator(mrl);
     }
 
@@ -42,23 +40,21 @@ namespace fpp {
                 "Failed to seek timestamp "
                     + utils::time_to_string(timestamp, DEFAULT_TIME_BASE)
                     + " in stream " + std::to_string(stream_index)
-                , ret
             };
         }
-        log_info("Success seek to ", utils::time_to_string(timestamp, DEFAULT_TIME_BASE));
+        log_info() << "Success seek to " << utils::time_to_string(timestamp, DEFAULT_TIME_BASE);
     }
 
     Packet InputFormatContext::read() {
-        setInterrupter(timeoutReading());
+        setInterruptTimeout(getTimeout(TimeoutProcess::Reading));
         Packet packet { MediaType::Unknown };
         if (const auto ret { ::av_read_frame(raw(), packet.ptr()) }; ret < 0) {
             if (ret == AVERROR_EOF) {
                 return Packet { MediaType::EndOF };
             }
             throw FFmpegException {
-                "Cannot read source: \'"
-                    + mediaResourceLocator() + "\'"
-                , ret
+                "Cannot read source: "
+                    + utils::quoted(mediaResourceLocator())
             };
         }
         processPacket(packet);
@@ -69,34 +65,33 @@ namespace fpp {
         if (!inputFormat()) {
             guessInputFromat();
         }
-        Dictionary dictionary { options };
-        AVFormatContext* fmt_ctx { ::avformat_alloc_context() };
-        setInterruptCallback(fmt_ctx);
-        setInterrupter(timeoutOpening());
-        if (const auto ret {
-                ::avformat_open_input(
-                    &fmt_ctx
-                    , mediaResourceLocator().c_str()
-                    , inputFormat()
-                    , dictionary.get()
-                )
-            }; ret < 0) {
+        reset(
+            [&]() -> AVFormatContext* {
+                AVFormatContext* fmt_ctx {
+                    ::avformat_alloc_context()
+                };
+                setInterruptCallback(fmt_ctx);
+                setInterruptTimeout(getTimeout(TimeoutProcess::Opening));
+                Dictionary dictionary { options };
+                if (const auto ret {
+                        ::avformat_open_input(
+                            &fmt_ctx
+                            , mediaResourceLocator().data()
+                            , inputFormat()
+                            , dictionary.get()
+                        )
+                    }; ret < 0) {
+                    return nullptr;
+                }
+                return fmt_ctx;
+            }()
+            , [](auto* ctx) { ::avformat_close_input(&ctx); }
+        );
+        if (isNull()) {
             return false;
         }
-        reset(std::shared_ptr<AVFormatContext> {
-            fmt_ctx
-            , [](auto* ctx) { /*::avformat_free_context(ctx);*/ } // TODO avformat_close_input free context 10.04
-        });
         setInputFormat(raw()->iformat);
-        if (const auto ret {
-                ::avformat_find_stream_info(raw(), nullptr)
-            }; ret < 0 ) {
-            throw FFmpegException {
-                "Failed to retrieve input stream information"
-                , ret
-            };
-        }
-        setStreams(parseFormatContext());
+        retrieveStreams();
         return true;
     }
 
@@ -105,18 +100,24 @@ namespace fpp {
     }
 
     void InputFormatContext::closeContext() {
-        auto ctx { raw() }; // TODO 10.04
-        ::avformat_close_input(&ctx);
-        _input_format = nullptr;
+        reset();
+        setInputFormat(nullptr);
     }
 
-    StreamVector InputFormatContext::parseFormatContext() {
+    void InputFormatContext::retrieveStreams() {
+        if (const auto ret {
+                ::avformat_find_stream_info(raw(), nullptr) // TODO: use options (12.05)
+            }; ret < 0 ) {
+            throw FFmpegException {
+                "Failed to retrieve input stream information"
+            };
+        }
         StreamVector result;
         for (auto i { 0u }; i < raw()->nb_streams; ++i) {
             result.push_back(Stream::make_input_stream(raw()->streams[i]));
             result.back()->params->setFormatFlags(inputFormat()->flags);
         }
-        return result;
+        setStreams(result);
     }
 
     void InputFormatContext::guessInputFromat() {
@@ -126,8 +127,8 @@ namespace fpp {
         setInputFormat(findInputFormat(short_name));
     }
 
-    AVInputFormat* InputFormatContext::findInputFormat(const char* short_name) const {
-        if (short_name) {
+    AVInputFormat* InputFormatContext::findInputFormat(const std::string_view short_name) const {
+        if (!short_name.empty()) {
             if (std::string { short_name } == "dshow") {
                 utils::device_register_all();
             }
@@ -138,7 +139,7 @@ namespace fpp {
                 utils::device_register_all();
             }
         }
-        return ::av_find_input_format(short_name);
+        return ::av_find_input_format(short_name.data());
     }
 
     AVInputFormat* InputFormatContext::inputFormat() {

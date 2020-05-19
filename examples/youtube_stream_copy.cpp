@@ -1,6 +1,6 @@
 #include "examples.hpp"
-#include <fpp/context/InputFormatContext.hpp>
-#include <fpp/context/OutputFormatContext.hpp>
+#include <fpp/format/InputFormatContext.hpp>
+#include <fpp/format/OutputFormatContext.hpp>
 
 void youtube_stream_copy() {
 
@@ -16,10 +16,10 @@ void youtube_stream_copy() {
 
     /* check input streams */
     if (!source.stream(fpp::MediaType::Video)) {
-        fpp::static_log_error(__func__, "Youtube require video stream");
+        fpp::static_log_error() << "Youtube require video stream";
     }
     if (!source.stream(fpp::MediaType::Audio)) {
-        fpp::static_log_error(__func__, "Youtube require video stream");
+        fpp::static_log_error() << "Youtube require audio stream";
     }
 
     /* create sink */

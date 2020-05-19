@@ -161,64 +161,14 @@ namespace fpp {
         }
     }
 
+    std::string utils::quoted(const std::string_view str, char delim) {
+        return delim + std::string { str } + delim;
+    }
+
     std::string utils::to_string(AVRational rational) {
         return std::to_string(rational.num)
-                + "/" +
+                + '/' +
                 std::to_string(rational.den);
-    }
-
-    bool utils::compatible_with_pixel_format(const AVCodec* codec, AVPixelFormat pixel_format) {
-        if (!codec) {
-            throw std::runtime_error {
-                std::string { __FUNCTION__ } +" failed: codec is NULL"
-            };
-        }
-        if (!codec->pix_fmts) {
-            static_log_warning(
-                "utils"
-                , std::string { __FUNCTION__ } +" failed: codec->pix_fmts is NULL"
-            );
-            return true;
-//            throw std::runtime_error {
-//               std::string { __FUNCTION__ } +" failed: codec->pix_fmts is NULL"
-//            };
-        }
-
-        auto pix_fmt { codec->pix_fmts };
-        while (pix_fmt[0] != AV_PIX_FMT_NONE) {
-            if (pix_fmt[0] == pixel_format) {
-                return true;
-            }
-            pix_fmt++;
-        }
-        return false;
-    }
-
-    bool utils::compatible_with_sample_format(const AVCodec* codec, AVSampleFormat sample_format) {
-        if (!codec) {
-            throw std::runtime_error {
-                std::string { __FUNCTION__ } +" failed: codec is NULL"
-            };
-        }
-        if (!codec->sample_fmts) {
-            static_log_warning(
-                "utils"
-                , std::string { __FUNCTION__ } +" failed: codec->sample_fmts is NULL"
-            );
-            return true;
-//            throw std::runtime_error {
-//                std::string { __FUNCTION__ } +" failed: codec->sample_fmts is NULL"
-//            };
-        }
-
-        auto smp_fmt { codec->sample_fmts };
-        while (smp_fmt[0] != AV_SAMPLE_FMT_NONE) {
-            if (smp_fmt[0] == sample_format) {
-                return true;
-            }
-            smp_fmt++;
-        }
-        return false;
     }
 
     std::string utils::ffmpeg_version() {
@@ -231,7 +181,7 @@ namespace fpp {
         }_;
     }
 
-    const char* utils::guess_format_short_name(const std::string_view media_resurs_locator) {
+    const std::string_view utils::guess_format_short_name(const std::string_view media_resurs_locator) {
         if (media_resurs_locator.find("rtsp://") != std::string_view::npos) {
             return "rtsp";
         }
@@ -254,7 +204,7 @@ namespace fpp {
             return "dshow";
         }
         if (media_resurs_locator.find("audio=") != std::string_view::npos) {
-            return "TODO 13.01";
+            return "dshow";
         }
         if (media_resurs_locator == "desktop") {
             return "gdigrab";
@@ -262,7 +212,7 @@ namespace fpp {
         if (media_resurs_locator.find("concat") != std::string_view::npos) {
             return "concat";
         }
-        return nullptr;
+        return {};
     }
 
     std::string utils::option_set_error_to_string(int ret) {
@@ -280,22 +230,22 @@ namespace fpp {
 
     std::string utils::send_packet_error_to_string(int ret) {
         if (AVERROR(EAGAIN) == ret) {
-            return "avcodec_send_packet failed: input is not accepted \
-                    in the current state - user must read output with \
-                    avcodec_receive_frame()";
+            return "avcodec_send_packet failed: input is not accepted "
+                    "in the current state - user must read output with "
+                    "avcodec_receive_frame()";
         }
         if (AVERROR_EOF == ret) {
-            return "avcodec_send_packet failed: the decoder has been \
-                    flushed, and no new packets can be sent to it";
+            return "avcodec_send_packet failed: the decoder has been "
+                    "flushed, and no new packets can be sent to it";
         }
         if (AVERROR(EINVAL) == ret) {
-            return "avcodec_send_packet failed: codec not opened, \
-                    it is an encoder, or requires flush";
+            return "avcodec_send_packet failed: codec not opened, "
+                    "it is an encoder, or requires flush";
         }
         if (AVERROR(ENOMEM) == ret) {
-            return "avcodec_send_packet failed: failed to add packet \
-                    to internal queue, or similar other errors: \
-                    legitimate decoding errors";
+            return "avcodec_send_packet failed: failed to add packet "
+                    "to internal queue, or similar other errors: "
+                    "legitimate decoding errors";
         }
         if (AVERROR_INVALIDDATA == ret) {
             return "avcodec_send_packet failed: Invalid data found "
@@ -306,37 +256,37 @@ namespace fpp {
 
     std::string utils::receive_frame_error_to_string(int ret) {
         if (AVERROR(EAGAIN) == ret) {
-            return "avcodec_receive_frame failed: output is not available \
-                    in this state - user must try to send new input";
+            return "avcodec_receive_frame failed: output is not available "
+                    "in this state - user must try to send new input";
         }
         if (AVERROR_EOF == ret) {
-            return "avcodec_receive_frame failed: the decoder has been fully \
-                    flushed, and there will be no more output frames";
+            return "avcodec_receive_frame failed: the decoder has been fully "
+                    "flushed, and there will be no more output frames";
         }
         if (AVERROR(EINVAL) == ret) {
-            return "avcodec_receive_frame failed: codec not opened, or it \
-                    is an encoder other negative values: \
-                    legitimate decoding errors";
+            return "avcodec_receive_frame failed: codec not opened, or it "
+                    "is an encoder other negative values: "
+                    "legitimate decoding errors";
         }
         return "avcodec_receive_frame failed: unknown code: " + std::to_string(ret);
     }
 
     std::string utils::send_frame_error_to_string(int ret) {
         if (AVERROR(EAGAIN) == ret) {
-            return "avcodec_receive_frame failed: input is not accepted in "
+            return "avcodec_send_frame failed: input is not accepted in "
                     "the current state - user must read output "
                     "with avcodec_receive_packet()";
         }
         if (AVERROR_EOF == ret) {
-            return "avcodec_receive_frame failed: the encoder has been flushed, "
+            return "avcodec_send_frame failed: the encoder has been flushed, "
                     "and no new frames can be sent to it";
         }
         if (AVERROR(EINVAL) == ret) {
-            return "avcodec_receive_frame failed: codec not opened, "
+            return "avcodec_send_frame failed: codec not opened, "
                     "refcounted_frames not set, it is a decoder, or requires flush";
         }
         if (AVERROR(ENOMEM) == ret) {
-            return "avcodec_receive_frame failed: failed to add packet "
+            return "avcodec_send_frame failed: failed to add packet "
                     "to internal queue, or similar other errors: "
                     "legitimate decoding errors";
         }
@@ -345,15 +295,15 @@ namespace fpp {
 
     std::string utils::receive_packet_error_to_string(int ret) {
         if (AVERROR(EAGAIN) == ret) {
-            return "avcodec_receive_frame failed: output is not available "
+            return "avcodec_receive_packet failed: output is not available "
                     "in the current state - user must try to send input";
         }
         if (AVERROR_EOF == ret) {
-            return "avcodec_receive_frame failed: the encoder has been "
+            return "avcodec_receive_packet failed: the encoder has been "
                     "fully flushed, and there will be no more output packets";
         }
         if (AVERROR(EAGAIN) == ret) {
-            return "avcodec_receive_frame failed: codec not opened, "
+            return "avcodec_receive_packet failed: codec not opened, "
                     "or it is an encoder other errors: "
                     "lgitimate decoding errors";
         }
@@ -362,10 +312,10 @@ namespace fpp {
 
     std::string utils::swr_convert_frame_error_to_string(int ret) {
         if (ret & AVERROR_INPUT_CHANGED) {
-            return "Input changed";
+            return "swr_convert_frame failed: Input changed";
         }
         if (ret & AVERROR_OUTPUT_CHANGED) {
-            return "Output changed";
+            return "swr_convert_frame failed: Output changed";
         }
         return std::to_string(ret);
     }
@@ -451,18 +401,18 @@ namespace fpp {
         const auto out { std::static_pointer_cast<const VideoParameters>(params.out) };
 
         if (in->width() != out->width()) {
-            static_log_warning("utils", "Rescaling required: width mismatch "
-                               , in->width(), " != " , out->width());
+            static_log_warning() << "Rescaling required: width mismatch "
+                                 << in->width() << " != " << out->width();
             return true;
         }
         if (in->height() != out->height()) {
-            static_log_warning("utils", "Rescaling required: height mismatch "
-                               , in->height(), " != " , out->height());
+            static_log_warning() << "Rescaling required: height mismatch "
+                                 << in->height() << " != " << out->height();
             return true;
         }
         if (in->pixelFormat() != out->pixelFormat()) {
-            static_log_warning("utils", "Rescaling required: pixel format mismatch "
-                               , in->pixelFormat(), " != " , out->pixelFormat());
+            static_log_warning() << "Rescaling required: pixel format mismatch "
+                                 << in->pixelFormat() << " != " << out->pixelFormat();
             return true;
         }
 
@@ -476,23 +426,23 @@ namespace fpp {
         const auto out { std::static_pointer_cast<const AudioParameters>(params.out) };
 
         if (in->sampleRate() != out->sampleRate()) {
-            static_log_warning("utils", "Resampling required: sample rate mismatch "
-                               , in->sampleRate(), " != ", out->sampleRate());
+            static_log_warning() << "Resampling required: sample rate mismatch "
+                                 << in->sampleRate() << " != " << out->sampleRate();
             return true;
         }
         if (in->sampleFormat() != out->sampleFormat()) {
-            static_log_warning("utils", "Resampling required: sample format mismatch "
-                               , in->sampleFormat(), " != ", out->sampleFormat());
+            static_log_warning() << "Resampling required: sample format mismatch "
+                                 << in->sampleFormat() << " != " << out->sampleFormat();
             return true;
         }
         if (in->channels() != out->channels()) {
-            static_log_warning("utils", "Resampling required: channels mismatch "
-                               , in->channels(), " != ", out->channels());
+            static_log_warning() << "Resampling required: channels mismatch "
+                                 << in->channels() << " != " << out->channels();
             return true;
         }
         if (in->channelLayout() != out->channelLayout()) {
-            static_log_warning("utils", "Resampling required: channel layout mismatch "
-                               , in->channelLayout(), " != ", out->channelLayout());
+            static_log_warning() << "Resampling required: channel layout mismatch "
+                                 << in->channelLayout() << " != " << out->channelLayout();
             return true;
         }
 
@@ -506,11 +456,10 @@ namespace fpp {
         const auto out { std::static_pointer_cast<const VideoParameters>(params.out) };
 
         if (in->frameRate() != out->frameRate()) {
-            static_log_warning("utils", "Video filter required: framerate mismatch "
-                                           , to_string(in->frameRate())
-                                           , " != "
-                                           , to_string(out->frameRate())
-            );
+            static_log_warning() << "Video filter required: framerate mismatch "
+                                 << to_string(in->frameRate())
+                                 << " != "
+                                 << to_string(out->frameRate());
             return true;
         }
 
@@ -528,11 +477,10 @@ namespace fpp {
         const auto out { params.out };
 
         if (in->codecId() != out->codecId()) {
-            static_log_warning("utils", "Transcoding required: codec id mismatch "
-                                           , in->codecId()
-                                           , " != "
-                                           , out->codecId()
-            );
+            static_log_warning() << "Transcoding required: codec id mismatch "
+                                 << in->codecId()
+                                 << " != "
+                                 << out->codecId();
             return true;
         }
 
@@ -540,7 +488,7 @@ namespace fpp {
     }
 
     bool utils::compare_float(float a, float b) {
-        const auto epsilon { 0.0001f };
+        constexpr auto epsilon { 0.0001f };
         return ::fabs(a - b) < epsilon;
     }
 

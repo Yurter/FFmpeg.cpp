@@ -1,6 +1,5 @@
 #include "OutputFormatContext.hpp"
 #include <fpp/core/Utils.hpp>
-#include <fpp/core/Logger.hpp>
 #include <fpp/core/FFmpegException.hpp>
 
 extern "C" {
@@ -11,7 +10,6 @@ namespace fpp {
 
     OutputFormatContext::OutputFormatContext(const std::string_view mrl)
         : _output_format { nullptr } {
-        setName("OutFmtCtx");
         setMediaResourceLocator(mrl);
     }
 
@@ -24,7 +22,7 @@ namespace fpp {
         if (packet.isEOF()) {
             return false;
         }
-        setInterrupter(timeoutWriting());
+        setInterruptTimeout(getTimeout(TimeoutProcess::Writing));
         if (write_mode == WriteMode::Instant) {
             ffmpeg_api(av_write_frame, raw(), packet.ptr());
         }
@@ -35,9 +33,7 @@ namespace fpp {
     }
 
     void OutputFormatContext::flush() {
-        if (const auto ret { ::av_write_frame(raw(), nullptr) }; ret != 1) { // TODO check ret value meaning and use ffmpeg_api_strict macro 09.04
-            throw FFmpegException { "OutputFormatContext flush failed", ret };
-        }
+        ffmpeg_api_strict(av_write_frame, raw(), nullptr);
     }
 
     std::string OutputFormatContext::sdp() {
@@ -80,29 +76,32 @@ namespace fpp {
         ffmpeg_api_strict(avformat_alloc_output_context2
             , &fmt_ctx
             , outputFormat()
-            , format_short_name
-            , mediaResourceLocator().c_str()
+            , format_short_name.data()
+            , mediaResourceLocator().data()
         );
         setOutputFormat(fmt_ctx->oformat);
-        reset(std::shared_ptr<AVFormatContext> {
+        reset(
             fmt_ctx
             , [](auto* ctx) { ::avformat_free_context(ctx); }
-        });
+        );
     }
 
-    bool OutputFormatContext::openContext(Options options) { // TODO avio_open2 24.03
+    bool OutputFormatContext::openContext(Options options) {
         if (streamNumber() == 0) {
             throw std::logic_error {
                 "Can't open context without streams"
             };
         }
         initStreamsCodecpar();
+        Dictionary dictionary { options };
         if (!(raw()->flags & AVFMT_NOFILE)) {
             if (const auto ret {
-                    ::avio_open(
-                        &raw()->pb                       /* AVIOContext */
-                        , mediaResourceLocator().c_str() /* url         */
-                        , AVIO_FLAG_WRITE                /* flags       */
+                    ::avio_open2(
+                        &raw()->pb                      /* AVIOContext */
+                        , mediaResourceLocator().data() /* url         */
+                        , AVIO_FLAG_WRITE               /* flags       */
+                        , nullptr                       /* int_cb      */
+                        , dictionary.get()
                     )
                 }; ret < 0) {
                 return false;
@@ -123,7 +122,7 @@ namespace fpp {
         if (!(outputFormat()->flags & AVFMT_NOFILE)) {
             ffmpeg_api_strict(avio_close, raw()->pb);
         }
-        _output_format = nullptr;
+        setOutputFormat(nullptr);
     }
 
     void OutputFormatContext::createStream(SpParameters params) {
@@ -142,9 +141,9 @@ namespace fpp {
     void OutputFormatContext::guessOutputFromat() {
         const auto out_fmt {
             ::av_guess_format(
-                nullptr                          /* short_name */
-                , mediaResourceLocator().c_str() /* filename   */
-                , nullptr                        /* mime_type  */
+                nullptr                         /* short_name */
+                , mediaResourceLocator().data() /* filename   */
+                , nullptr                       /* mime_type  */
             )
         };
         if (!out_fmt) {
@@ -153,10 +152,6 @@ namespace fpp {
             };
         }
         setOutputFormat(out_fmt);
-    }
-
-    StreamVector OutputFormatContext::parseFormatContext() {
-        throw std::logic_error { "OutputFormatContext::parseFormatContext()" };
     }
 
     void OutputFormatContext::writeHeader() { // TODO use options 09.04
@@ -170,9 +165,9 @@ namespace fpp {
         ffmpeg_api_strict(av_write_trailer, raw());
     }
 
-    void OutputFormatContext::initStreamsCodecpar() { // TODO refactor 16.04
+    void OutputFormatContext::initStreamsCodecpar() {
         for (const auto& stream : streams()) {
-            stream->params->initCodecpar(stream->codecpar());
+            stream->initCodecpar();
         }
     }
 

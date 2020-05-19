@@ -13,9 +13,9 @@ namespace fpp {
 
     public:
 
-        Frame(MediaType type);
+        explicit Frame(MediaType type);
         Frame(const Frame& other);
-        Frame(const AVFrame& frame, AVRational time_base, MediaType type);
+        Frame(const AVFrame& frame, MediaType type, AVRational time_base, int stream_index);
         ~Frame() override;
 
         Frame& operator=(const Frame& other);
@@ -23,8 +23,10 @@ namespace fpp {
         int64_t             pts() const;
         void                setPts(int64_t pts);
         void                setTimeBase(AVRational time_base);
+        void                setStreamIndex(int stream_index);
 
         AVRational          timeBase()  const;
+        int                 streamIndex()  const;
         bool                keyFrame()  const;
         int                 nbSamples() const;
 
@@ -34,12 +36,13 @@ namespace fpp {
     private:
 
         void                ref(const Frame&   other);
-        void                ref(const AVFrame& other, AVRational time_base);
+        void                ref(const AVFrame& other, AVRational time_base, int stream_index);
         void                unref();
 
     private:
 
         AVRational          _time_base;
+        int                 _stream_index;
 
     };
 

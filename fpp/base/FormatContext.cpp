@@ -1,6 +1,5 @@
 ﻿#include "FormatContext.hpp"
 #include <fpp/core/Utils.hpp>
-#include <fpp/core/Logger.hpp>
 #include <iomanip>
 
 extern "C" {
@@ -10,22 +9,28 @@ extern "C" {
 
 namespace fpp {
 
+    constexpr auto default_opening_timeout_ms { 20'000 };
+    constexpr auto default_closing_timeout_ms { 5'000  };
+    constexpr auto default_reading_timeout_ms { 5'000  };
+    constexpr auto default_writing_timeout_ms { 1'000  };
+
     FormatContext::FormatContext()
         : _opened { false }
-        , _timeout_opening { 20'000 }
-        , _timeout_closing { 5'000 }
-        , _timeout_reading { 5'000 }
-        , _timeout_writing { 1'000 } {
-        setName("FormatContext");
+        , _timeouts {
+              default_opening_timeout_ms
+            , default_closing_timeout_ms
+            , default_reading_timeout_ms
+            , default_writing_timeout_ms
+        } {
     }
 
     void FormatContext::close() {
         if (closed()) {
             return;
         }
-        setInterrupter(timeoutClosing());
+        setInterruptTimeout(getTimeout(TimeoutProcess::Closing));
         closeContext();
-        reset(nullptr);
+        reset();
         setStreams({});
         setOpened(false);
     }
@@ -58,15 +63,15 @@ namespace fpp {
 
     bool FormatContext::open(Options options) {
         if (opened()) {
-            log_error("Context already opened");
+            log_error() << "Context already opened";
             return false;
         }
         if (!openContext(options)) {
-            log_error("Could not open ", mediaResourceLocator());
+            log_error() << "Could not open " << utils::quoted(mediaResourceLocator());
             return false;
         }
         setOpened(true);
-        log_info(toString());
+        log_info() << toString();
         return true;
     }
 
@@ -80,15 +85,15 @@ namespace fpp {
         ctx->interrupt_callback.opaque   = &_interrupter;
     }
 
-    void FormatContext::setInterrupter(int64_t timeout_ms) {
+    void FormatContext::setInterruptTimeout(int64_t timeout_ms) {
         _interrupter.set(timeout_ms);
     }
 
     void FormatContext::createContext() {
-        reset(std::shared_ptr<AVFormatContext> {
+        reset(
             ::avformat_alloc_context()
             , [](auto* ctx) { ::avformat_free_context(ctx); }
-        });
+        );
     }
 
     int FormatContext::interrupt_callback(void* opaque) {
@@ -98,16 +103,15 @@ namespace fpp {
             reinterpret_cast<const Interrupter*>(opaque)
         };
         if (interrupter->isTimeout()) {
-            static_log_error(
-                "interrupt_callback"
-                , "Timed out: ", interrupter->timeout_ms
-            );
+            static_log_error()
+                << "interrupt_callback: "
+                << "Timed out: " << interrupter->timeout_ms;
             return FAIL;
         }
         return OK;
     }
 
-    std::string FormatContext::mediaResourceLocator() const {
+    const std::string_view FormatContext::mediaResourceLocator() const {
         return _media_resource_locator;
     }
 
@@ -118,8 +122,8 @@ namespace fpp {
         }
     }
 
-    void FormatContext::setStreams(StreamVector stream_list) {
-        _streams = stream_list;
+    void FormatContext::setStreams(StreamVector stream_vector) {
+        _streams = stream_vector;
     }
 
     void FormatContext::processPacket(Packet& packet) {
@@ -147,36 +151,12 @@ namespace fpp {
         return _streams;
     }
 
-    void FormatContext::setTimeoutOpening(int64_t ms) {
-        _timeout_opening = ms;
+    void FormatContext::setTimeout(TimeoutProcess process, int64_t ms) {
+        _timeouts[std::size_t(process)] = ms;
     }
 
-    void FormatContext::setTimeoutClosing(int64_t ms) {
-        _timeout_closing = ms;
-    }
-
-    void FormatContext::setTimeoutReading(int64_t ms) {
-        _timeout_reading = ms;
-    }
-
-    void FormatContext::setTimeoutWriting(int64_t ms) {
-        _timeout_writing = ms;
-    }
-
-    int64_t FormatContext::timeoutOpening() const {
-        return _timeout_opening;
-    }
-
-    int64_t FormatContext::timeoutClosing() const {
-        return _timeout_closing;
-    }
-
-    int64_t FormatContext::timeoutReading() const {
-        return _timeout_reading;
-    }
-
-    int64_t FormatContext::timeoutWriting() const {
-        return _timeout_writing;
+    int64_t FormatContext::getTimeout(TimeoutProcess process) const {
+        return _timeouts[std::size_t(process)];
     }
 
     const StreamVector FormatContext::streams() const {

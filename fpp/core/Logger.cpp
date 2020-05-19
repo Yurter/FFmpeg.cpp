@@ -1,14 +1,15 @@
 #include "Logger.hpp"
 #include <fpp/core/Utils.hpp>
-#include <string>
 #include <iostream>
+#include <string>
 #include <thread>
+#include <regex>
+#include <ctime>
+#include <chrono>
+
 #ifdef _WIN32
 #include <Windows.h>
 #endif
-#include <ctime>
-#include <regex>
-#include <chrono>
 
 namespace fpp {
 
@@ -107,9 +108,9 @@ namespace fpp {
             case LogLevel::Error:
                 return "err ";
             case LogLevel::Quiet:
-                return "   ";
+                return "    ";
             }
-        return "?";
+        return "?   ";
     }
 
     Logger& Logger::instance() {
@@ -132,12 +133,6 @@ namespace fpp {
         case LogLevel::Error:
             ::av_log_set_level(AV_LOG_ERROR);
             break;
-//        case LogLevel::Debug:
-//            ::av_log_set_level(AV_LOG_DEBUG);
-//            break;
-//        case LogLevel::Trace:
-//            ::av_log_set_level(AV_LOG_TRACE);
-//            break;
         case LogLevel::Quiet:
             ::av_log_set_level(AV_LOG_QUIET);
             break;
@@ -148,11 +143,40 @@ namespace fpp {
         _print_func = foo;
     }
 
+    void Logger::print(const std::string_view caller_name, LogLevel log_level, const std::string_view message) const {
+        if (ignoreMessage(log_level)) {
+            return;
+        }
+
+        std::stringstream ss;
+        ss << '[' << logLevelToString(log_level) << ']'
+           << '[' << threadIdFormated()          << ']'
+           << '[' << currentTimeFormated()       << ']'
+           << '[' << caller_name                 << ']'
+           << ' ' << message;
+
+        _print_func(log_level, ss.str());
+    }
+
+    void Logger::print(LogLevel log_level, const std::string_view message) const {
+        if (ignoreMessage(log_level)) {
+            return;
+        }
+
+        std::stringstream ss;
+        ss << '[' << logLevelToString(log_level) << ']'
+           << '[' << threadIdFormated()          << ']'
+           << '[' << currentTimeFormated()       << ']'
+           << ' ' << message;
+
+        _print_func(log_level, ss.str());
+    }
+
     bool Logger::ignoreMessage(LogLevel message_log_level) const {
         return (message_log_level == LogLevel::Quiet) || (message_log_level > _log_level);
     }
 
-    Logger::ConsoleHandler::ConsoleHandler(std::mutex& mutex, LogLevel log_level) :
+    ConsoleHandler::ConsoleHandler(std::mutex& mutex, LogLevel log_level) :
         _h_stdout {
         #ifdef _WIN32
             ::GetStdHandle(STD_OUTPUT_HANDLE)
@@ -164,11 +188,11 @@ namespace fpp {
         setConsoleColor(log_level);
     }
 
-    Logger::ConsoleHandler::~ConsoleHandler() {
+    ConsoleHandler::~ConsoleHandler() {
         resetConsoleColor();
     }
 
-    void Logger::ConsoleHandler::setConsoleColor(LogLevel log_level) const {
+    void ConsoleHandler::setConsoleColor(LogLevel log_level) const {
         #ifdef _WIN32
 
         constexpr auto white  { FOREGROUND_RED|FOREGROUND_GREEN|FOREGROUND_BLUE      };
@@ -194,7 +218,7 @@ namespace fpp {
         #endif
     }
 
-    void Logger::ConsoleHandler::resetConsoleColor() const {
+    void ConsoleHandler::resetConsoleColor() const {
         #ifdef _WIN32
         constexpr auto white { FOREGROUND_RED|FOREGROUND_GREEN|FOREGROUND_BLUE };
         ::SetConsoleTextAttribute(_h_stdout, white);
@@ -203,5 +227,55 @@ namespace fpp {
         #endif
     }
 
+    MessageHandler::MessageHandler(LogLevel log_level)
+        : _caller_name { /* default */ }
+        , _log_level { log_level } {
+    }
+
+    MessageHandler::MessageHandler(const std::string_view caller_name, LogLevel log_level)
+        : _caller_name { caller_name }
+        , _log_level { log_level } {
+    }
+
+    MessageHandler::~MessageHandler() { // TODO: refactor (19.05)
+        if (_caller_name.empty()) {
+            switch (_log_level) {
+                case LogLevel::Info:
+                    Logger::instance().print(LogLevel::Info,    _ss.str());
+                    return;
+                case LogLevel::Warning:
+                    Logger::instance().print(LogLevel::Warning, _ss.str());
+                    return;
+                case LogLevel::Error:
+                    Logger::instance().print(LogLevel::Error,   _ss.str());
+                    return;
+                case LogLevel::Quiet:
+                    return;
+            }
+        }
+        else {
+            switch (_log_level) {
+                case LogLevel::Info:
+                    Logger::instance().print(_caller_name, LogLevel::Info,    _ss.str());
+                    return;
+                case LogLevel::Warning:
+                    Logger::instance().print(_caller_name, LogLevel::Warning, _ss.str());
+                    return;
+                case LogLevel::Error:
+                    Logger::instance().print(_caller_name, LogLevel::Error,   _ss.str());
+                    return;
+                case LogLevel::Quiet:
+                    return;
+            }
+        }
+    }
+
+    void set_log_level(LogLevel log_level) {
+        Logger::instance().setLogLevel(log_level);
+    }
+
+    void set_ffmpeg_log_level(LogLevel log_level) {
+        Logger::instance().setFFmpegLogLevel(log_level);
+    }
 
 } // namespace fpp

@@ -1,6 +1,6 @@
 #include "Stream.hpp"
 #include <fpp/core/Utils.hpp>
-#include <fpp/core/Logger.hpp>
+#include <fpp/core/FFmpegException.hpp>
 
 extern "C" {
     #include <libavformat/avformat.h>
@@ -18,36 +18,23 @@ namespace fpp {
         , _start_time_point { FROM_START }
         , _end_time_point { TO_END }
         , _stamp_from_zero { false } {
-
-        setName("Stream");
-
+        if (duration() == NOPTS_VALUE) {
+            setDuration(0);
+        }
     }
 
     // input stream
     Stream::Stream(AVStream* avstream)
         : Stream(avstream, utils::to_media_type(avstream->codecpar->codec_type)) {
-
-        setName("In" + utils::to_string(type()) + "Stream");
         params = utils::make_params(type());
         params->parseStream(avstream);
-
     }
 
     // output stream
     Stream::Stream(AVStream* avstream, const SpParameters parameters)
         : Stream(avstream, parameters->type()) {
-
-        setName("Out" + utils::to_string(type()) + "Stream");
         params = parameters;
         params->initCodecpar(codecpar());
-        if (invalid_int(params->streamIndex())) {
-            params->setStreamIndex(index());
-        }
-        else {
-            // index pre-setted for some reason
-            raw()->index = int(params->streamIndex());
-        }
-
     }
 
     std::string Stream::toString() const {
@@ -60,6 +47,10 @@ namespace fpp {
         return "[" + std::to_string(index()) + "] "
                 + utils::to_string(type()) + " stream" + lang + ": "
                 + params->toString();
+    }
+
+    void Stream::initCodecpar() {
+        params->initCodecpar(codecpar());
     }
 
     void Stream::stampPacket(Packet& packet) {
@@ -89,7 +80,7 @@ namespace fpp {
         packet.setPos(-1);
         packet.setTimeBase(params->timeBase());
 
-        params->increaseDuration(packet.duration());
+        increaseDuration(packet.duration());
         _prev_dts = packet.dts();
         _prev_pts = packet.pts();
         _packet_index++;
@@ -102,53 +93,55 @@ namespace fpp {
         };
         const auto actual_duration {
             ::av_rescale_q(
-                params->duration()
+                duration()
                 , params->timeBase()
                 , DEFAULT_TIME_BASE
             )
         };
         if (actual_duration >= planned_duration) {
-            log_info(
-                "Time is over: "
-                , utils::time_to_string(actual_duration, DEFAULT_TIME_BASE)
-            );
+            log_info()
+                << "Time is over: "
+                << utils::time_to_string(actual_duration, DEFAULT_TIME_BASE);
             return true;
         }
         return false;
     }
 
-    void Stream::setIndex(int64_t value) {
-        raw()->index = int(value);
-        params->setStreamIndex(value);
+    void Stream::setIndex(int value) {
+        raw()->index = value;
     }
 
-    void Stream::setStartTimePoint(int64_t msec) {
+    void Stream::setDuration(int64_t duration) {
+        raw()->duration = duration;
+    }
+
+    void Stream::setStartTimePoint(int64_t msec) { // TODO (18.05)
         if (_start_time_point == msec) {
             return;
         }
         if ((msec != FROM_START) && (msec < 0)) {
-            log_warning("Cannot set start time point less then zero: ", msec, ", ignored");
+//            log_warning("Cannot set start time point less then zero: ", msec, ", ignored");
             return;
         }
         if ((_end_time_point != TO_END) && (msec > _end_time_point)) {
-            log_warning("Cannot set start time point more then end time point "
-                        , _end_time_point,  ": ", msec, ", ignored");
+//            log_warning("Cannot set start time point more then end time point "
+//                        , _end_time_point,  ": ", msec, ", ignored");
             return;
         }
         _start_time_point = msec;
     }
 
-    void Stream::setEndTimePoint(int64_t msec) {
+    void Stream::setEndTimePoint(int64_t msec) { // TODO (18.05)
         if (_end_time_point == msec) {
             return;
         }
         if ((msec != TO_END) && (msec < 0)) {
-            log_warning("Cannot set end time point less then zero: ", msec, ", ignored");
+//            log_warning("Cannot set end time point less then zero: ", msec, ", ignored");
             return;
         }
         if ((_start_time_point != FROM_START) && (msec < _start_time_point)) {
-            log_warning("Cannot set end time point less then start time point "
-                        , _start_time_point,  ": ", msec, ", ignored");
+//            log_warning("Cannot set end time point less then start time point "
+//                        , _start_time_point,  ": ", msec, ", ignored");
             return;
         }
         _end_time_point = msec;
@@ -160,6 +153,10 @@ namespace fpp {
 
     int64_t Stream::index() const {
         return raw()->index;
+    }
+
+    int64_t Stream::duration() const {
+        return raw()->duration;
     }
 
     int64_t Stream::startTimePoint() const {
@@ -179,6 +176,14 @@ namespace fpp {
             throw std::runtime_error { "stream is null" };
         }
         return raw()->codecpar;
+    }
+
+    void Stream::addMetadata(const std::string_view key, const std::string_view value) {
+        ffmpeg_api_strict(av_dict_set, &raw()->metadata, key.data(), value.data(), 0);
+    }
+
+    void Stream::increaseDuration(const int64_t value) {
+        raw()->duration += value;
     }
 
     void Stream::shiftStamps(Packet& packet) {
