@@ -126,17 +126,16 @@ namespace fpp {
         _streams = stream_vector;
     }
 
-    void FormatContext::processPacket(Packet& packet) {
+    bool FormatContext::processPacket(Packet& packet) {
         const auto packet_stream {
             stream(packet.streamIndex())
         };
+        if (packet_stream->timeIsOver()) {
+            return false;
+        }
+        packet.setType(packet_stream->type());
         packet_stream->stampPacket(packet);
-        const auto packet_type { // TODO: refactor it (03.06)
-            packet_stream->timeIsOver()
-                ? MediaType::EndOF
-                : packet_stream->type()
-        };
-        packet.setType(packet_type);
+        return true;
     }
 
     void FormatContext::addStream(SharedStream stream) {

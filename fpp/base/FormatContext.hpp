@@ -48,7 +48,7 @@ namespace fpp {
         SharedStream        stream(MediaType stream_type);
         int64_t             streamNumber() const;
 
-        void                processPacket(Packet& packet);
+        bool                processPacket(Packet& packet);
 
         std::string         toString() const override final;
 

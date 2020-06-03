@@ -18,8 +18,7 @@ namespace fpp {
     }
 
     bool OutputFormatContext::write(Packet& packet) {
-        processPacket(packet);
-        if (packet.isEOF()) {
+        if (!processPacket(packet)) {
             return false;
         }
         setInterruptTimeout(getTimeout(TimeoutProcess::Writing));

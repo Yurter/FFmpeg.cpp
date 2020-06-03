@@ -56,7 +56,9 @@ namespace fpp {
                     + utils::quoted(mediaResourceLocator())
             };
         }
-        processPacket(packet);
+        if (!processPacket(packet)) {
+            return Packet { MediaType::EndOF };
+        }
         return packet;
     }
 

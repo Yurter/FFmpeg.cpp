@@ -54,7 +54,6 @@ namespace fpp {
     }
 
     void Stream::stampPacket(Packet& packet) {
-
         if (packet.timeBase() != DEFAULT_RATIONAL) {
             ::av_packet_rescale_ts(
                 packet.ptr()
@@ -84,7 +83,6 @@ namespace fpp {
         _prev_dts = packet.dts();
         _prev_pts = packet.pts();
         _packet_index++;
-
     }
 
     bool Stream::timeIsOver() const {
