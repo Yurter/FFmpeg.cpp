@@ -111,7 +111,7 @@ void youtube_stream_copy_with_silence() {
         else if (packet.isAudio()) {
             for (const auto& a_frame  : audio_decoder.decode(packet))   {
             for (const auto& ra_frame : resample.resample(a_frame))     {
-            for (const auto& a_packet : audio_encoder.encode(ra_frame)) {
+            for (      auto& a_packet : audio_encoder.encode(ra_frame)) {
                 sink.write(a_packet);
             }}}
         }

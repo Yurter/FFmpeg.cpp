@@ -90,7 +90,7 @@ void record_screen_win() {
         if (packet.isVideo()) {
             for (const auto& v_frame  : video_decoder.decode(packet))   {
                  const auto& rv_frame { rescaler.scale(v_frame) };
-            for (const auto& v_packet : video_encoder.encode(rv_frame)) {
+            for (      auto& v_packet : video_encoder.encode(rv_frame)) {
                 sink.write(v_packet);
             }}
         }

@@ -18,7 +18,7 @@ namespace fpp {
         void                createStream(SpParameters params);
         void                copyStream(const SharedStream other);
 
-        bool                write(Packet packet, WriteMode write_mode = WriteMode::Instant);
+        bool                write(Packet& packet, WriteMode write_mode = WriteMode::Instant);
         void                flush();
 
         std::string         sdp();
@@ -35,6 +35,8 @@ namespace fpp {
         void                writeTrailer();
         void                initStreamsCodecpar();
         void                parseStreamsTimeBase();
+        bool                instantWrite(Packet& packet);
+        bool                interleavedWrite(Packet& packet);
 
     private:
 

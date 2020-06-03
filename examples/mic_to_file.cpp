@@ -77,7 +77,7 @@ void mic_to_file() {
         if (packet.isAudio()) {
             for (const auto& a_frame  : audio_decoder.decode(packet))   {
             for (const auto& ra_frame : resampler.resample(a_frame))    {
-            for (const auto& a_packet : audio_encoder.encode(ra_frame)) {
+            for (      auto& a_packet : audio_encoder.encode(ra_frame)) {
                 stop_flag = !sink.write(a_packet);
             }}}
         }

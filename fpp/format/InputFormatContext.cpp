@@ -30,7 +30,6 @@ namespace fpp {
                     case SeekPrecision::Precisely:
                         throw std::runtime_error { "NOT_IMPLEMENTED" };
                 }
-
             }()
         };
         if (const auto ret {
