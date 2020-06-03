@@ -26,7 +26,7 @@ namespace fpp {
 
         FormatContext();
 
-        const std::string_view mediaResourceLocator() const;
+        std::string         mediaResourceLocator() const;
         void                setMediaResourceLocator(const std::string_view mrl);
         const StreamVector  streams()               const;
         StreamVector        streams();
