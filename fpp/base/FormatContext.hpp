@@ -28,7 +28,7 @@ namespace fpp {
 
         std::string         mediaResourceLocator() const;
         void                setMediaResourceLocator(const std::string_view mrl);
-        const StreamVector  streams()               const;
+        const StreamVector  streams() const;
         StreamVector        streams();
 
         void                setTimeout(TimeoutProcess process, int64_t ms);
