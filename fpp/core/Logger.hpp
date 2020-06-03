@@ -1,5 +1,4 @@
 #pragma once
-#include <fstream>
 #include <sstream>
 #include <iomanip>
 #include <functional>
@@ -7,18 +6,55 @@
 
 namespace fpp {
 
-    /* Категории сообщений, которые выводятся в консоль.
-     * Каждый последующий уровень включает в себя предыдущий */
-    enum LogLevel {
-        /* Сообщения не выводится */
+    enum class LogLevel : uint8_t {
         Quiet,
-        /* Сообщения об ошибках */
         Error,
-        /* Сообщения о некорректно установленных параметрах,
-         * которые могут привести к проблемам */
         Warning,
-        /* Стандартная информация */
         Info,
+    };
+
+    class MessageHandler {
+
+    public:
+
+        MessageHandler(const MessageHandler&) = delete;
+        MessageHandler(MessageHandler&&) = delete;
+        MessageHandler& operator=(const MessageHandler&) = delete;
+        MessageHandler& operator=(MessageHandler&&) = delete;
+
+        explicit MessageHandler(LogLevel log_level);
+        MessageHandler(const std::string_view caller_name, LogLevel log_level);
+        ~MessageHandler();
+
+        template<typename T>
+        inline MessageHandler& operator<<(T&& data) {
+            _ss << data;
+            return *this;
+        }
+
+    private:
+
+        const std::string _caller_name;
+        const LogLevel _log_level;
+        std::stringstream _ss;
+
+    };
+
+    class ConsoleHandler {
+
+    public:
+
+        ConsoleHandler(std::mutex& mutex, LogLevel log_level);
+        ~ConsoleHandler();
+
+    private:
+
+        void setConsoleColor(LogLevel log_level) const;
+        void resetConsoleColor() const;
+
+        void* _h_stdout;
+        std::lock_guard<std::mutex> _lock;
+
     };
 
     class Logger {
@@ -31,47 +67,18 @@ namespace fpp {
         void                setFFmpegLogLevel(LogLevel log_level) const;
         void                setPrintCallback(std::function<void(LogLevel,const std::string&)> foo);
 
-        template <typename... Args>
-        void print(const std::string_view caller_name, LogLevel log_level, Args&&... args) const {
-            if (ignoreMessage(log_level)) {
-                return;
-            }
-
-            std::stringstream ss;
-            ss << '[' << logLevelToString(log_level) << ']'
-               << '[' << threadIdFormated() << ']'
-               << '[' << currentTimeFormated() << ']'
-               << '[' << std::setw(15) << std::left << std::setfill(' ') << caller_name << ']' << ' ';
-
-            (ss << ... << std::forward<Args>(args));
-
-            _print_func(log_level, ss.str());
-        }
+        void                print(const std::string_view caller_name, LogLevel log_level, const std::string_view message) const;
+        void                print(LogLevel log_level, const std::string_view message) const;
 
     private:
 
         Logger();
         ~Logger();
 
-        Logger(Logger const&)            = delete;
-        Logger(Logger const&&)           = delete;
-        Logger& operator=(Logger const&) = delete;
-
-    private:
-
-        struct ConsoleHandler {
-
-            ConsoleHandler(std::mutex& mutex, LogLevel log_level);
-            ~ConsoleHandler();
-
-        private:
-
-            void setConsoleColor(LogLevel log_level) const;
-            void resetConsoleColor() const;
-
-            void* _h_stdout;
-            std::lock_guard<std::mutex> _lock;
-        };
+        Logger(const Logger&)            = delete;
+        Logger(Logger&&)                 = delete;
+        Logger& operator=(const Logger&) = delete;
+        Logger& operator=(Logger&&)      = delete;
 
     private:
 
@@ -90,36 +97,26 @@ namespace fpp {
 
     };
 
+    void set_log_level(LogLevel log_level);
+    void set_ffmpeg_log_level(LogLevel log_level);
 
-/* Макрос установки дирректории, в которой находятся файлы лога.
- * Должен вызыватся первым по отношению к остальным макросам    */
-//#define set_log_dir(x) fpp::Logger::instance(x)
+    // TODO (18.05)
+    // error: C2280: "fpp::MessageHandler::MessageHandler(const fpp::MessageHandler &)":
+    // предпринята попытка ссылки на удаленную функцию
+//    const auto test_log_info {
+//        [ h_msg = MessageHandler { LogLevel::Info } ]() mutable -> MessageHandler& {
+//            return h_msg;
+//        }
+//    };
 
-/* Макрос установки уровня лога - сообщения, имеющие урень выше установленного, игнорируются */
-//#define set_log_level(x)        logger.setLogLevel(x)
-//#define set_ffmpeg_log_level(x) logger.setFFmpegLogLevel(x)
-
-    inline auto set_log_level(LogLevel log_level) {
-        Logger::instance().setLogLevel(log_level);
+    inline MessageHandler static_log_info() {
+        return MessageHandler { LogLevel::Info };
     }
-
-    inline auto set_ffmpeg_log_level(LogLevel log_level) {
-        Logger::instance().setFFmpegLogLevel(log_level);
+    inline MessageHandler static_log_warning() {
+        return MessageHandler { LogLevel::Warning };
     }
-
-    template <typename... Args>
-    inline auto static_log_info(const std::string_view caller_name, Args&&... args) {
-        Logger::instance().print(caller_name, LogLevel::Info, std::forward<Args>(args)...);
-    }
-
-    template <typename... Args>
-    inline auto static_log_warning(const std::string_view caller_name, Args&&... args) {
-        Logger::instance().print(caller_name, LogLevel::Warning, std::forward<Args>(args)...);
-    }
-
-    template <typename... Args>
-    inline auto static_log_error(const std::string_view caller_name, Args&&... args) {
-        Logger::instance().print(caller_name, LogLevel::Error, std::forward<Args>(args)...);
+    inline MessageHandler static_log_error() {
+        return MessageHandler { LogLevel::Error };
     }
 
 } // namespace fpp

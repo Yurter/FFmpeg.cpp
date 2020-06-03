@@ -1,10 +1,10 @@
 #include "examples.hpp"
-#include <fpp/context/InputFormatContext.hpp>
-#include <fpp/context/OutputFormatContext.hpp>
+#include <fpp/format/InputFormatContext.hpp>
+#include <fpp/format/OutputFormatContext.hpp>
 #include <fpp/codec/DecoderContext.hpp>
 #include <fpp/codec/EncoderContext.hpp>
-#include <fpp/refi/ResampleContext.hpp>
-#include <fpp/refi/RescaleContext.hpp>
+#include <fpp/resample/ResampleContext.hpp>
+#include <fpp/scale/RescaleContext.hpp>
 #include <fpp/core/Utils.hpp>
 
 void youtube_stream_transcode() {
@@ -21,10 +21,10 @@ void youtube_stream_transcode() {
 
     /* check input streams */
     if (!source.stream(fpp::MediaType::Video)) {
-        fpp::static_log_error(__func__, "Youtube require video stream");
+        fpp::static_log_error() << "Youtube require video stream";
     }
     if (!source.stream(fpp::MediaType::Audio)) {
-        fpp::static_log_error(__func__, "Youtube require video stream");
+        fpp::static_log_error() << "Youtube require audio stream";
     }
 
     /* get input parameters */

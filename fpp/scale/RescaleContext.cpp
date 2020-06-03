@@ -1,6 +1,5 @@
 #include "RescaleContext.hpp"
 #include <fpp/core/FFmpegException.hpp>
-#include <fpp/core/Logger.hpp>
 #include <fpp/core/Utils.hpp>
 
 extern "C" {
@@ -11,23 +10,23 @@ namespace fpp {
 
     RescaleContext::RescaleContext(InOutParams parameters)
         : params { parameters } {
-        setName("Rescaler");
         init();
     }
 
-    Frame RescaleContext::scale(const Frame source_frame) {
+    Frame RescaleContext::scale(const Frame& frame) {
         Frame rescaled_frame { createFrame() };
         ::sws_scale(
             raw()
-            , source_frame.raw().data       /* srcSlice[]  */
-            , source_frame.raw().linesize   /* srcStride[] */
+            , frame.raw().data              /* srcSlice[]  */
+            , frame.raw().linesize          /* srcStride[] */
             , 0                             /* srcSliceY   */
-            , source_frame.raw().height     /* srcSliceH   */
+            , frame.raw().height            /* srcSliceH   */
             , rescaled_frame.raw().data     /* dst[]       */
             , rescaled_frame.raw().linesize /* dstStride[] */
         );
-        ::av_frame_copy_props(rescaled_frame.ptr(), source_frame.ptr());
-        rescaled_frame.setTimeBase(params.in->timeBase());
+        ::av_frame_copy_props(rescaled_frame.ptr(), frame.ptr());
+        rescaled_frame.setTimeBase(frame.timeBase());
+        rescaled_frame.setStreamIndex(frame.streamIndex());
         return rescaled_frame;
     }
 
@@ -39,7 +38,7 @@ namespace fpp {
             std::static_pointer_cast<const VideoParameters>(params.out)
         };
 
-        reset(std::shared_ptr<SwsContext> {
+        reset(
             ::sws_getContext(
                 int(in_param->width()), int(in_param->height()), in_param->pixelFormat()
                 , int(out_param->width()), int(out_param->height()), out_param->pixelFormat()
@@ -49,20 +48,19 @@ namespace fpp {
                 , nullptr     /* param     */
             )
             , [](auto* ctx) { ::sws_freeContext(ctx); }
-        });
-
-        log_info("Inited "
-            , "from "
-                , "[" , in_param->width()
-                , "x"  , in_param->height()
-                , ", " , in_param->pixelFormat()
-                , "] "
-            , "to "
-                , "[" , out_param->width()
-                , "x"  , out_param->height()
-                , ", " , out_param->pixelFormat()
-                , "]"
         );
+
+        log_info() << "Inited "
+            << "from "
+                << '['  << in_param->width()
+                << 'x'  << in_param->height()
+                << ", " << in_param->pixelFormat()
+                << "] "
+            << "to "
+                << '['  << out_param->width()
+                << 'x'  << out_param->height()
+                << ", " << out_param->pixelFormat()
+                << ']';
     }
 
     Frame RescaleContext::createFrame() const {
@@ -71,8 +69,8 @@ namespace fpp {
             std::static_pointer_cast<const VideoParameters>(params.out)
         };
         frame.raw().format = output_params->pixelFormat();
-        frame.raw().width  = int(output_params->width());
-        frame.raw().height = int(output_params->height());
+        frame.raw().width  = output_params->width();
+        frame.raw().height = output_params->height();
         constexpr auto align { 32 };
         ffmpeg_api_strict(av_frame_get_buffer, frame.ptr(), align);
         return frame;

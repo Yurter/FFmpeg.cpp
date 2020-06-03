@@ -1,6 +1,6 @@
 #pragma once
-#include <string_view>
 #include <fpp/core/wrap/FFmpegObject.hpp>
+#include <string_view>
 #include <vector>
 #include <string>
 
@@ -15,7 +15,7 @@ namespace fpp {
 
     public:
 
-        Dictionary(const Options& options);
+        explicit Dictionary(const Options& options);
         ~Dictionary() override;
 
         void setOption(const std::string_view key, const std::string_view value);

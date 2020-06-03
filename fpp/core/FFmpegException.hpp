@@ -8,10 +8,9 @@ namespace fpp {
 
     public:
 
-        FFmpegException(const std::string& error_message, int ret = 0);
+        explicit FFmpegException(const std::string& error_message);
 
         const char*         what()  const noexcept override;
-        int                 ret()   const noexcept;
 
     protected:
 
@@ -29,22 +28,6 @@ namespace fpp {
             return false;\
         }\
     } while (false)
-//#define ffmpeg_api(foo,...) \
-//    do {\
-//        if (const auto ret { foo(__VA_ARGS__) }; ret < 0) {\
-//            log_error(#foo " failed: " + CODE_POS);\
-//            return false;\
-//        }\
-//    } while (false)
-
-//#define ffmpeg_api_strict(foo,...) \
-//    do {\
-//        if (const auto ret { foo(__VA_ARGS__) }; ret < 0) {\
-//            throw fpp::FFmpegException {\
-//                " failed: "\
-//            };\
-//        }\
-//    } while (false)
 
 #define ffmpeg_api_strict(foo,...) \
     do {\

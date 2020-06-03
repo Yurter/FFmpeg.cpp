@@ -1,61 +1,37 @@
 #pragma once
+#include <fpp/core/wrap/SharedFFmpegObject.hpp>
 #include <fpp/base/Frame.hpp>
-#include <fpp/stream/VideoParameters.hpp>
 
+struct AVFilter;
+struct AVFilterContext;
 struct AVFilterGraph;
-struct AVFilterContext;
-struct AVFilterContext;
-struct AVFilterInOut;
 
 namespace fpp {
 
-    class FilterContext : public Object {
+    class FilterContext : public SharedFFmpegObject<AVFilterContext> {
 
     public:
 
-        FilterContext(SpParameters parameters, const std::string& filters_descr);
+        FilterContext(AVFilterGraph* graph
+                      , const std::string_view name
+                      , const std::string_view unique_id
+                      , const std::string_view args
+                      , void* opaque);
 
-        FrameVector         filter(Frame source_frame);
-        std::string         description() const;
+        void                linkTo(FilterContext& other);
+        void                setAudioBufferSinkFrameSize(unsigned frame_size);
 
-        std::string         toString() const override final;
-
-        const SpParameters  params;
-
-    public:
-
-        static const char   Separator = ',';
-        static std::string  set_pts(float coef) { return "setpts=" + std::to_string(coef) + "*PTS"; }
-        static std::string  keep_every_frame(int n) { return "select='not(mod(n," + std::to_string(n) + "))'"; }
-
-        protected:
-
-        void                init();
-
-    protected:
-
-        virtual void        initBufferSource()  = 0;
-        virtual void        initBufferSink()    = 0;
+        FrameVector         read();
+        void                write(const Frame& frame);
 
     private:
 
-        void                initInputs();
-        void                initOutputs();
-        void                initFilterGraph();
+        const AVFilter*     getFilterByName(const std::string_view name) const;
 
     private:
 
-        const std::string   _filters_descr;
-
-    protected:
-
-        std::shared_ptr<AVFilterGraph>      _filter_graph;
-
-        std::shared_ptr<AVFilterInOut>      _inputs;
-        std::shared_ptr<AVFilterInOut>      _outputs;
-
-        std::shared_ptr<AVFilterContext>    _buffersrc_ctx;
-        std::shared_ptr<AVFilterContext>    _buffersink_ctx;
+        int                 _nb_input_pads;
+        int                 _nb_output_pads;
 
     };
 

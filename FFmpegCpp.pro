@@ -26,6 +26,7 @@ INCLUDEPATH += include
 SOURCES += \
     examples/adaptive_streaming.cpp \
     examples/concatenate.cpp \
+    examples/filter_complex.cpp \
     examples/filter_text_on_video.cpp \
     examples/filter_timelapase.cpp \
     examples/mic_to_file.cpp \
@@ -44,8 +45,12 @@ SOURCES += \
     examples/youtube_stream_copy_with_silence.cpp \
     examples/youtube_stream_transcode.cpp \
     examples/youtube_stream_transcode_with_silence.cpp \
-    fpp/refi/BitStreamFilterContext.cpp \
-    fpp/refi/ResampleContext.cpp \
+    fpp/base/FilterChain.cpp \
+    fpp/base/FilterGraph.cpp \
+    fpp/filter/BitStreamFilterContext.cpp \
+    fpp/filter/ComplexFilterGraph.cpp \
+    fpp/filter/LinearFilterGraph.cpp \
+    fpp/resample/ResampleContext.cpp \
     fpp/refi/VideoFilters/Drawtext.cpp \
     main.cpp \
     fpp/base/CodecContext.cpp \
@@ -56,16 +61,14 @@ SOURCES += \
     fpp/base/Parameters.cpp \
     fpp/codec/DecoderContext.cpp \
     fpp/codec/EncoderContext.cpp \
-    fpp/context/InputFormatContext.cpp \
-    fpp/context/OutputFormatContext.cpp \
+    fpp/format/InputFormatContext.cpp \
+    fpp/format/OutputFormatContext.cpp \
     fpp/core/FFmpegException.cpp \
     fpp/core/Logger.cpp \
     fpp/core/Object.cpp \
     fpp/core/Utils.cpp \
-    fpp/refi/AudioFilterContext.cpp \
     fpp/base/FilterContext.cpp \
-    fpp/refi/RescaleContext.cpp \
-    fpp/refi/VideoFilterContext.cpp \
+    fpp/scale/RescaleContext.cpp \
     fpp/stream/AudioParameters.cpp \
     fpp/stream/Stream.cpp \
     fpp/stream/VideoParameters.cpp
@@ -74,6 +77,8 @@ HEADERS += \
     examples/examples.hpp \
     fpp/base/CodecContext.hpp \
     fpp/base/Dictionary.hpp \
+    fpp/base/FilterChain.hpp \
+    fpp/base/FilterGraph.hpp \
     fpp/base/FormatContext.hpp \
     fpp/base/Frame.hpp \
     fpp/base/MediaData.hpp \
@@ -81,27 +86,22 @@ HEADERS += \
     fpp/base/Parameters.hpp \
     fpp/codec/DecoderContext.hpp \
     fpp/codec/EncoderContext.hpp \
-    fpp/context/InputFormatContext.hpp \
-    fpp/context/OutputFormatContext.hpp \
+    fpp/format/InputFormatContext.hpp \
+    fpp/format/OutputFormatContext.hpp \
     fpp/core/FFmpegException.hpp \
     fpp/core/Logger.hpp \
     fpp/core/Object.hpp \
     fpp/core/Utils.hpp \
-    fpp/core/async/AsyncList.hpp \
-    fpp/core/async/AsyncObject.hpp \
-    fpp/core/async/AsyncQueue.hpp \
-    fpp/core/async/AsyncVector.hpp \
     fpp/core/time/Chronometer.hpp \
-    fpp/core/time/Timer.hpp \
     fpp/core/wrap/FFmpegObject.hpp \
     fpp/core/wrap/SharedFFmpegObject.hpp \
-    fpp/refi/AudioFilterContext.hpp \
-    fpp/refi/BitStreamFilterContext.hpp \
+    fpp/filter/BitStreamFilterContext.hpp \
+    fpp/filter/ComplexFilterGraph.hpp \
+    fpp/filter/LinearFilterGraph.hpp \
     fpp/refi/VideoFilters/DrawText.hpp \
     fpp/base/FilterContext.hpp \
-    fpp/refi/ResampleContext.hpp \
-    fpp/refi/RescaleContext.hpp \
-    fpp/refi/VideoFilterContext.hpp \
+    fpp/resample/ResampleContext.hpp \
+    fpp/scale/RescaleContext.hpp \
     fpp/stream/AudioParameters.hpp \
     fpp/stream/Stream.hpp \
     fpp/stream/VideoParameters.hpp

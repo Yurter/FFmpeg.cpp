@@ -7,7 +7,6 @@ namespace fpp {
     Packet::Packet(MediaType type)
         : MediaData(type)
         , _time_base { DEFAULT_RATIONAL } {
-        setName("Packet");
     }
 
     Packet::Packet(const Packet& other)
@@ -75,8 +74,8 @@ namespace fpp {
         return raw().pos;
     }
 
-    int64_t Packet::streamIndex() const {
-        return int64_t(raw().stream_index);
+    int Packet::streamIndex() const {
+        return raw().stream_index;
     }
 
     bool Packet::keyFrame() const {
@@ -103,8 +102,7 @@ namespace fpp {
     }
 
     void Packet::ref(const Packet& other) {
-        ffmpeg_api_strict(av_packet_ref, ptr(), other.ptr());
-        setTimeBase(other.timeBase());
+        ref(other.raw(), other.timeBase());
     }
 
     void Packet::ref(const AVPacket& other, AVRational time_base) {

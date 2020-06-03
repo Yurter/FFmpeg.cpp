@@ -1,6 +1,5 @@
 #include "VideoParameters.hpp"
 #include <fpp/core/Utils.hpp>
-#include <fpp/core/Logger.hpp>
 
 extern "C" {
     #include <libavformat/avformat.h>
@@ -15,7 +14,6 @@ namespace fpp {
         : Parameters(MediaType::Video)
         , _gop_size { 0 }
         , _frame_rate { DEFAULT_RATIONAL } {
-        setName("VideoParameters");
     }
 
     void VideoParameters::setWidth(int width) {
@@ -30,11 +28,11 @@ namespace fpp {
         raw().sample_aspect_ratio = sample_aspect_ratio;
     }
 
-    void VideoParameters::setFrameRate(AVRational frame_rate) {
+    void VideoParameters::setFrameRate(AVRational frame_rate) { // TODO (18.05)
         if ((frame_rate.num * frame_rate.den) == 0) {
-            log_error("setFrameRate failed: ", frame_rate);
+            log_error() << "setFrameRate failed: " << frame_rate; // TODO (18.05)
             AVRational default_framerate { 16, 1 };
-            log_error("seted default value: ", default_framerate);
+            log_error() << "seted default value: " << default_framerate; // TODO (18.05)
             _frame_rate = default_framerate;
             return;
         }

@@ -5,7 +5,7 @@
 #include <memory>
 
 extern "C" {
-    #include <libavcodec/avcodec.h> // TODO: move to cpp file (20.04)
+    #include <libavcodec/avcodec.h>
 }
 
 constexpr auto DEFAULT_TIME_BASE { AVRational { 1, 1000 } };
@@ -24,7 +24,7 @@ namespace fpp {
 
     public:
 
-        Parameters(MediaType type);
+        explicit Parameters(MediaType type);
         Parameters(const Parameters& other);
         Parameters& operator=(const Parameters& other);
 
