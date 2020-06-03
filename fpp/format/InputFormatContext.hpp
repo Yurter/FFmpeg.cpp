@@ -44,6 +44,8 @@ namespace fpp {
         AVInputFormat*      inputFormat();
         void                setInputFormat(AVInputFormat* in_fmt);
 
+        Packet              readFromSource();
+
     private:
 
         AVInputFormat*      _input_format;

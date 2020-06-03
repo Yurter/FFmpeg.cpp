@@ -46,16 +46,7 @@ namespace fpp {
 
     Packet InputFormatContext::read() {
         setInterruptTimeout(getTimeout(TimeoutProcess::Reading));
-        Packet packet { MediaType::Unknown };
-        if (const auto ret { ::av_read_frame(raw(), packet.ptr()) }; ret < 0) {
-            if (ret == AVERROR_EOF) {
-                return Packet { MediaType::EndOF };
-            }
-            throw FFmpegException {
-                "Cannot read source: "
-                    + utils::quoted(mediaResourceLocator())
-            };
-        }
+        auto packet { readFromSource() };
         if (!processPacket(packet)) {
             return Packet { MediaType::EndOF };
         }
@@ -149,6 +140,20 @@ namespace fpp {
 
     void InputFormatContext::setInputFormat(AVInputFormat* in_fmt) {
         _input_format = in_fmt;
+    }
+
+    Packet InputFormatContext::readFromSource() {
+        Packet packet { MediaType::Unknown };
+        if (const auto ret { ::av_read_frame(raw(), packet.ptr()) }; ret < 0) {
+            if (ret == AVERROR_EOF) {
+                return Packet { MediaType::EndOF };
+            }
+            throw FFmpegException {
+                "Cannot read source: "
+                    + utils::quoted(mediaResourceLocator())
+            };
+        }
+        return packet;
     }
 
 } // namespace fpp
