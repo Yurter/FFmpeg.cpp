@@ -13,7 +13,7 @@ namespace fpp {
 
         BitStreamFilterContext(const fpp::SpParameters param, const std::string_view filter_name);
 
-        Packet filter(Packet packet);
+        Packet              filter(Packet packet);
 
     };
 

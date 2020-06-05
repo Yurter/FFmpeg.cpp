@@ -17,18 +17,22 @@ namespace fpp {
         close();
     }
 
-    bool OutputFormatContext::write(Packet packet, WriteMode write_mode) {
+    bool OutputFormatContext::write(Packet& packet) {
+        if (!processPacket(packet)) {
+            return false;
+        }
+        setInterruptTimeout(getTimeout(TimeoutProcess::Writing));
+        ffmpeg_api(av_write_frame, raw(), packet.ptr());
+        return true;
+    }
+
+    bool OutputFormatContext::interleavedWrite(Packet& packet) {
         processPacket(packet);
         if (packet.isEOF()) {
             return false;
         }
         setInterruptTimeout(getTimeout(TimeoutProcess::Writing));
-        if (write_mode == WriteMode::Instant) {
-            ffmpeg_api(av_write_frame, raw(), packet.ptr());
-        }
-        else if (write_mode == WriteMode::Interleaved) {
-            ffmpeg_api(av_interleaved_write_frame, raw(), packet.ptr());
-        }
+        ffmpeg_api(av_interleaved_write_frame, raw(), packet.ptr());
         return true;
     }
 
@@ -36,7 +40,7 @@ namespace fpp {
         ffmpeg_api_strict(av_write_frame, raw(), nullptr);
     }
 
-    std::string OutputFormatContext::sdp() {
+    std::string OutputFormatContext::sdp() { // TODO: move method to utils & make arg array of OFC (05.06)
         char buf[256] {};
         AVFormatContext* ctxs[] { raw() }; // TODO do not use utils::merge_sdp_files(), instead use ctxs array 09.04
         ffmpeg_api_strict(av_sdp_create
@@ -86,7 +90,7 @@ namespace fpp {
         );
     }
 
-    bool OutputFormatContext::openContext(Options options) {
+    bool OutputFormatContext::openContext(const Options& options) {
         if (streamNumber() == 0) {
             throw std::logic_error {
                 "Can't open context without streams"
@@ -114,7 +118,7 @@ namespace fpp {
     }
 
     std::string OutputFormatContext::formatName() const {
-        return raw()->oformat->name;
+        return std::string { raw()->oformat->name };
     }
 
     void OutputFormatContext::closeContext() {

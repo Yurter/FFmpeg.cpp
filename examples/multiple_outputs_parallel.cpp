@@ -19,7 +19,7 @@ void multiple_outputs_parallel() {
     constexpr auto N { 5 };
     std::array<fpp::OutputFormatContext,N> sinks;
 
-    for (size_t i { 0 }; i < N; ++i) {
+    for (std::size_t i { 0 }; i < N; ++i) {
         const auto file_name { std::to_string(i).append(".flv") }; // 0.flv, 1.flv...
         sinks[i].setMediaResourceLocator(file_name);
         sinks[i].copyStream(source.stream(fpp::MediaType::Video));

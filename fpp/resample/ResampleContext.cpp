@@ -31,10 +31,10 @@ namespace fpp {
         reset(
             ::swr_alloc_set_opts(
                 nullptr   /* existing Swr context */
-                , int64_t(out_param->channelLayout())
+                , std::int64_t(out_param->channelLayout())
                 , out_param->sampleFormat()
                 , out_param->sampleRate()
-                , int64_t(in_param->channelLayout())
+                , std::int64_t(in_param->channelLayout())
                 , in_param->sampleFormat()
                 , in_param->sampleRate()
                 , 0       /* logging level offset */

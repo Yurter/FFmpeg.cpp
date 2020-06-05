@@ -102,15 +102,15 @@ namespace fpp {
     std::string_view Logger::logLevelToString(LogLevel value) const {
         switch (value) {
             case LogLevel::Info:
-                return "info";
+                return std::string_view { "info" };
             case LogLevel::Warning:
-                return "warn";
+                return std::string_view { "warn" };
             case LogLevel::Error:
-                return "err ";
+                return std::string_view { "err " };
             case LogLevel::Quiet:
-                return "    ";
+                return std::string_view { "    " };
             }
-        return "?   ";
+        return std::string_view { "?   " };
     }
 
     Logger& Logger::instance() {

@@ -54,7 +54,7 @@ namespace fpp {
         }
     }
 
-    std::string utils::pts_to_string(int64_t pts) {
+    std::string utils::pts_to_string(std::int64_t pts) {
         return (pts == NOPTS_VALUE) ? "NOPTS" : std::to_string(pts);
     }
 
@@ -82,23 +82,23 @@ namespace fpp {
         return ::avcodec_get_name(codec_id);
     }
 
-    void utils::sleep_for(int64_t milliseconds) {
+    void utils::sleep_for(std::int64_t milliseconds) {
         std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds));
     }
 
-    void utils::sleep_for_ms(int64_t milliseconds) {
+    void utils::sleep_for_ms(std::int64_t milliseconds) {
         sleep_for(milliseconds);
     }
 
-    void utils::sleep_for_sec(int64_t seconds) {
+    void utils::sleep_for_sec(std::int64_t seconds) {
         sleep_for_ms(seconds * 1'000);
     }
 
-    void utils::sleep_for_min(int64_t minutes) {
+    void utils::sleep_for_min(std::int64_t minutes) {
         sleep_for_sec(minutes * 60);
     }
 
-    std::string utils::time_to_string(int64_t time_stamp, AVRational time_base) {
+    std::string utils::time_to_string(std::int64_t time_stamp, AVRational time_base) {
         const auto time_ms { ::av_rescale_q(time_stamp, time_base, DEFAULT_TIME_BASE) };
         const auto ms {   time_ms % 1000               };
         const auto ss {  (time_ms / 1000) % 60         };
@@ -107,7 +107,7 @@ namespace fpp {
         return std::to_string(hh) + ':' + std::to_string(mm) + ':' + std::to_string(ss) + '.' + std::to_string(ms);
     }
 
-    std::string utils::channel_layout_to_string(int nb_channels, uint64_t channel_layout) {
+    std::string utils::channel_layout_to_string(int nb_channels, std::uint64_t channel_layout) {
         if (channel_layout == 0) {
             return "Unknown or unspecified";
         }
@@ -344,7 +344,7 @@ namespace fpp {
     std::string utils::merge_sdp_files(const std::string& sdp_one, const std::string& sdp_two) {
         std::string result { sdp_one };
 
-        std::istringstream iss(sdp_two);
+        std::istringstream iss { sdp_two };
         std::string line;
 
         while (std::getline(iss, line)) {
@@ -447,27 +447,6 @@ namespace fpp {
         }
 
         return false;
-    }
-
-    bool utils::video_filter_required(const InOutParams& params) {
-        assert(params.in->isVideo() && params.out->isVideo());
-
-        const auto in  { std::static_pointer_cast<const VideoParameters>(params.in)  };
-        const auto out { std::static_pointer_cast<const VideoParameters>(params.out) };
-
-        if (in->frameRate() != out->frameRate()) {
-            static_log_warning() << "Video filter required: framerate mismatch "
-                                 << to_string(in->frameRate())
-                                 << " != "
-                                 << to_string(out->frameRate());
-            return true;
-        }
-
-        return false;
-    }
-
-    bool utils::audio_filter_required(const InOutParams&) {
-        throw std::runtime_error { "audio_filter_required() is not implemented" };
     }
 
     bool utils::transcoding_required(const InOutParams& params) {

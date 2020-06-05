@@ -30,19 +30,19 @@ namespace fpp {
         return *this;
     }
 
-    void Packet::setPts(int64_t pts) {
+    void Packet::setPts(std::int64_t pts) {
         raw().pts = pts;
     }
 
-    void Packet::setDts(int64_t dts) {
+    void Packet::setDts(std::int64_t dts) {
         raw().dts = dts;
     }
 
-    void Packet::setPos(int64_t pos) {
+    void Packet::setPos(std::int64_t pos) {
         raw().pos = pos;
     }
 
-    void Packet::setDuration(int64_t duration) {
+    void Packet::setDuration(std::int64_t duration) {
         raw().duration = duration;
     }
 
@@ -50,8 +50,8 @@ namespace fpp {
         _time_base = time_base;
     }
 
-    void Packet::setStreamIndex(int64_t stream_index) {
-        raw().stream_index = int(stream_index);
+    void Packet::setStreamIndex(int stream_index) {
+        raw().stream_index = stream_index;
     }
 
     int64_t Packet::pts() const {
@@ -82,8 +82,8 @@ namespace fpp {
         return raw().flags & AV_PKT_FLAG_KEY;
     }
 
-    size_t Packet::size() const {
-        return size_t(raw().size);
+    int Packet::size() const {
+        return raw().size;
     }
 
     std::string Packet::toString() const {

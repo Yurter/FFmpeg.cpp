@@ -3,10 +3,9 @@
 
 namespace fpp {
 
-    enum class SeekPrecision : uint8_t {
+    enum class SeekPrecision : std::uint8_t {
         Forward,
         Backward,
-        Precisely,
         Any,
     };
 
@@ -17,22 +16,12 @@ namespace fpp {
         explicit InputFormatContext(const std::string_view mrl = {}, const std::string_view format_short_name = {});
         ~InputFormatContext() override;
 
-        void                seek(int64_t stream_index, int64_t timestamp, SeekPrecision seek_precision = SeekPrecision::Forward);
+        bool                seek(int stream_index, std::int64_t timestamp, SeekPrecision seek_precision = SeekPrecision::Forward);
         Packet              read();
-
-        static std::string  silence(int64_t sample_rate) {
-            return "anullsrc=r=" + std::to_string(sample_rate)
-                    + ":cl=mono";
-        }
-
-        static std::string  sine(int64_t frequency, int64_t sample_rate) {
-            return "sine=frequency=" + std::to_string(frequency)
-                    + ":sample_rate=" + std::to_string(sample_rate);
-        }
 
     private:
 
-        bool                openContext(Options options) override;
+        bool                openContext(const Options& options) override;
         std::string         formatName() const override;
         void                closeContext() override;
 
@@ -41,8 +30,10 @@ namespace fpp {
         void                guessInputFromat();
         AVInputFormat*      findInputFormat(const std::string_view short_name) const;
 
-        AVInputFormat*      inputFormat();
-        void                setInputFormat(AVInputFormat* in_fmt);
+        AVInputFormat*      inputFormat();                          // TODO: make public (05.06)
+        void                setInputFormat(AVInputFormat* in_fmt);  // TODO: make public (05.06)
+
+        Packet              readFromSource();
 
     private:
 

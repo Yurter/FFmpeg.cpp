@@ -61,7 +61,7 @@ namespace fpp {
         _opened = opened;
     }
 
-    bool FormatContext::open(Options options) {
+    bool FormatContext::open(const Options& options) {
         if (opened()) {
             log_error() << "Context already opened";
             return false;
@@ -85,7 +85,7 @@ namespace fpp {
         ctx->interrupt_callback.opaque   = &_interrupter;
     }
 
-    void FormatContext::setInterruptTimeout(int64_t timeout_ms) {
+    void FormatContext::setInterruptTimeout(std::int64_t timeout_ms) {
         _interrupter.set(timeout_ms);
     }
 
@@ -111,7 +111,7 @@ namespace fpp {
         return OK;
     }
 
-    const std::string_view FormatContext::mediaResourceLocator() const {
+    std::string FormatContext::mediaResourceLocator() const {
         return _media_resource_locator;
     }
 
@@ -126,36 +126,35 @@ namespace fpp {
         _streams = stream_vector;
     }
 
-    void FormatContext::processPacket(Packet& packet) {
+    bool FormatContext::processPacket(Packet& packet) {
         const auto packet_stream {
             stream(packet.streamIndex())
         };
+        if (packet_stream->timeIsOver()) {
+            return false;
+        }
+        packet.setType(packet_stream->type());
         packet_stream->stampPacket(packet);
-        const auto packet_type {
-            packet_stream->timeIsOver()
-                ? MediaType::EndOF
-                : packet_stream->type()
-        };
-        packet.setType(packet_type);
+        return true;
     }
 
     void FormatContext::addStream(SharedStream stream) {
         _streams.push_back(stream);
     }
 
-    int64_t FormatContext::streamNumber() const {
-        return int64_t(raw()->nb_streams);
+    unsigned int FormatContext::streamNumber() const {
+        return raw()->nb_streams;
     }
 
     StreamVector FormatContext::streams() {
         return _streams;
     }
 
-    void FormatContext::setTimeout(TimeoutProcess process, int64_t ms) {
+    void FormatContext::setTimeout(TimeoutProcess process, std::int64_t ms) {
         _timeouts[std::size_t(process)] = ms;
     }
 
-    int64_t FormatContext::getTimeout(TimeoutProcess process) const {
+    std::int64_t FormatContext::getTimeout(TimeoutProcess process) const {
         return _timeouts[std::size_t(process)];
     }
 
@@ -163,8 +162,8 @@ namespace fpp {
         return _streams;
     }
 
-    SharedStream FormatContext::stream(int64_t index) {
-        return _streams.at(size_t(index));
+    SharedStream FormatContext::stream(std::size_t index) {
+        return _streams.at(index);
     }
 
     SharedStream FormatContext::stream(MediaType stream_type) {

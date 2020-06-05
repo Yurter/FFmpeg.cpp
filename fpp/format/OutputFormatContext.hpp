@@ -3,11 +3,6 @@
 
 namespace fpp {
 
-    enum class WriteMode : uint8_t {
-        Instant,
-        Interleaved,
-    };
-
     class OutputFormatContext : public FormatContext {
 
     public:
@@ -18,7 +13,9 @@ namespace fpp {
         void                createStream(SpParameters params);
         void                copyStream(const SharedStream other);
 
-        bool                write(Packet packet, WriteMode write_mode = WriteMode::Instant);
+        bool                write(Packet& packet);
+        bool                interleavedWrite(Packet& packet);
+
         void                flush();
 
         std::string         sdp();
@@ -26,7 +23,7 @@ namespace fpp {
     private:
 
         void                createContext() override;
-        bool                openContext(Options options) override;
+        bool                openContext(const Options& options) override;
         std::string         formatName() const override;
         void                closeContext() override;
 
@@ -38,8 +35,8 @@ namespace fpp {
 
     private:
 
-        AVOutputFormat*     outputFormat();
-        void                setOutputFormat(AVOutputFormat* out_fmt);
+        AVOutputFormat*     outputFormat();                             // TODO: make public (05.06)
+        void                setOutputFormat(AVOutputFormat* out_fmt);   // TODO: make public (05.06)
 
     private:
 

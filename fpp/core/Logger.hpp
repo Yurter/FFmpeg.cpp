@@ -6,7 +6,7 @@
 
 namespace fpp {
 
-    enum class LogLevel : uint8_t {
+    enum class LogLevel : std::uint8_t {
         Quiet,
         Error,
         Warning,
