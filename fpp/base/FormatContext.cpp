@@ -61,7 +61,7 @@ namespace fpp {
         _opened = opened;
     }
 
-    bool FormatContext::open(Options options) {
+    bool FormatContext::open(const Options& options) {
         if (opened()) {
             log_error() << "Context already opened";
             return false;

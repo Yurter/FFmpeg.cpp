@@ -38,7 +38,7 @@ namespace fpp {
         void                setTimeout(TimeoutProcess process, std::int64_t ms);
         std::int64_t        getTimeout(TimeoutProcess process) const;
 
-        bool                open(Options options = {});
+        bool                open(const Options& options = {});
         bool                open(const std::string_view mrl, Options options = {});
         void                close();
 
