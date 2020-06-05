@@ -57,7 +57,6 @@ namespace fpp {
             if (ret < 0) {
                 throw FFmpegException { "av_buffersink_get_frame failed" };
             }
-            output_frame.setTimeBase({ 1, 1 });
             filtered_frames.push_back(output_frame);
         }
         return filtered_frames;
