@@ -18,7 +18,7 @@ namespace fpp {
     class Parameters;
     using SpParameters = std::shared_ptr<Parameters>;
     using InOutParams = struct InOutParams { SpParameters in; SpParameters out; };
-    using Extradata = std::pair<uint8_t*,size_t>;
+    using Extradata = std::pair<std::uint8_t*,std::size_t>;
 
     class Parameters : public FFmpegObject<AVCodecParameters>, public MediaData {
 
@@ -34,7 +34,7 @@ namespace fpp {
         bool                isDecoder() const;
         bool                isEncoder() const;
 
-        void                setBitrate(int64_t bitrate);
+        void                setBitrate(std::int64_t bitrate);
         void                setTimeBase(AVRational time_base);
         void                setExtradata(Extradata extradata);
         void                setFormatFlags(int flags);
@@ -42,7 +42,7 @@ namespace fpp {
         AVCodecID           codecId()       const;
         std::string         codecName()     const;
         AVCodec*            codec()         const;
-        int64_t             bitrate()       const;
+        std::int64_t        bitrate()       const;
         AVRational          timeBase()      const;
         Extradata           extradata()     const;
         std::string         codecType()     const;

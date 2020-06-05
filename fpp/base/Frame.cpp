@@ -35,11 +35,11 @@ namespace fpp {
         return *this;
     }
 
-    int64_t Frame::pts() const {
+    std::int64_t Frame::pts() const {
         return raw().pts;
     }
 
-    void Frame::setPts(int64_t pts) {
+    void Frame::setPts(std::int64_t pts) {
         raw().pts = pts;
     }
 
@@ -67,16 +67,14 @@ namespace fpp {
         return raw().nb_samples;
     }
 
-    size_t Frame::size() const {
+    int Frame::size() const {
         if (isVideo()) {
-            return size_t(
-                ::av_image_get_buffer_size(
+            return ::av_image_get_buffer_size(
                     AVPixelFormat(raw().format)
                     , raw().width
                     , raw().height
                     , 32 /* align */
-                )
-            );
+                );
         }
         if (isAudio()) {
             const auto channels {
@@ -84,14 +82,14 @@ namespace fpp {
             };
             const auto bufer_size {
                 ::av_samples_get_buffer_size(
-                    nullptr                         /* linesize */
+                    nullptr                        /* linesize */
                     , channels
                     , raw().nb_samples
                     , AVSampleFormat(raw().format)
-                    , 32                            /* align */
+                    , 32                           /* align */
                 )
             };
-            return size_t(bufer_size);
+            return bufer_size;
         }
         return 0;
     }

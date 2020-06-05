@@ -95,7 +95,7 @@ void text_on_video() {
         if (packet.isVideo()) {
             for (const auto& v_frame  : video_decoder.decode(packet))  {
             for (const auto& f_frame  : filter_graph.filter(v_frame))  {
-            for (const auto& v_packet : video_encoder.encode(f_frame)) {
+            for (      auto& v_packet : video_encoder.encode(f_frame)) {
                 sink.write(v_packet);
             }}}
         }

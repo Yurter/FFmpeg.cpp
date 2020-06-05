@@ -17,9 +17,9 @@ namespace fpp {
         close();
     }
 
-    void InputFormatContext::seek(int64_t stream_index, int64_t timestamp, SeekPrecision seek_precision) {
+    bool InputFormatContext::seek(int stream_index, std::int64_t timestamp, SeekPrecision seek_precision) {
         const auto flags {
-            [&]() {
+            [&]() -> int {
                 switch (seek_precision) {
                     case SeekPrecision::Forward:
                         return 0;
@@ -27,41 +27,24 @@ namespace fpp {
                         return AVSEEK_FLAG_BACKWARD;
                     case SeekPrecision::Any:
                         return AVSEEK_FLAG_ANY;
-                    case SeekPrecision::Precisely:
-                        throw std::runtime_error { "NOT_IMPLEMENTED" };
                 }
-
             }()
         };
-        if (const auto ret {
-                ::av_seek_frame(raw(), int(stream_index), timestamp, flags)
-            }; ret < 0) {
-            throw FFmpegException {
-                "Failed to seek timestamp "
-                    + utils::time_to_string(timestamp, DEFAULT_TIME_BASE)
-                    + " in stream " + std::to_string(stream_index)
-            };
-        }
+        ffmpeg_api(av_seek_frame, raw(), stream_index, timestamp, flags);
         log_info() << "Success seek to " << utils::time_to_string(timestamp, DEFAULT_TIME_BASE);
+        return true;
     }
 
     Packet InputFormatContext::read() {
         setInterruptTimeout(getTimeout(TimeoutProcess::Reading));
-        Packet packet { MediaType::Unknown };
-        if (const auto ret { ::av_read_frame(raw(), packet.ptr()) }; ret < 0) {
-            if (ret == AVERROR_EOF) {
-                return Packet { MediaType::EndOF };
-            }
-            throw FFmpegException {
-                "Cannot read source: "
-                    + utils::quoted(mediaResourceLocator())
-            };
+        auto packet { readFromSource() };
+        if (!processPacket(packet)) {
+            return Packet { MediaType::EndOF };
         }
-        processPacket(packet);
         return packet;
     }
 
-    bool InputFormatContext::openContext(Options options) {
+    bool InputFormatContext::openContext(const Options& options) {
         if (!inputFormat()) {
             guessInputFromat();
         }
@@ -96,7 +79,7 @@ namespace fpp {
     }
 
     std::string InputFormatContext::formatName() const {
-        return raw()->iformat->name;
+        return std::string { raw()->iformat->name };
     }
 
     void InputFormatContext::closeContext() {
@@ -148,6 +131,20 @@ namespace fpp {
 
     void InputFormatContext::setInputFormat(AVInputFormat* in_fmt) {
         _input_format = in_fmt;
+    }
+
+    Packet InputFormatContext::readFromSource() {
+        Packet packet { MediaType::Unknown };
+        if (const auto ret { ::av_read_frame(raw(), packet.ptr()) }; ret < 0) {
+            if (ret == AVERROR_EOF) {
+                return Packet { MediaType::EndOF };
+            }
+            throw FFmpegException {
+                "Cannot read source: "
+                    + utils::quoted(mediaResourceLocator())
+            };
+        }
+        return packet;
     }
 
 } // namespace fpp

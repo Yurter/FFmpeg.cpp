@@ -84,12 +84,12 @@ namespace fpp {
         const auto other_video_parames {
             std::static_pointer_cast<VideoParameters>(other)
         };
-        if (not_inited_int(width()))            { setWidth(other_video_parames->width());               }
-        if (not_inited_int(height()))           { setHeight(other_video_parames->height());             }
-        if (not_inited_q(frameRate()))          { setFrameRate(other_video_parames->frameRate());       }
-        if (not_inited_pix_fmt(pixelFormat()))  { setPixelFormat(other_video_parames->pixelFormat());   }
-        if (not_inited_int(gopSize()))          { setGopSize(other_video_parames->gopSize());           }
-        if (not_inited_q(sampleAspectRatio()))  { setSampleAspectRatio(other_video_parames->sampleAspectRatio()); }
+        if (not_inited_int(width()))           { setWidth(other_video_parames->width());             }
+        if (not_inited_int(height()))          { setHeight(other_video_parames->height());           }
+        if (not_inited_int(gopSize()))         { setGopSize(other_video_parames->gopSize());         }
+        if (not_inited_q(frameRate()))         { setFrameRate(other_video_parames->frameRate());     }
+        if (not_inited_pix_fmt(pixelFormat())) { setPixelFormat(other_video_parames->pixelFormat()); }
+        if (not_inited_q(sampleAspectRatio())) { setSampleAspectRatio(other_video_parames->sampleAspectRatio()); }
     }
 
     void VideoParameters::parseStream(const AVStream* avstream) {

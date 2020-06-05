@@ -16,7 +16,7 @@ namespace fpp {
         return receivePackets(frame.timeBase(), frame.streamIndex());
     }
 
-    PacketVector EncoderContext::flush(AVRational time_base, int64_t stream_index) {
+    PacketVector EncoderContext::flush(AVRational time_base, int stream_index) {
         sendFlushFrame();
         return receivePackets(time_base, stream_index);
     }
@@ -41,7 +41,7 @@ namespace fpp {
         }
     }
 
-    PacketVector EncoderContext::receivePackets(AVRational time_base, int64_t stream_index) {
+    PacketVector EncoderContext::receivePackets(AVRational time_base, int stream_index) {
         PacketVector encoded_packets;
         auto ret { 0 };
         while (0 == ret) {

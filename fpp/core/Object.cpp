@@ -16,7 +16,7 @@ namespace fpp {
     }
 
     std::string Object::toString() const {
-        return "[" + name() + ":" + std::to_string(int64_t(this)) + "]";
+        return "[" + name() + ":" + std::to_string(std::int64_t(this)) + "]";
     }
 
     MessageHandler Object::log_info() const {

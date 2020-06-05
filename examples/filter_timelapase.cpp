@@ -83,7 +83,7 @@ void timelapase() {
         fpp::MediaType::Unknown
     };
     const auto read_video_packet {
-        [&packet,&source]() {
+        [&]() {
             do {
                 packet = source.read();
             } while (!packet.isVideo() && !packet.isEOF());
@@ -93,10 +93,10 @@ void timelapase() {
 
     /* read and write packet */
     while (read_video_packet()) {
-        for (const auto& v_frame  : video_decoder.decode(packet)) {
-        for (const auto& f_frame  : filter_graph.filter(v_frame)) {
+        for (const auto& v_frame : video_decoder.decode(packet)) {
+        for (const auto& f_frame : filter_graph.filter(v_frame)) {
         const auto r_frame { rescaler.scale(f_frame) };
-        for (auto& v_packet : video_encoder.encode(r_frame))      {
+        for (auto& v_packet : video_encoder.encode(r_frame))     {
             v_packet.setStreamIndex(0);
             v_packet.setTimeBase(in_params->timeBase());
             sink.write(v_packet);

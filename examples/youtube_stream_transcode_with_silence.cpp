@@ -27,7 +27,7 @@ void youtube_stream_transcode_with_silence() {
 
     /* create audio source */
     fpp::InputFormatContext audio_source {
-        fpp::InputFormatContext::silence(44'100)
+        "anullsrc=r=" + std::to_string(44'100) + ":cl=mono"
     };
 
     /* open audio source */
@@ -130,14 +130,14 @@ void youtube_stream_transcode_with_silence() {
         if (packet.isVideo()) {
             for (const auto& v_frame  : video_decoder.decode(packet))   {
                  const auto& rv_frame { rescaler.scale(v_frame) };
-            for (const auto& v_packet : video_encoder.encode(rv_frame)) {
+            for (      auto& v_packet : video_encoder.encode(rv_frame)) {
                 sink.write(v_packet);
             }}
         }
         else if (packet.isAudio()) {
             for (const auto& a_frame  : audio_decoder.decode(packet))   {
             for (const auto& ra_frame : resample.resample(a_frame))     {
-            for (const auto& a_packet : audio_encoder.encode(ra_frame)) {
+            for (      auto& a_packet : audio_encoder.encode(ra_frame)) {
                 sink.write(a_packet);
             }}}
         }

@@ -24,7 +24,7 @@ namespace fpp {
         raw().format = int(sample_format);
     }
 
-    void AudioParameters::setChannelLayout(uint64_t channel_layout) {
+    void AudioParameters::setChannelLayout(std::uint64_t channel_layout) {
         raw().channel_layout = channel_layout;
     }
 
@@ -69,10 +69,10 @@ namespace fpp {
         const auto other_audio {
             std::static_pointer_cast<AudioParameters>(other)
         };
-        if (not_inited_int(sampleRate()))           { setSampleRate(other_audio->sampleRate());         }
-        if (not_inited_smp_fmt(sampleFormat()))     { setSampleFormat(other_audio->sampleFormat());     }
-        if (not_inited_ch_layout(channelLayout()))  { setChannelLayout(other_audio->channelLayout());   }
-        if (not_inited_int(channels()))             { setChannels(other_audio->channels());             }
+        if (not_inited_int(channels()))            { setChannels(other_audio->channels());           }
+        if (not_inited_int(sampleRate()))          { setSampleRate(other_audio->sampleRate());       }
+        if (not_inited_smp_fmt(sampleFormat()))    { setSampleFormat(other_audio->sampleFormat());   }
+        if (not_inited_ch_layout(channelLayout())) { setChannelLayout(other_audio->channelLayout()); }
     }
 
     void AudioParameters::parseStream(const AVStream* avstream) {
@@ -85,7 +85,7 @@ namespace fpp {
         };
         if (channel_layout_unspecified) {
             avstream->codecpar->channel_layout
-                = uint64_t(::av_get_default_channel_layout(int(channels())));
+                = std::uint64_t(::av_get_default_channel_layout(channels()));
         }
         setChannelLayout(avstream->codecpar->channel_layout);
         setFrameSize(avstream->codecpar->frame_size);

@@ -1,9 +1,9 @@
 #pragma once
-#include <stdint.h>
+#include <cstdint>
 
 namespace fpp {
 
-    enum class MediaType : uint8_t {
+    enum class MediaType : std::uint8_t {
         Unknown,
         Video,
         Audio,

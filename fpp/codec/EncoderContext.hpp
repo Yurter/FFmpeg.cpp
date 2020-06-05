@@ -12,13 +12,13 @@ namespace fpp {
         explicit EncoderContext(const SpParameters params, Options options = {});
 
         PacketVector        encode(const Frame& frame);
-        PacketVector        flush(AVRational time_base, int64_t stream_index);
+        PacketVector        flush(AVRational time_base, int stream_index);
 
     private:
 
         void                sendFrame(const Frame& frame);
         void                sendFlushFrame();
-        PacketVector        receivePackets(AVRational time_base, int64_t stream_index);
+        PacketVector        receivePackets(AVRational time_base, int stream_index);
 
     };
 

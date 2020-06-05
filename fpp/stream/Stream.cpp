@@ -54,7 +54,6 @@ namespace fpp {
     }
 
     void Stream::stampPacket(Packet& packet) {
-
         if (packet.timeBase() != DEFAULT_RATIONAL) {
             ::av_packet_rescale_ts(
                 packet.ptr()
@@ -84,7 +83,6 @@ namespace fpp {
         _prev_dts = packet.dts();
         _prev_pts = packet.pts();
         _packet_index++;
-
     }
 
     bool Stream::timeIsOver() const {
@@ -111,11 +109,11 @@ namespace fpp {
         raw()->index = value;
     }
 
-    void Stream::setDuration(int64_t duration) {
+    void Stream::setDuration(std::int64_t duration) {
         raw()->duration = duration;
     }
 
-    void Stream::setStartTimePoint(int64_t msec) { // TODO (18.05)
+    void Stream::setStartTimePoint(std::int64_t msec) { // TODO (18.05)
         if (_start_time_point == msec) {
             return;
         }
@@ -131,7 +129,7 @@ namespace fpp {
         _start_time_point = msec;
     }
 
-    void Stream::setEndTimePoint(int64_t msec) { // TODO (18.05)
+    void Stream::setEndTimePoint(std::int64_t msec) { // TODO (18.05)
         if (_end_time_point == msec) {
             return;
         }
@@ -151,23 +149,23 @@ namespace fpp {
         _stamp_from_zero = value;
     }
 
-    int64_t Stream::index() const {
+    int Stream::index() const {
         return raw()->index;
     }
 
-    int64_t Stream::duration() const {
+    std::int64_t Stream::duration() const {
         return raw()->duration;
     }
 
-    int64_t Stream::startTimePoint() const {
+    std::int64_t Stream::startTimePoint() const {
         return _start_time_point;
     }
 
-    int64_t Stream::endTimePoint() const {
+    std::int64_t Stream::endTimePoint() const {
         return _end_time_point;
     }
 
-    int64_t Stream::packetIndex() const {
+    std::int64_t Stream::packetIndex() const {
         return _packet_index;
     }
 
@@ -178,11 +176,12 @@ namespace fpp {
         return raw()->codecpar;
     }
 
-    void Stream::addMetadata(const std::string_view key, const std::string_view value) {
-        ffmpeg_api_strict(av_dict_set, &raw()->metadata, key.data(), value.data(), 0);
+    bool Stream::addMetadata(const std::string_view key, const std::string_view value, int flags) {
+        ffmpeg_api(av_dict_set, &raw()->metadata, key.data(), value.data(), flags);
+        return true;
     }
 
-    void Stream::increaseDuration(const int64_t value) {
+    void Stream::increaseDuration(const std::int64_t value) {
         raw()->duration += value;
     }
 
@@ -200,18 +199,7 @@ namespace fpp {
 
     void Stream::calculatePacketDuration(Packet& packet) {
         if (raw()->cur_dts == NOPTS_VALUE) {
-            const auto fps {
-                ::av_q2intfloat(
-                    std::static_pointer_cast<VideoParameters>(params)->frameRate()
-                )
-            };
-            const auto inv_tb {
-                ::av_q2intfloat(::av_inv_q(params->timeBase()))
-            };
-            const auto avg_pkt_dur {
-                inv_tb / fps
-            };
-            packet.setDuration(avg_pkt_dur);
+            packet.setDuration(0);
         } else {
             packet.setDuration(std::abs(packet.dts() - raw()->cur_dts));
         }

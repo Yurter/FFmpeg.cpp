@@ -26,29 +26,26 @@ namespace fpp {
 
         FormatContext();
 
-        const std::string_view mediaResourceLocator() const;
-        void                setMediaResourceLocator(const std::string_view);
-        const StreamVector  streams()               const;
+        std::string         mediaResourceLocator() const;
+        void                setMediaResourceLocator(const std::string_view mrl);
+
+        unsigned int        streamNumber() const;
         StreamVector        streams();
+        const StreamVector  streams() const;
+        SharedStream        stream(std::size_t index);
+        SharedStream        stream(MediaType stream_type);
 
-        void                setTimeout(TimeoutProcess process, int64_t ms);
-        int64_t             getTimeout(TimeoutProcess process) const;
+        void                setTimeout(TimeoutProcess process, std::int64_t ms);
+        std::int64_t        getTimeout(TimeoutProcess process) const;
 
-        bool                open(Options options = {});
+        bool                open(const Options& options = {});
         bool                open(const std::string_view mrl, Options options = {});
         void                close();
 
         bool                opened() const;
         bool                closed() const;
 
-        void                reconnectOnFailure(bool reconnect);
         void                flushContextAfterEachPacket(bool value);
-
-        SharedStream        stream(int64_t index);
-        SharedStream        stream(MediaType stream_type);
-        int64_t             streamNumber() const;
-
-        void                processPacket(Packet& packet);
 
         std::string         toString() const override final;
 
@@ -57,13 +54,13 @@ namespace fpp {
         struct Interrupter {
 
             Chronometer     chronometer;
-            int64_t         timeout_ms { 0 };
+            std::int64_t    timeout_ms { 0 };
 
             bool isTimeout() const {
                 return chronometer.elapsed_milliseconds() > timeout_ms;
             }
 
-            void set(int64_t timeout) {
+            void set(std::int64_t timeout) {
                 timeout_ms = timeout;
                 chronometer.reset();
             }
@@ -71,15 +68,17 @@ namespace fpp {
         };
 
         void                setInterruptCallback(AVFormatContext* ctx);
-        void                setInterruptTimeout(int64_t timeout_ms);
+        void                setInterruptTimeout(std::int64_t timeout_ms);
 
         virtual void        createContext();
-        virtual bool        openContext(Options options) = 0;
+        virtual bool        openContext(const Options& options) = 0;
         virtual void        closeContext() = 0;
         virtual std::string formatName() const = 0;
 
         void                addStream(SharedStream stream);
         void                setStreams(StreamVector stream_vector);
+
+        bool                processPacket(Packet& packet);
 
     private:
 
@@ -88,11 +87,11 @@ namespace fpp {
 
     private:
 
-        std::string         _media_resource_locator;
+        std::string         _media_resource_locator; // TODO: use raw()->url instead (05.06)
         bool                _opened;
         StreamVector        _streams;
 
-        using TimeoutsArray = std::array<int64_t,std::size_t(TimeoutProcess::EnumSize)>;
+        using TimeoutsArray = std::array<std::int64_t,std::size_t(TimeoutProcess::EnumSize)>;
         TimeoutsArray       _timeouts;
         Interrupter         _interrupter;
 

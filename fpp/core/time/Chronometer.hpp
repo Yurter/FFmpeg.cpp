@@ -1,5 +1,6 @@
 #pragma once
 #include <chrono>
+#include <cstdint>
 
 namespace fpp {
 
@@ -15,7 +16,7 @@ namespace fpp {
             _start_point = std::chrono::system_clock::now();
         }
 
-        int64_t elapsed_milliseconds() const {
+        std::int64_t elapsed_milliseconds() const {
             const auto end_point { std::chrono::system_clock::now() };
             return std::chrono::duration_cast<std::chrono::milliseconds>
                     (end_point - _start_point).count();
