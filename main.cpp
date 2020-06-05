@@ -5,7 +5,7 @@
 
 auto main() -> int {
 
-    fpp::static_log_info() << "Started";
+    fpp::static_log_info() << "Program started";
     fpp::static_log_info() << "FFmpeg version " << fpp::utils::ffmpeg_version();
     fpp::set_ffmpeg_log_level(fpp::LogLevel::Error);
 
@@ -46,7 +46,7 @@ auto main() -> int {
         fpp::static_log_error() << "Unknown exception";
     }
 
-    fpp::static_log_info() << "Finished";
+    fpp::static_log_info() << "Program finished";
     return 0;
 
 }
