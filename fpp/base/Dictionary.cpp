@@ -19,7 +19,7 @@ namespace fpp {
         setString(&_dictionary, key, value);
     }
 
-    void Dictionary::setOption(const std::string_view key, int64_t value) {
+    void Dictionary::setOption(const std::string_view key, std::int64_t value) {
         setString(&_dictionary, key, std::to_string(value));
     }
 
@@ -56,14 +56,14 @@ namespace fpp {
                 )
             }; ret < 0) {
             throw FFmpegException {
-                std::string("Setting option - ")
+                std::string { "Setting option - " }
                     + value.data() + " " + key.data()
                     + " failed"
             };
         }
     }
 
-    void Dictionary::setInt(AVDictionary** dict, const std::string_view key, int64_t value) const {
+    void Dictionary::setInt(AVDictionary** dict, const std::string_view key, std::int64_t value) const {
         if (const auto ret {
                 ::av_dict_set_int(
                     dict
@@ -73,7 +73,7 @@ namespace fpp {
                 )
             }; ret < 0) {
             throw FFmpegException {
-                std::string("Setting option - ")
+                std::string { "Setting option - " }
                     + key.data() + " " + std::to_string(value)
                     + " failed"
             };

@@ -20,22 +20,22 @@ namespace fpp {
 
         Packet& operator=(const Packet& other);
 
-        void                setPts(int64_t pts);
-        void                setDts(int64_t dts);
-        void                setPos(int64_t pos);
-        void                setDuration(int64_t duration);
+        void                setPts(std::int64_t pts);
+        void                setDts(std::int64_t dts);
+        void                setPos(std::int64_t pos);
+        void                setDuration(std::int64_t duration);
         void                setTimeBase(AVRational time_base);
-        void                setStreamIndex(int64_t stream_index);
+        void                setStreamIndex(int stream_index);
 
-        int64_t             pts()           const;
-        int64_t             dts()           const;
-        int64_t             duration()      const;
+        std::int64_t        pts()           const;
+        std::int64_t        dts()           const;
+        std::int64_t        duration()      const;
         AVRational          timeBase()      const;
-        int64_t             pos()           const;
+        std::int64_t        pos()           const;
         int                 streamIndex()   const;
         bool                keyFrame()      const;
 
-        size_t              size()          const;
+        int                 size()          const;
         std::string         toString()      const override;
 
     private:

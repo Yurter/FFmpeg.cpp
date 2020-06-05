@@ -29,17 +29,17 @@ namespace fpp {
         bool                timeIsOver() const;
 
         void                setIndex(int value);
-        void                setDuration(int64_t duration);
-        void                setStartTimePoint(int64_t msec);
-        void                setEndTimePoint(int64_t msec);
+        void                setDuration(std::int64_t duration);
+        void                setStartTimePoint(std::int64_t msec);
+        void                setEndTimePoint(std::int64_t msec);
 
         void                stampFromZero(bool value);
 
-        int64_t             index()             const;
-        int64_t             duration()          const;
-        int64_t             startTimePoint()    const;
-        int64_t             endTimePoint()      const;
-        int64_t             packetIndex()       const;
+        std::int64_t        index()             const;
+        std::int64_t        duration()          const;
+        std::int64_t        startTimePoint()    const;
+        std::int64_t        endTimePoint()      const;
+        std::int64_t        packetIndex()       const;
 
         AVCodecParameters*  codecpar();
 
@@ -47,7 +47,7 @@ namespace fpp {
 
     private:
 
-        void                increaseDuration(const int64_t value);
+        void                increaseDuration(const std::int64_t value);
 
         void                shiftStamps(Packet& packet);
         void                calculatePacketDuration(Packet& packet);
@@ -61,12 +61,12 @@ namespace fpp {
 
     private:
 
-        int64_t             _prev_dts;
-        int64_t             _prev_pts;
-        int64_t             _packet_index;
+        std::int64_t        _prev_dts;
+        std::int64_t        _prev_pts;
+        std::int64_t        _packet_index;
 
-        int64_t             _start_time_point; // TODO not used 25.03
-        int64_t             _end_time_point;
+        std::int64_t        _start_time_point; // TODO not used 25.03
+        std::int64_t        _end_time_point;
 
         bool                _stamp_from_zero;
 

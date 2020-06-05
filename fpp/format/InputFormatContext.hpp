@@ -3,7 +3,7 @@
 
 namespace fpp {
 
-    enum class SeekPrecision : uint8_t {
+    enum class SeekPrecision : std::uint8_t {
         Forward,
         Backward,
         Precisely,
@@ -17,15 +17,15 @@ namespace fpp {
         explicit InputFormatContext(const std::string_view mrl = {}, const std::string_view format_short_name = {});
         ~InputFormatContext() override;
 
-        void                seek(int64_t stream_index, int64_t timestamp, SeekPrecision seek_precision = SeekPrecision::Forward);
+        void                seek(int stream_index, std::int64_t timestamp, SeekPrecision seek_precision = SeekPrecision::Forward);
         Packet              read();
 
-        static std::string  silence(int64_t sample_rate) {
+        static std::string  silence(std::int64_t sample_rate) {
             return "anullsrc=r=" + std::to_string(sample_rate)
                     + ":cl=mono";
         }
 
-        static std::string  sine(int64_t frequency, int64_t sample_rate) {
+        static std::string  sine(std::int64_t frequency, std::int64_t sample_rate) {
             return "sine=frequency=" + std::to_string(frequency)
                     + ":sample_rate=" + std::to_string(sample_rate);
         }

@@ -35,19 +35,19 @@ namespace fpp {
         static std::string  to_string(AVPixelFormat pxl_fmt);
         static std::string  to_string(bool value);
         static std::string  to_string(MediaType type);
-        static std::string  pts_to_string(int64_t pts);
-        static std::string  time_to_string(int64_t time_stamp, AVRational time_base);
-        static std::string  channel_layout_to_string(int nb_channels, uint64_t channel_layout);
+        static std::string  pts_to_string(std::int64_t pts);
+        static std::string  time_to_string(std::int64_t time_stamp, AVRational time_base);
+        static std::string  channel_layout_to_string(int nb_channels, std::uint64_t channel_layout);
 
         static MediaType    to_media_type(AVMediaType type);
         static AVMediaType  from_media_type(MediaType type);
 
         static std::string  quoted(const std::string_view str, char delim = '"');
 
-        static void         sleep_for(int64_t milliseconds);
-        static void         sleep_for_ms(int64_t milliseconds);
-        static void         sleep_for_sec(int64_t seconds);
-        static void         sleep_for_min(int64_t minutes);
+        static void         sleep_for(std::int64_t milliseconds);
+        static void         sleep_for_ms(std::int64_t milliseconds);
+        static void         sleep_for_sec(std::int64_t seconds);
+        static void         sleep_for_min(std::int64_t minutes);
 
         static bool         rescaling_required(const InOutParams& params);
         static bool         resampling_required(const InOutParams& params);

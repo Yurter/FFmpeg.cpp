@@ -27,8 +27,8 @@ namespace fpp {
 
     private:
 
-        int64_t             _samples_count;
-        int64_t             _source_pts;
+        std::int64_t        _samples_count;
+        std::int64_t        _source_pts;
 
     };
 

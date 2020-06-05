@@ -17,7 +17,7 @@ namespace fpp {
         close();
     }
 
-    void InputFormatContext::seek(int64_t stream_index, int64_t timestamp, SeekPrecision seek_precision) {
+    void InputFormatContext::seek(int stream_index, std::int64_t timestamp, SeekPrecision seek_precision) {
         const auto flags {
             [&]() {
                 switch (seek_precision) {
@@ -33,7 +33,7 @@ namespace fpp {
             }()
         };
         if (const auto ret {
-                ::av_seek_frame(raw(), int(stream_index), timestamp, flags)
+                ::av_seek_frame(raw(), stream_index, timestamp, flags)
             }; ret < 0) {
             throw FFmpegException {
                 "Failed to seek timestamp "

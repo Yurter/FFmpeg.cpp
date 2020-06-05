@@ -14,13 +14,13 @@ namespace fpp {
 
         void                setSampleRate(int sample_rate);
         void                setSampleFormat(AVSampleFormat sample_format);
-        void                setChannelLayout(uint64_t channels_layout);
+        void                setChannelLayout(std::uint64_t channels_layout);
         void                setChannels(int channels);
         void                setFrameSize(int frame_size);
 
         int                 sampleRate()    const;
         AVSampleFormat      sampleFormat()  const;
-        uint64_t            channelLayout() const;
+        std::uint64_t       channelLayout() const;
         int                 channels()      const;
         int                 frameSize()     const;
 

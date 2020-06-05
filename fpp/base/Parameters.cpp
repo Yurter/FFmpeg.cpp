@@ -62,7 +62,7 @@ namespace fpp {
         return _format_flags & flag;
     }
 
-    void Parameters::setBitrate(int64_t bitrate) {
+    void Parameters::setBitrate(std::int64_t bitrate) {
         raw().bit_rate = bitrate;
     }
 
@@ -74,7 +74,7 @@ namespace fpp {
         ::av_freep(&raw().extradata);
         const auto& [data,data_size] { extradata };
         if (data_size != 0) {
-            raw().extradata = reinterpret_cast<uint8_t*>(
+            raw().extradata = reinterpret_cast<std::uint8_t*>(
                 ::av_mallocz(data_size + AV_INPUT_BUFFER_PADDING_SIZE)
             );
             if (!raw().extradata) {
@@ -104,7 +104,7 @@ namespace fpp {
         return _codec;
     }
 
-    int64_t Parameters::bitrate() const {
+    std::int64_t Parameters::bitrate() const {
         return raw().bit_rate;
     }
 

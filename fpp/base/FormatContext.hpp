@@ -35,8 +35,8 @@ namespace fpp {
         SharedStream        stream(std::size_t index);
         SharedStream        stream(MediaType stream_type);
 
-        void                setTimeout(TimeoutProcess process, int64_t ms);
-        int64_t             getTimeout(TimeoutProcess process) const;
+        void                setTimeout(TimeoutProcess process, std::int64_t ms);
+        std::int64_t        getTimeout(TimeoutProcess process) const;
 
         bool                open(Options options = {});
         bool                open(const std::string_view mrl, Options options = {});
@@ -54,7 +54,7 @@ namespace fpp {
         struct Interrupter {
 
             Chronometer     chronometer;
-            int64_t         timeout_ms { 0 };
+            std::int64_t    timeout_ms { 0 };
 
             bool isTimeout() const {
                 return chronometer.elapsed_milliseconds() > timeout_ms;
@@ -68,7 +68,7 @@ namespace fpp {
         };
 
         void                setInterruptCallback(AVFormatContext* ctx);
-        void                setInterruptTimeout(int64_t timeout_ms);
+        void                setInterruptTimeout(std::int64_t timeout_ms);
 
         virtual void        createContext();
         virtual bool        openContext(Options options) = 0;
@@ -91,7 +91,7 @@ namespace fpp {
         bool                _opened;
         StreamVector        _streams;
 
-        using TimeoutsArray = std::array<int64_t,std::size_t(TimeoutProcess::EnumSize)>;
+        using TimeoutsArray = std::array<std::int64_t,std::size_t(TimeoutProcess::EnumSize)>;
         TimeoutsArray       _timeouts;
         Interrupter         _interrupter;
 

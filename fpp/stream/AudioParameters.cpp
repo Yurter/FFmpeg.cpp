@@ -24,7 +24,7 @@ namespace fpp {
         raw().format = int(sample_format);
     }
 
-    void AudioParameters::setChannelLayout(uint64_t channel_layout) {
+    void AudioParameters::setChannelLayout(std::uint64_t channel_layout) {
         raw().channel_layout = channel_layout;
     }
 
@@ -85,7 +85,7 @@ namespace fpp {
         };
         if (channel_layout_unspecified) {
             avstream->codecpar->channel_layout
-                = uint64_t(::av_get_default_channel_layout(int(channels())));
+                = std::uint64_t(::av_get_default_channel_layout(channels()));
         }
         setChannelLayout(avstream->codecpar->channel_layout);
         setFrameSize(avstream->codecpar->frame_size);

@@ -19,7 +19,7 @@ namespace fpp {
         ~Dictionary() override;
 
         void setOption(const std::string_view key, const std::string_view value);
-        void setOption(const std::string_view key,                int64_t value);
+        void setOption(const std::string_view key,           std::int64_t value);
 
         AVDictionary**  get();
 
@@ -30,7 +30,7 @@ namespace fpp {
         void            free();
 
         void setString(AVDictionary** dict, const std::string_view key, const std::string_view value) const;
-        void setInt   (AVDictionary** dict, const std::string_view key,                int64_t value) const;
+        void setInt   (AVDictionary** dict, const std::string_view key,           std::int64_t value) const;
 
     private:
 

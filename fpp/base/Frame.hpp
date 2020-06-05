@@ -20,8 +20,8 @@ namespace fpp {
 
         Frame& operator=(const Frame& other);
 
-        int64_t             pts() const;
-        void                setPts(int64_t pts);
+        std::int64_t        pts() const;
+        void                setPts(std::int64_t pts);
         void                setTimeBase(AVRational time_base);
         void                setStreamIndex(int stream_index);
 
@@ -30,7 +30,7 @@ namespace fpp {
         bool                keyFrame()  const;
         int                 nbSamples() const;
 
-        size_t              size()      const;
+        int                 size()      const;
         std::string         toString()  const override;
 
     private:

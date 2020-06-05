@@ -85,7 +85,7 @@ namespace fpp {
         ctx->interrupt_callback.opaque   = &_interrupter;
     }
 
-    void FormatContext::setInterruptTimeout(int64_t timeout_ms) {
+    void FormatContext::setInterruptTimeout(std::int64_t timeout_ms) {
         _interrupter.set(timeout_ms);
     }
 
@@ -150,11 +150,11 @@ namespace fpp {
         return _streams;
     }
 
-    void FormatContext::setTimeout(TimeoutProcess process, int64_t ms) {
+    void FormatContext::setTimeout(TimeoutProcess process, std::int64_t ms) {
         _timeouts[std::size_t(process)] = ms;
     }
 
-    int64_t FormatContext::getTimeout(TimeoutProcess process) const {
+    std::int64_t FormatContext::getTimeout(TimeoutProcess process) const {
         return _timeouts[std::size_t(process)];
     }
 

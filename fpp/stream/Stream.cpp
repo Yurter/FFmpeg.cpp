@@ -109,11 +109,11 @@ namespace fpp {
         raw()->index = value;
     }
 
-    void Stream::setDuration(int64_t duration) {
+    void Stream::setDuration(std::int64_t duration) {
         raw()->duration = duration;
     }
 
-    void Stream::setStartTimePoint(int64_t msec) { // TODO (18.05)
+    void Stream::setStartTimePoint(std::int64_t msec) { // TODO (18.05)
         if (_start_time_point == msec) {
             return;
         }
@@ -129,7 +129,7 @@ namespace fpp {
         _start_time_point = msec;
     }
 
-    void Stream::setEndTimePoint(int64_t msec) { // TODO (18.05)
+    void Stream::setEndTimePoint(std::int64_t msec) { // TODO (18.05)
         if (_end_time_point == msec) {
             return;
         }
@@ -149,23 +149,23 @@ namespace fpp {
         _stamp_from_zero = value;
     }
 
-    int64_t Stream::index() const {
+    std::int64_t Stream::index() const {
         return raw()->index;
     }
 
-    int64_t Stream::duration() const {
+    std::int64_t Stream::duration() const {
         return raw()->duration;
     }
 
-    int64_t Stream::startTimePoint() const {
+    std::int64_t Stream::startTimePoint() const {
         return _start_time_point;
     }
 
-    int64_t Stream::endTimePoint() const {
+    std::int64_t Stream::endTimePoint() const {
         return _end_time_point;
     }
 
-    int64_t Stream::packetIndex() const {
+    std::int64_t Stream::packetIndex() const {
         return _packet_index;
     }
 
@@ -180,7 +180,7 @@ namespace fpp {
         ffmpeg_api_strict(av_dict_set, &raw()->metadata, key.data(), value.data(), 0);
     }
 
-    void Stream::increaseDuration(const int64_t value) {
+    void Stream::increaseDuration(const std::int64_t value) {
         raw()->duration += value;
     }
 
