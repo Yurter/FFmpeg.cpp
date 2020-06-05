@@ -79,7 +79,7 @@ namespace fpp {
     }
 
     std::string InputFormatContext::formatName() const {
-        return raw()->iformat->name;
+        return std::string { raw()->iformat->name };
     }
 
     void InputFormatContext::closeContext() {

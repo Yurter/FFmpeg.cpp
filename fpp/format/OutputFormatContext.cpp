@@ -40,7 +40,7 @@ namespace fpp {
         ffmpeg_api_strict(av_write_frame, raw(), nullptr);
     }
 
-    std::string OutputFormatContext::sdp() {
+    std::string OutputFormatContext::sdp() { // TODO: move method to utils & make arg array of OFC (05.06)
         char buf[256] {};
         AVFormatContext* ctxs[] { raw() }; // TODO do not use utils::merge_sdp_files(), instead use ctxs array 09.04
         ffmpeg_api_strict(av_sdp_create
@@ -118,7 +118,7 @@ namespace fpp {
     }
 
     std::string OutputFormatContext::formatName() const {
-        return raw()->oformat->name;
+        return std::string { raw()->oformat->name };
     }
 
     void OutputFormatContext::closeContext() {

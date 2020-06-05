@@ -30,8 +30,8 @@ namespace fpp {
         void                guessInputFromat();
         AVInputFormat*      findInputFormat(const std::string_view short_name) const;
 
-        AVInputFormat*      inputFormat();
-        void                setInputFormat(AVInputFormat* in_fmt);
+        AVInputFormat*      inputFormat();                          // TODO: make public (05.06)
+        void                setInputFormat(AVInputFormat* in_fmt);  // TODO: make public (05.06)
 
         Packet              readFromSource();
 

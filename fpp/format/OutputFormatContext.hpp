@@ -15,6 +15,7 @@ namespace fpp {
 
         bool                write(Packet& packet);
         bool                interleavedWrite(Packet& packet);
+
         void                flush();
 
         std::string         sdp();
@@ -34,8 +35,8 @@ namespace fpp {
 
     private:
 
-        AVOutputFormat*     outputFormat();
-        void                setOutputFormat(AVOutputFormat* out_fmt);
+        AVOutputFormat*     outputFormat();                             // TODO: make public (05.06)
+        void                setOutputFormat(AVOutputFormat* out_fmt);   // TODO: make public (05.06)
 
     private:
 

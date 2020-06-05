@@ -344,7 +344,7 @@ namespace fpp {
     std::string utils::merge_sdp_files(const std::string& sdp_one, const std::string& sdp_two) {
         std::string result { sdp_one };
 
-        std::istringstream iss(sdp_two);
+        std::istringstream iss { sdp_two };
         std::string line;
 
         while (std::getline(iss, line)) {
