@@ -95,9 +95,9 @@ namespace fpp {
 
     std::string Parameters::codecName() const {
         if (!_codec) {
-            return "none";
+            return std::string { "none" };
         }
-        return _codec->name;
+        return std::string { _codec->name };
     }
 
     AVCodec* Parameters::codec() const {
@@ -117,7 +117,9 @@ namespace fpp {
     }
 
     std::string Parameters::codecType() const {
-        return isDecoder() ? "decoder" : "encoder";
+        return isDecoder()
+                ? std::string { "decoder" }
+                : std::string { "encoder" };
     }
 
     int Parameters::formatFlags() const {
@@ -128,11 +130,11 @@ namespace fpp {
         return utils::to_string(type()) + " "
             + codecName()
             + (codec()
-                ? std::string { " " }
-                    + (::av_codec_is_decoder(codec()) ? "decoder" : "encoder") + ", "
+                ? std::string { ' ' }
+                    + codecType() + ", "
                     + (bitrate() ? std::to_string(bitrate()) : "N/A") + " bit/s, "
                     + "tb " + utils::to_string(timeBase())
-               : "");
+                : std::string {});
     }
 
     void Parameters::completeFrom(const SpParameters other) {

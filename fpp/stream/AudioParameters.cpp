@@ -69,10 +69,10 @@ namespace fpp {
         const auto other_audio {
             std::static_pointer_cast<AudioParameters>(other)
         };
-        if (not_inited_int(sampleRate()))           { setSampleRate(other_audio->sampleRate());         }
-        if (not_inited_smp_fmt(sampleFormat()))     { setSampleFormat(other_audio->sampleFormat());     }
-        if (not_inited_ch_layout(channelLayout()))  { setChannelLayout(other_audio->channelLayout());   }
-        if (not_inited_int(channels()))             { setChannels(other_audio->channels());             }
+        if (not_inited_int(channels()))            { setChannels(other_audio->channels());           }
+        if (not_inited_int(sampleRate()))          { setSampleRate(other_audio->sampleRate());       }
+        if (not_inited_smp_fmt(sampleFormat()))    { setSampleFormat(other_audio->sampleFormat());   }
+        if (not_inited_ch_layout(channelLayout())) { setChannelLayout(other_audio->channelLayout()); }
     }
 
     void AudioParameters::parseStream(const AVStream* avstream) {
