@@ -60,7 +60,7 @@ namespace fpp {
                 return chronometer.elapsed_milliseconds() > timeout_ms;
             }
 
-            void set(int64_t timeout) {
+            void set(std::int64_t timeout) {
                 timeout_ms = timeout;
                 chronometer.reset();
             }
