@@ -449,27 +449,6 @@ namespace fpp {
         return false;
     }
 
-    bool utils::video_filter_required(const InOutParams& params) {
-        assert(params.in->isVideo() && params.out->isVideo());
-
-        const auto in  { std::static_pointer_cast<const VideoParameters>(params.in)  };
-        const auto out { std::static_pointer_cast<const VideoParameters>(params.out) };
-
-        if (in->frameRate() != out->frameRate()) {
-            static_log_warning() << "Video filter required: framerate mismatch "
-                                 << to_string(in->frameRate())
-                                 << " != "
-                                 << to_string(out->frameRate());
-            return true;
-        }
-
-        return false;
-    }
-
-    bool utils::audio_filter_required(const InOutParams&) {
-        throw std::runtime_error { "audio_filter_required() is not implemented" };
-    }
-
     bool utils::transcoding_required(const InOutParams& params) {
         assert(params.in->type() == params.out->type());
 

@@ -3,10 +3,6 @@
 #include <fpp/base/Parameters.hpp>
 #include <sstream>
 
-extern "C" {
-    #include <libavcodec/avcodec.h>
-}
-
 constexpr auto ffmpeg_4_0 { AV_VERSION_INT(56,14,100) };
 constexpr auto ffmpeg_4_1 { AV_VERSION_INT(56,35,100) };
 
@@ -52,8 +48,6 @@ namespace fpp {
         static bool         rescaling_required(const InOutParams& params);
         static bool         resampling_required(const InOutParams& params);
         static bool         transcoding_required(const InOutParams& params);
-        static bool         video_filter_required(const InOutParams& params);
-        static bool         audio_filter_required(const InOutParams& params);
 
         static bool         compare_float(float a, float b);
 
@@ -73,9 +67,6 @@ namespace fpp {
         static SpParameters make_youtube_audio_params();
 
         static std::string  merge_sdp_files(const std::string& sdp_one, const std::string& sdp_two);
-
-        static std::vector<std::string> video_device_list(); // TODO (27.04)
-        static std::vector<std::string> audio_device_list(); // TODO (27.04)
 
     };
 

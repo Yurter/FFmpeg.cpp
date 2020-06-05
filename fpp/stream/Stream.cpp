@@ -199,18 +199,7 @@ namespace fpp {
 
     void Stream::calculatePacketDuration(Packet& packet) {
         if (raw()->cur_dts == NOPTS_VALUE) {
-            const auto fps {
-                ::av_q2intfloat(
-                    std::static_pointer_cast<VideoParameters>(params)->frameRate()
-                )
-            };
-            const auto inv_tb {
-                ::av_q2intfloat(::av_inv_q(params->timeBase()))
-            };
-            const auto avg_pkt_dur {
-                inv_tb / fps
-            };
-            packet.setDuration(avg_pkt_dur);
+            packet.setDuration(0);
         } else {
             packet.setDuration(std::abs(packet.dts() - raw()->cur_dts));
         }

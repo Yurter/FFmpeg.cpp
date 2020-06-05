@@ -3,6 +3,7 @@
 #include <fpp/format/OutputFormatContext.hpp>
 #include <fpp/codec/DecoderContext.hpp>
 #include <fpp/codec/EncoderContext.hpp>
+#include <fpp/stream/AudioParameters.hpp>
 #include <fpp/filter/ComplexFilterGraph.hpp>
 #include <array>
 
