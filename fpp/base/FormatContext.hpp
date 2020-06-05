@@ -71,7 +71,7 @@ namespace fpp {
         void                setInterruptTimeout(std::int64_t timeout_ms);
 
         virtual void        createContext();
-        virtual bool        openContext(Options options) = 0;
+        virtual bool        openContext(const Options& options) = 0;
         virtual void        closeContext() = 0;
         virtual std::string formatName() const = 0;
 

@@ -22,7 +22,7 @@ namespace fpp {
     private:
 
         void                createContext() override;
-        bool                openContext(Options options) override;
+        bool                openContext(const Options& options) override;
         std::string         formatName() const override;
         void                closeContext() override;
 

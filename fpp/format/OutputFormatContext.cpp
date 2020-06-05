@@ -90,7 +90,7 @@ namespace fpp {
         );
     }
 
-    bool OutputFormatContext::openContext(Options options) {
+    bool OutputFormatContext::openContext(const Options& options) {
         if (streamNumber() == 0) {
             throw std::logic_error {
                 "Can't open context without streams"

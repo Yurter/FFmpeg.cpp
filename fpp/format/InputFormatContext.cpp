@@ -53,7 +53,7 @@ namespace fpp {
         return packet;
     }
 
-    bool InputFormatContext::openContext(Options options) {
+    bool InputFormatContext::openContext(const Options& options) {
         if (!inputFormat()) {
             guessInputFromat();
         }

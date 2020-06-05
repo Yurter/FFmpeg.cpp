@@ -26,7 +26,7 @@ void youtube_stream_copy_with_silence() {
 
     /* create audio source */
     fpp::InputFormatContext audio_source {
-        fpp::InputFormatContext::silence(44'100)
+        "anullsrc=r=" + std::to_string(44'100) + ":cl=mono"
     };
 
     /* open audio source */
