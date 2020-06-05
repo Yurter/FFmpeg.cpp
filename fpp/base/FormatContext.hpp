@@ -87,7 +87,7 @@ namespace fpp {
 
     private:
 
-        std::string         _media_resource_locator;
+        std::string         _media_resource_locator; // TODO: use raw()->url instead (05.06)
         bool                _opened;
         StreamVector        _streams;
 

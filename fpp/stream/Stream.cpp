@@ -149,7 +149,7 @@ namespace fpp {
         _stamp_from_zero = value;
     }
 
-    std::int64_t Stream::index() const {
+    int Stream::index() const {
         return raw()->index;
     }
 
@@ -176,8 +176,9 @@ namespace fpp {
         return raw()->codecpar;
     }
 
-    void Stream::addMetadata(const std::string_view key, const std::string_view value) {
-        ffmpeg_api_strict(av_dict_set, &raw()->metadata, key.data(), value.data(), 0);
+    bool Stream::addMetadata(const std::string_view key, const std::string_view value, int flags) {
+        ffmpeg_api(av_dict_set, &raw()->metadata, key.data(), value.data(), flags);
+        return true;
     }
 
     void Stream::increaseDuration(const std::int64_t value) {

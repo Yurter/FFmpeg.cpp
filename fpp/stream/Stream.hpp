@@ -1,6 +1,5 @@
 #pragma once
-#include <fpp/stream/VideoParameters.hpp>
-#include <fpp/stream/AudioParameters.hpp>
+#include <fpp/base/Parameters.hpp>
 #include <fpp/base/Packet.hpp>
 #include <vector>
 
@@ -35,7 +34,7 @@ namespace fpp {
 
         void                stampFromZero(bool value);
 
-        std::int64_t        index()             const;
+        int                 index()             const;
         std::int64_t        duration()          const;
         std::int64_t        startTimePoint()    const;
         std::int64_t        endTimePoint()      const;
@@ -43,7 +42,7 @@ namespace fpp {
 
         AVCodecParameters*  codecpar();
 
-        void                addMetadata(const std::string_view key, const std::string_view value);
+        bool                addMetadata(const std::string_view key, const std::string_view value, int flags = {});
 
     private:
 
