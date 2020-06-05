@@ -17,9 +17,9 @@ namespace fpp {
         close();
     }
 
-    void InputFormatContext::seek(int stream_index, std::int64_t timestamp, SeekPrecision seek_precision) {
+    bool InputFormatContext::seek(int stream_index, std::int64_t timestamp, SeekPrecision seek_precision) {
         const auto flags {
-            [&]() {
+            [&]() -> int {
                 switch (seek_precision) {
                     case SeekPrecision::Forward:
                         return 0;
@@ -27,21 +27,12 @@ namespace fpp {
                         return AVSEEK_FLAG_BACKWARD;
                     case SeekPrecision::Any:
                         return AVSEEK_FLAG_ANY;
-                    case SeekPrecision::Precisely:
-                        throw std::runtime_error { "NOT_IMPLEMENTED" };
                 }
             }()
         };
-        if (const auto ret {
-                ::av_seek_frame(raw(), stream_index, timestamp, flags)
-            }; ret < 0) {
-            throw FFmpegException {
-                "Failed to seek timestamp "
-                    + utils::time_to_string(timestamp, DEFAULT_TIME_BASE)
-                    + " in stream " + std::to_string(stream_index)
-            };
-        }
+        ffmpeg_api(av_seek_frame, raw(), stream_index, timestamp, flags);
         log_info() << "Success seek to " << utils::time_to_string(timestamp, DEFAULT_TIME_BASE);
+        return true;
     }
 
     Packet InputFormatContext::read() {
