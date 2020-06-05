@@ -28,8 +28,12 @@ namespace fpp {
 
         std::string         mediaResourceLocator() const;
         void                setMediaResourceLocator(const std::string_view mrl);
-        const StreamVector  streams() const;
+
+        unsigned int        streamNumber() const;
         StreamVector        streams();
+        const StreamVector  streams() const;
+        SharedStream        stream(std::size_t index);
+        SharedStream        stream(MediaType stream_type);
 
         void                setTimeout(TimeoutProcess process, int64_t ms);
         int64_t             getTimeout(TimeoutProcess process) const;
@@ -41,14 +45,7 @@ namespace fpp {
         bool                opened() const;
         bool                closed() const;
 
-        void                reconnectOnFailure(bool reconnect);
         void                flushContextAfterEachPacket(bool value);
-
-        SharedStream        stream(int64_t index);
-        SharedStream        stream(MediaType stream_type);
-        int64_t             streamNumber() const;
-
-        bool                processPacket(Packet& packet);
 
         std::string         toString() const override final;
 
@@ -80,6 +77,8 @@ namespace fpp {
 
         void                addStream(SharedStream stream);
         void                setStreams(StreamVector stream_vector);
+
+        bool                processPacket(Packet& packet);
 
     private:
 

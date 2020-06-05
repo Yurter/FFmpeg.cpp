@@ -142,8 +142,8 @@ namespace fpp {
         _streams.push_back(stream);
     }
 
-    int64_t FormatContext::streamNumber() const {
-        return int64_t(raw()->nb_streams);
+    unsigned int FormatContext::streamNumber() const {
+        return raw()->nb_streams;
     }
 
     StreamVector FormatContext::streams() {
@@ -162,8 +162,8 @@ namespace fpp {
         return _streams;
     }
 
-    SharedStream FormatContext::stream(int64_t index) {
-        return _streams.at(size_t(index));
+    SharedStream FormatContext::stream(std::size_t index) {
+        return _streams.at(index);
     }
 
     SharedStream FormatContext::stream(MediaType stream_type) {
