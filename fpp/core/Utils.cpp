@@ -231,21 +231,20 @@ namespace fpp {
     std::string utils::send_packet_error_to_string(int ret) {
         if (AVERROR(EAGAIN) == ret) {
             return "avcodec_send_packet failed: input is not accepted "
-                    "in the current state - user must read output with "
-                    "avcodec_receive_frame()";
+                   "in the current state - user must read output with "
+                   "avcodec_receive_frame()";
         }
         if (AVERROR_EOF == ret) {
             return "avcodec_send_packet failed: the decoder has been "
-                    "flushed, and no new packets can be sent to it";
+                   "flushed, and no new packets can be sent to it";
         }
         if (AVERROR(EINVAL) == ret) {
             return "avcodec_send_packet failed: codec not opened, "
-                    "it is an encoder, or requires flush";
+                   "it is an encoder, or requires flush";
         }
         if (AVERROR(ENOMEM) == ret) {
             return "avcodec_send_packet failed: failed to add packet "
-                    "to internal queue, or similar other errors: "
-                    "legitimate decoding errors";
+                   "to internal queue, or similar";
         }
         if (AVERROR_INVALIDDATA == ret) {
             return "avcodec_send_packet failed: Invalid data found "
@@ -257,16 +256,15 @@ namespace fpp {
     std::string utils::receive_frame_error_to_string(int ret) {
         if (AVERROR(EAGAIN) == ret) {
             return "avcodec_receive_frame failed: output is not available "
-                    "in this state - user must try to send new input";
+                   "in this state - user must try to send new input";
         }
         if (AVERROR_EOF == ret) {
             return "avcodec_receive_frame failed: the decoder has been fully "
-                    "flushed, and there will be no more output frames";
+                   "flushed, and there will be no more output frames";
         }
         if (AVERROR(EINVAL) == ret) {
             return "avcodec_receive_frame failed: codec not opened, or it "
-                    "is an encoder other negative values: "
-                    "legitimate decoding errors";
+                   "is an encoder";
         }
         return "avcodec_receive_frame failed: unknown code: " + std::to_string(ret);
     }
@@ -279,16 +277,15 @@ namespace fpp {
         }
         if (AVERROR_EOF == ret) {
             return "avcodec_send_frame failed: the encoder has been flushed, "
-                    "and no new frames can be sent to it";
+                   "and no new frames can be sent to it";
         }
         if (AVERROR(EINVAL) == ret) {
             return "avcodec_send_frame failed: codec not opened, "
-                    "refcounted_frames not set, it is a decoder, or requires flush";
+                   "refcounted_frames not set, it is a decoder, or requires flush";
         }
         if (AVERROR(ENOMEM) == ret) {
             return "avcodec_send_frame failed: failed to add packet "
-                    "to internal queue, or similar other errors: "
-                    "legitimate decoding errors";
+                   "to internal queue, or similar";
         }
         return "avcodec_send_frame failed: unknown code: " + std::to_string(ret);
     }
@@ -296,16 +293,15 @@ namespace fpp {
     std::string utils::receive_packet_error_to_string(int ret) {
         if (AVERROR(EAGAIN) == ret) {
             return "avcodec_receive_packet failed: output is not available "
-                    "in the current state - user must try to send input";
+                   "in the current state - user must try to send input";
         }
         if (AVERROR_EOF == ret) {
             return "avcodec_receive_packet failed: the encoder has been "
-                    "fully flushed, and there will be no more output packets";
+                   "fully flushed, and there will be no more output packets";
         }
         if (AVERROR(EAGAIN) == ret) {
             return "avcodec_receive_packet failed: codec not opened, "
-                    "or it is an encoder other errors: "
-                    "lgitimate decoding errors";
+                   "or it is an encoder";
         }
         return "avcodec_receive_packet failed: unknown code: " + std::to_string(ret);
     }
