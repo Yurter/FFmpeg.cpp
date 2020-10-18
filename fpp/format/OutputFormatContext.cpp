@@ -14,7 +14,18 @@ namespace fpp {
     }
 
     OutputFormatContext::~OutputFormatContext() {
-        close();
+        try {
+            close();
+        }
+        catch(const fpp::FFmpegException& e) {
+            log_error() << "FFmpegException: " << e.what();
+        }
+        catch (const std::exception& e) {
+            log_error() << "Exception: " << e.what();
+        }
+        catch (...) {
+            log_error() << "Unknown exception";
+        }
     }
 
     bool OutputFormatContext::write(Packet& packet) {

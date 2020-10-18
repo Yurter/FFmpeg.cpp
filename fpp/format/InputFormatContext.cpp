@@ -14,7 +14,18 @@ namespace fpp {
     }
 
     InputFormatContext::~InputFormatContext() {
-        close();
+        try {
+            close();
+        }
+        catch(const fpp::FFmpegException& e) {
+            log_error() << "FFmpegException: " << e.what();
+        }
+        catch (const std::exception& e) {
+            log_error() << "Exception: " << e.what();
+        }
+        catch (...) {
+            log_error() << "Unknown exception";
+        }
     }
 
     bool InputFormatContext::seek(int stream_index, std::int64_t timestamp, SeekPrecision seek_precision) {
