@@ -90,23 +90,22 @@ namespace fpp {
         );
         setOutputFormat(fmt_ctx->oformat);
         reset(
-            fmt_ctx
+              fmt_ctx
             , [](auto* ctx) { ::avformat_free_context(ctx); }
         );
     }
 
     bool OutputFormatContext::openContext(const Options& options) {
         if (streamNumber() == 0) {
-            throw std::logic_error {
-                "Can't open context without streams"
-            };
+            log_error() << "Can't open context without streams";
+            return false;
         }
         initStreamsCodecpar();
         Dictionary dictionary { options };
         if (!(raw()->flags & AVFMT_NOFILE)) {
             if (const auto ret {
                     ::avio_open2(
-                        &raw()->pb                      /* AVIOContext */
+                          &raw()->pb                    /* AVIOContext */
                         , mediaResourceLocator().data() /* url         */
                         , AVIO_FLAG_WRITE               /* flags       */
                         , nullptr                       /* int_cb      */
@@ -150,7 +149,7 @@ namespace fpp {
     void OutputFormatContext::guessOutputFromat() {
         const auto out_fmt {
             ::av_guess_format(
-                nullptr                         /* short_name */
+                  nullptr                       /* short_name */
                 , mediaResourceLocator().data() /* filename   */
                 , nullptr                       /* mime_type  */
             )
@@ -165,7 +164,7 @@ namespace fpp {
 
     void OutputFormatContext::writeHeader() { // TODO use options 09.04
         ::avformat_write_header(
-            raw()
+              raw()
             , nullptr /* options */
         );
     }
