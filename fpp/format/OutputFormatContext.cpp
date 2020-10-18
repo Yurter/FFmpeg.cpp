@@ -17,14 +17,8 @@ namespace fpp {
         try {
             close();
         }
-        catch(const fpp::FFmpegException& e) {
-            log_error() << "FFmpegException: " << e.what();
-        }
-        catch (const std::exception& e) {
-            log_error() << "Exception: " << e.what();
-        }
         catch (...) {
-            log_error() << "Unknown exception";
+            utils::handle_exceptions(this);
         }
     }
 

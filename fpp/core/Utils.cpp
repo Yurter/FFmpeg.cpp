@@ -467,4 +467,19 @@ namespace fpp {
         return ::fabs(a - b) < epsilon;
     }
 
+    void utils::handle_exceptions(const Object* owner) {
+        try {
+            throw;
+        }
+        catch(const fpp::FFmpegException& e) {
+            fpp::static_log_error() << owner->name() << " FFmpegException: " << e.what();
+        }
+        catch (const std::exception& e) {
+            fpp::static_log_error() << owner->name() << " std::exception: " << e.what();
+        }
+        catch (...) {
+            fpp::static_log_error() << owner->name() << " Unknown exception";
+        }
+    }
+
 } // namespace fpp

@@ -50,6 +50,7 @@ namespace fpp {
         static bool         transcoding_required(const InOutParams& params);
 
         static bool         compare_float(float a, float b);
+        static void         handle_exceptions(const Object* owner);
 
         static const std::string_view guess_format_short_name(const std::string_view media_resurs_locator);
 
