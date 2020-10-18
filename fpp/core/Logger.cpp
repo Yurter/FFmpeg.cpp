@@ -156,7 +156,7 @@ namespace fpp {
            << '[' << threadIdFormated()                 << ']'
            << '[' << currentTimeFormated()              << ']'
            << '[' << caller_name.data()                 << ']'
-           << ' ' << message.data();
+           << message.data();
 
         _print_func(log_level, ss.str());
     }
@@ -170,7 +170,7 @@ namespace fpp {
         ss << '[' << logLevelToString(log_level).data() << ']'
            << '[' << threadIdFormated()                 << ']'
            << '[' << currentTimeFormated()              << ']'
-           << ' ' << message.data();
+           << message.data();
 
         _print_func(log_level, ss.str());
     }

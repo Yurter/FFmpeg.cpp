@@ -6,7 +6,7 @@
 auto main() -> int {
 
     fpp::static_log_info() << "Program started";
-    fpp::static_log_info() << "FFmpeg version " << fpp::utils::ffmpeg_version();
+    fpp::static_log_info() << "FFmpeg version:" << fpp::utils::ffmpeg_version();
     fpp::set_ffmpeg_log_level(fpp::LogLevel::Error);
 
     try {
@@ -40,9 +40,9 @@ auto main() -> int {
 //        multiple_outputs_parallel();
 
     } catch (const fpp::FFmpegException& e) {
-        fpp::static_log_error() << "FFmpegException: " << e.what();
+        fpp::static_log_error() << "FFmpegException:" << e.what();
     } catch (const std::exception& e) {
-        fpp::static_log_error() << "Exception: " << e.what();
+        fpp::static_log_error() << "Exception:" << e.what();
     } catch (...) {
         fpp::static_log_error() << "Unknown exception";
     }

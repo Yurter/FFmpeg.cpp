@@ -28,7 +28,7 @@ namespace fpp {
 
         template<typename T>
         inline MessageHandler& operator<<(T&& data) {
-            _ss << data;
+            _ss << ' ' << data;
             return *this;
         }
 
