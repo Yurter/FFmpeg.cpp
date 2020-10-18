@@ -16,6 +16,9 @@ namespace fpp {
         explicit InputFormatContext(const std::string_view mrl = {}, const std::string_view format_short_name = {});
         ~InputFormatContext() override;
 
+        AVInputFormat*      inputFormat();
+        void                setInputFormat(AVInputFormat* in_fmt);
+
         bool                seek(int stream_index, std::int64_t timestamp, SeekPrecision seek_precision = SeekPrecision::Forward);
         Packet              read();
 
@@ -29,9 +32,6 @@ namespace fpp {
 
         void                guessInputFromat();
         AVInputFormat*      findInputFormat(const std::string_view short_name) const;
-
-        AVInputFormat*      inputFormat();                          // TODO: make public (05.06)
-        void                setInputFormat(AVInputFormat* in_fmt);  // TODO: make public (05.06)
 
         Packet              readFromSource();
 
