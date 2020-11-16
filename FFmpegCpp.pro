@@ -12,11 +12,14 @@ CONFIG -= qt
 #INCLUDEPATH += D:\dev\00_ffmpeg\ffmpeg-4.1.3-win64-dev\include
 #LIBS += -LD:\dev\00_ffmpeg\ffmpeg-4.1.3-win64-dev\lib
 
-INCLUDEPATH += /usr/include/x86_64-linux-gnu/
+#INCLUDEPATH += /usr/include/x86_64-linux-gnu/
 #LIBS += -L/usr/lib/x86_64-linux-gnu/
 
-INCLUDEPATH += G:\dev\00_ffmpeg\ffmpeg-4.2.2-win64-dev\include
-LIBS += -LG:\dev\00_ffmpeg\ffmpeg-4.2.2-win64-dev\lib
+#INCLUDEPATH += G:\dev\00_ffmpeg\ffmpeg-4.2.2-win64-dev\include
+#LIBS += -LG:\dev\00_ffmpeg\ffmpeg-4.2.2-win64-dev\lib
+
+INCLUDEPATH += D:\libs\ffmpeg\4.1.3\ffmpeg-4.1.3-win64-dev\include
+LIBS += -LD:\libs\ffmpeg\4.1.3\ffmpeg-4.1.3-win64-dev\lib
 
 LIBS += -lavcodec -lavdevice -lavfilter -lavformat -lavutil
 LIBS += -lpostproc -lswresample -lswscale
