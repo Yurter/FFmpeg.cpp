@@ -9,11 +9,13 @@ namespace fpp {
         Any,
     };
 
+    inline const auto camera { [](const std::string_view cameraName) { return std::string { "video=" }.append(cameraName); } };
+
     class InputFormatContext : public FormatContext {
 
     public:
 
-        explicit InputFormatContext(const std::string_view mrl = {}, const std::string_view format_short_name = {});
+        explicit InputFormatContext(const std::string_view mrl = {}, const std::string_view format = {});
         ~InputFormatContext() override;
 
         AVInputFormat*      inputFormat();

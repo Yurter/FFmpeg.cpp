@@ -14,6 +14,7 @@ auto main() -> int {
         // Common
 //        transmuxing_file();
 //        webcam_to_file();
+        webcam_to_udp();
 //        mic_to_file();
 //        record_screen_win();
 //        transsizing();

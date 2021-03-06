@@ -8,8 +8,8 @@ extern "C" {
 
 namespace fpp {
 
-    InputFormatContext::InputFormatContext(const std::string_view mrl, const std::string_view format_short_name)
-        : _input_format { findInputFormat(format_short_name) } {
+    InputFormatContext::InputFormatContext(const std::string_view mrl, const std::string_view format)
+        : _input_format { findInputFormat(format) } {
         setMediaResourceLocator(mrl);
     }
 
@@ -20,6 +20,8 @@ namespace fpp {
         catch (...) {
             utils::handle_exceptions(this);
         }
+
+        avformat_license();
     }
 
     bool InputFormatContext::seek(int stream_index, std::int64_t timestamp, SeekPrecision seek_precision) {

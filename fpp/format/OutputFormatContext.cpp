@@ -8,8 +8,8 @@ extern "C" {
 
 namespace fpp {
 
-    OutputFormatContext::OutputFormatContext(const std::string_view mrl)
-        : _output_format { nullptr } {
+    OutputFormatContext::OutputFormatContext(const std::string_view mrl, const std::string_view format)
+        : _output_format { findOutputFormat(format) } {
         setMediaResourceLocator(mrl);
     }
 
@@ -160,6 +160,10 @@ namespace fpp {
             };
         }
         setOutputFormat(out_fmt);
+    }
+
+    AVOutputFormat* OutputFormatContext::findOutputFormat(const std::string_view short_name) const {
+        return ::av_guess_format(short_name.data(), nullptr, nullptr);
     }
 
     void OutputFormatContext::writeHeader() { // TODO use options 09.04

@@ -4,6 +4,7 @@ void transmuxing_file();
 void transrating_file();
 void transsizing();
 void webcam_to_file();
+void webcam_to_udp();
 void mic_to_file();
 void record_screen_win();
 

@@ -7,11 +7,11 @@ namespace fpp {
 
     public:
 
-        explicit OutputFormatContext(const std::string_view mrl = {});
+        OutputFormatContext(const std::string_view mrl = {}, const std::string_view format = {});
         ~OutputFormatContext() override;
 
-        AVOutputFormat*     outputFormat();
         void                setOutputFormat(AVOutputFormat* out_fmt);
+        AVOutputFormat*     outputFormat();
 
         void                createStream(SpParameters params);
         void                copyStream(const SharedStream other);
@@ -31,6 +31,7 @@ namespace fpp {
         void                closeContext() override;
 
         void                guessOutputFromat();
+        AVOutputFormat*     findOutputFormat(const std::string_view short_name) const;
         void                writeHeader();
         void                writeTrailer();
         void                initStreamsCodecpar();

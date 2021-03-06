@@ -1,4 +1,13 @@
-TEMPLATE = app
+#TEMPLATE = lib
+#CONFIG += staticlib
+#CONFIG += dll
+
+CONFIG(debug, debug|release) {
+    TARGET = fppd
+} else {
+    TARGET = fpp
+}
+
 CONFIG += console c++17
 CONFIG -= app_bundle
 CONFIG -= qt
@@ -44,6 +53,7 @@ SOURCES += \
     examples/transrating.cpp \
     examples/transsizing.cpp \
     examples/webcam_to_file.cpp \
+    examples/webcam_to_udp.cpp \
     examples/youtube_stream_copy.cpp \
     examples/youtube_stream_copy_with_silence.cpp \
     examples/youtube_stream_transcode.cpp \
