@@ -19,7 +19,7 @@ void shiftElementsToBegin(Buffer& buffer, std::size_t actual_size, std::size_t f
 
 void read_and_write_to_memory() {
 
-    constexpr auto MEMORY_DATA_FORMAT { "avi" };
+    constexpr auto MEMORY_FORMAT_CONTEXT { "avi" }; // TODO: почему работает только с ави?
 
     /* create source */
     fpp::InputFormatContext real_source {
@@ -48,7 +48,7 @@ void read_and_write_to_memory() {
     /* create sink */
     fpp::OutputFormatContext memory_sink {
           &custom_output_buffer
-        , MEMORY_DATA_FORMAT
+        , MEMORY_FORMAT_CONTEXT
     };
 
     /* copy source's streams to sink */
@@ -76,7 +76,7 @@ void read_and_write_to_memory() {
     /* ? */
     fpp::InputFormatContext memory_source {
           &custom_input_buffer
-        , MEMORY_DATA_FORMAT
+        , MEMORY_FORMAT_CONTEXT
     };
 
     /* ? */
