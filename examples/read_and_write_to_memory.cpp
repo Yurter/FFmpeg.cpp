@@ -19,6 +19,8 @@ void shiftElementsToBegin(Buffer& buffer, std::size_t actual_size, std::size_t f
 
 void read_and_write_to_memory() {
 
+    constexpr auto MEMORY_DATA_FORMAT { "avi" };
+
     /* create source */
     fpp::InputFormatContext real_source {
         "rtsp://205.120.142.79/live/ch00_0"
@@ -46,7 +48,7 @@ void read_and_write_to_memory() {
     /* create sink */
     fpp::OutputFormatContext memory_sink {
           &custom_output_buffer
-        , "avi"
+        , MEMORY_DATA_FORMAT
     };
 
     /* copy source's streams to sink */
@@ -74,7 +76,7 @@ void read_and_write_to_memory() {
     /* ? */
     fpp::InputFormatContext memory_source {
           &custom_input_buffer
-        , "avi"
+        , MEMORY_DATA_FORMAT
     };
 
     /* ? */
