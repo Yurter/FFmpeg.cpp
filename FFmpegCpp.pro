@@ -2,6 +2,8 @@
 #CONFIG += staticlib
 #CONFIG += dll
 
+# TODO: build both lib and dll at once
+
 CONFIG(debug, debug|release) {
     TARGET = fppd
 } else {
