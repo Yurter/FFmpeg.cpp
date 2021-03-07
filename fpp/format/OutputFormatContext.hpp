@@ -1,46 +1,48 @@
 #pragma once
 #include <fpp/base/FormatContext.hpp>
+#include <fpp/format/OutputContext.hpp>
 
 namespace fpp {
 
-    class OutputFormatContext : public FormatContext {
+class OutputFormatContext : public FormatContext {
 
-    public:
+public:
 
-        OutputFormatContext(const std::string_view mrl = {}, const std::string_view format = {});
-        ~OutputFormatContext() override;
+    explicit OutputFormatContext(const std::string_view mrl = {}, const std::string_view format = {});
+    explicit OutputFormatContext(OutputContext* output_ctx);
+    ~OutputFormatContext() override;
 
-        void                setOutputFormat(AVOutputFormat* out_fmt);
-        AVOutputFormat*     outputFormat();
+    void                setOutputFormat(AVOutputFormat* out_fmt);
+    AVOutputFormat*     outputFormat();
 
-        void                createStream(SpParameters params);
-        void                copyStream(const SharedStream other);
+    void                createStream(SpParameters params);
+    void                copyStream(const SharedStream other);
 
-        bool                write(Packet& packet);
-        bool                interleavedWrite(Packet& packet);
+    bool                write(Packet& packet);
+    bool                interleavedWrite(Packet& packet);
 
-        void                flush();
+    void                flush();
 
-        std::string         sdp();
+    std::string         sdp();
 
-    private:
+private:
 
-        void                createContext() override;
-        bool                openContext(const Options& options) override;
-        std::string         formatName() const override;
-        void                closeContext() override;
+    void                createContext() override;
+    bool                openContext(const Options& options) override;
+    std::string         formatName() const override;
+    void                closeContext() override;
 
-        void                guessOutputFromat();
-        AVOutputFormat*     findOutputFormat(const std::string_view short_name) const;
-        void                writeHeader();
-        void                writeTrailer();
-        void                initStreamsCodecpar();
-        void                parseStreamsTimeBase();
+    void                guessOutputFromat();
+    AVOutputFormat*     findOutputFormat(const std::string_view short_name) const;
+    void                writeHeader();
+    void                writeTrailer();
+    void                initStreamsCodecpar();
+    void                parseStreamsTimeBase();
 
-    private:
+private:
 
-        AVOutputFormat*     _output_format;
+    AVOutputFormat*     _output_format;
 
-    };
+};
 
 } // namespace fpp

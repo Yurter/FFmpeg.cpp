@@ -10,7 +10,7 @@ void webcam_to_udp() {
 
     /* create source */
     fpp::InputFormatContext source {
-        fpp::camera("HD WebCam")
+        "video=HD WebCam"
     };
 
     /* change default image size (480x360) */

@@ -91,7 +91,7 @@ namespace fpp {
 
     void FormatContext::createContext() {
         reset(
-            ::avformat_alloc_context()
+              ::avformat_alloc_context()
             , [](auto* ctx) { ::avformat_free_context(ctx); }
         );
     }
@@ -118,7 +118,7 @@ namespace fpp {
     void FormatContext::setMediaResourceLocator(const std::string_view mrl) {
         _media_resource_locator = mrl;
         if (!_media_resource_locator.empty()) {
-            createContext();
+            createContext(); // TODO: side effect!
         }
     }
 
