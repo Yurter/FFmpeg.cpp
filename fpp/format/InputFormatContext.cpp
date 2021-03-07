@@ -11,12 +11,16 @@ namespace fpp {
 InputFormatContext::InputFormatContext(const std::string_view mrl, const std::string_view format)
     : _input_format { findInputFormat(format) } {
     setMediaResourceLocator(mrl);
+    createContext();
 }
 
-InputFormatContext::InputFormatContext(InputContext* input_ctx) {
+InputFormatContext::InputFormatContext(InputContext* input_ctx, const std::string_view format)
+    : _input_format { findInputFormat(format) } {
+    setMediaResourceLocator("Custom input buffer");
     createContext();
     raw()->pb = input_ctx->raw();
-    raw()->flags |= AVFMT_FLAG_CUSTOM_IO;
+//    raw()->flags |= AVFMT_FLAG_CUSTOM_IO;
+//    raw()->flags |= AVFMT_NOFILE; // ?
 }
 
 InputFormatContext::~InputFormatContext() {
@@ -54,35 +58,39 @@ Packet InputFormatContext::read() {
     return packet;
 }
 
-bool InputFormatContext::openContext(const Options& options) {
-    if (!inputFormat()) {
-        guessInputFromat();
-    }
+void InputFormatContext::createContext() {
     reset(
-        [&]() -> AVFormatContext* {
+        [&]() {
             AVFormatContext* fmt_ctx {
                 ::avformat_alloc_context()
             };
             setInterruptCallback(fmt_ctx);
             setInterruptTimeout(getTimeout(TimeoutProcess::Opening));
-            Dictionary dictionary { options };
-            if (const auto ret {
-                    ::avformat_open_input(
-                          &fmt_ctx
-                        , mediaResourceLocator().data()
-                        , inputFormat()
-                        , dictionary.get()
-                    )
-                }; ret < 0) {
-                return nullptr;
-            }
+            fmt_ctx->iformat = inputFormat();
             return fmt_ctx;
         }()
         , [](auto* ctx) { ::avformat_close_input(&ctx); }
     );
-    if (isNull()) {
+}
+
+bool InputFormatContext::openContext(const Options& options) {
+    if (!inputFormat()) {
+        guessInputFromat();
+    }
+
+    Dictionary dictionary { options };
+    auto fmt_ctx { raw() };
+    if (const auto ret {
+            ::avformat_open_input(
+                  &fmt_ctx
+                , mediaResourceLocator().data()
+                , inputFormat()
+                , dictionary.get()
+            )
+        }; ret < 0) {
         return false;
     }
+
     setInputFormat(raw()->iformat);
     retrieveStreams();
     return true;

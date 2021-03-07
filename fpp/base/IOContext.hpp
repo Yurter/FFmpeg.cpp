@@ -17,7 +17,7 @@ public:
 
     struct CbResult {
         const bool success { false };
-        const int bytesRead { 0 };
+        const std::size_t bytesRead { 0 };
     };
 
     IOContext(Type type, std::size_t buffer_size = 4096);

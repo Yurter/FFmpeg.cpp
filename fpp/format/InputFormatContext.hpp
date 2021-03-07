@@ -15,7 +15,7 @@ class InputFormatContext : public FormatContext {
 public:
 
     explicit InputFormatContext(const std::string_view mrl = {}, const std::string_view format = {});
-    explicit InputFormatContext(InputContext* input_ctx);
+    InputFormatContext(InputContext* input_ctx, const std::string_view format);
     ~InputFormatContext() override;
 
     AVInputFormat*      inputFormat();
@@ -26,6 +26,7 @@ public:
 
 private:
 
+    void                createContext() override;
     bool                openContext(const Options& options) override;
     std::string         formatName() const override;
     void                closeContext() override;

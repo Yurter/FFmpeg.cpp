@@ -33,9 +33,7 @@ void transmuxing_file() {
     constexpr auto one_minute { 1 * 60 * 1000 };
     source.stream(0)->setEndTimePoint(one_minute);
 
-    fpp::Packet packet {
-        fpp::MediaType::Unknown
-    };
+    fpp::Packet packet;
     const auto read_packet {
         [&packet,&source]() {
             packet = source.read();

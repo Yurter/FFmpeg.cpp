@@ -9,7 +9,7 @@ class OutputFormatContext : public FormatContext {
 public:
 
     explicit OutputFormatContext(const std::string_view mrl = {}, const std::string_view format = {});
-    explicit OutputFormatContext(OutputContext* output_ctx, const std::string_view format);
+    OutputFormatContext(OutputContext* output_ctx, const std::string_view format);
     ~OutputFormatContext() override;
 
     void                setOutputFormat(AVOutputFormat* out_fmt);

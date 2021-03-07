@@ -19,7 +19,8 @@ auto main() -> int {
 //        record_screen_win();
 //        transsizing();
 //        read_from_memory();
-        write_to_memory();
+//        write_to_memory();
+        read_and_write_to_memory();
 
         // YouTube stream
 //        youtube_stream_copy();

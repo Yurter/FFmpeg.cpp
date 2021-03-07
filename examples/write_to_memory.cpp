@@ -1,7 +1,6 @@
 #include "examples.hpp"
 #include <fpp/format/InputFormatContext.hpp>
 #include <fpp/format/OutputFormatContext.hpp>
-#include <fpp/core/Logger.hpp>
 
 void write_to_memory() {
 

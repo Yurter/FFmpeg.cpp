@@ -46,6 +46,7 @@ SOURCES += \
     examples/mic_to_file.cpp \
     examples/multiple_outputs_parallel.cpp \
     examples/multiple_outputs_sequence.cpp \
+    examples/read_and_write_to_memory.cpp \
     examples/record_screen_win.cpp \
     examples/rtp_audio_stream.cpp \
     examples/rtp_video_and_audio_stream.cpp \

@@ -117,9 +117,6 @@ namespace fpp {
 
     void FormatContext::setMediaResourceLocator(const std::string_view mrl) {
         _media_resource_locator = mrl;
-//        if (!_media_resource_locator.empty()) {
-//            createContext(); // TODO: side effect!
-//        }
     }
 
     void FormatContext::setStreams(StreamVector stream_vector) {

@@ -139,7 +139,7 @@ std::string OutputFormatContext::formatName() const {
 
 void OutputFormatContext::closeContext() {
     writeTrailer();
-    if (!(outputFormat()->flags & AVFMT_NOFILE)) {
+    if (!(outputFormat()->flags & AVFMT_NOFILE)) { // TODO: fix crush
         ffmpeg_api_strict(avio_close, raw()->pb);
     }
     setOutputFormat(nullptr);
