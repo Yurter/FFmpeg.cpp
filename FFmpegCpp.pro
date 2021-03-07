@@ -60,9 +60,12 @@ SOURCES += \
     examples/youtube_stream_transcode_with_silence.cpp \
     fpp/base/FilterChain.cpp \
     fpp/base/FilterGraph.cpp \
+    fpp/base/IOContext.cpp \
     fpp/filter/BitStreamFilterContext.cpp \
     fpp/filter/ComplexFilterGraph.cpp \
     fpp/filter/LinearFilterGraph.cpp \
+    fpp/format/InputContext.cpp \
+    fpp/format/OutputContext.cpp \
     fpp/resample/ResampleContext.cpp \
     fpp/refi/VideoFilters/Drawtext.cpp \
     main.cpp \
@@ -94,12 +97,15 @@ HEADERS += \
     fpp/base/FilterGraph.hpp \
     fpp/base/FormatContext.hpp \
     fpp/base/Frame.hpp \
+    fpp/base/IOContext.hpp \
     fpp/base/MediaData.hpp \
     fpp/base/Packet.hpp \
     fpp/base/Parameters.hpp \
     fpp/codec/DecoderContext.hpp \
     fpp/codec/EncoderContext.hpp \
+    fpp/format/InputContext.hpp \
     fpp/format/InputFormatContext.hpp \
+    fpp/format/OutputContext.hpp \
     fpp/format/OutputFormatContext.hpp \
     fpp/core/FFmpegException.hpp \
     fpp/core/Logger.hpp \

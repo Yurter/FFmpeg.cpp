@@ -13,6 +13,7 @@ namespace fpp {
     using bytes = std::vector<std::uint8_t>;
 
     constexpr auto NOPTS_VALUE      { AV_NOPTS_VALUE };
+    constexpr auto ERROR_EOF        { AVERROR_EOF };
     constexpr auto DEFAULT_RATIONAL { AVRational { 0, 1 } };
     constexpr auto DEFAULT_INT      { 0 };
     constexpr auto not_inited_q     { [](auto x) { return ::av_cmp_q(x, DEFAULT_RATIONAL) == 0; } };

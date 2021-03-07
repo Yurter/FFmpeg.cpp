@@ -128,7 +128,7 @@ namespace fpp {
 
     bool FormatContext::processPacket(Packet& packet) {
         const auto packet_stream {
-            stream(packet.streamIndex())
+            stream(static_cast<std::size_t>(packet.streamIndex()))
         };
         if (packet_stream->timeIsOver()) {
             return false;

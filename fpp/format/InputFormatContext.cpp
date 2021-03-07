@@ -28,12 +28,9 @@ namespace fpp {
         const auto flags {
             [&]() -> int {
                 switch (seek_precision) {
-                    case SeekPrecision::Forward:
-                        return 0;
-                    case SeekPrecision::Backward:
-                        return AVSEEK_FLAG_BACKWARD;
-                    case SeekPrecision::Any:
-                        return AVSEEK_FLAG_ANY;
+                    case SeekPrecision::Forward:  return 0;
+                    case SeekPrecision::Backward: return AVSEEK_FLAG_BACKWARD;
+                    case SeekPrecision::Any:      return AVSEEK_FLAG_ANY;
                 }
             }()
         };
@@ -65,7 +62,7 @@ namespace fpp {
                 Dictionary dictionary { options };
                 if (const auto ret {
                         ::avformat_open_input(
-                            &fmt_ctx
+                              &fmt_ctx
                             , mediaResourceLocator().data()
                             , inputFormat()
                             , dictionary.get()
