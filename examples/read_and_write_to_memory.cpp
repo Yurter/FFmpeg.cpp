@@ -46,7 +46,7 @@ void read_and_write_to_memory() {
     /* create sink */
     fpp::OutputFormatContext memory_sink {
           &custom_output_buffer
-        , "flv"
+        , "avi"
     };
 
     /* copy source's streams to sink */
@@ -66,7 +66,7 @@ void read_and_write_to_memory() {
             std::memcpy(buf, buffer.data(), bytesRead);
             buffer_size -= bytesRead;
             shiftElementsToBegin(buffer, buffer_size, bytesRead);
-//            fpp::static_log_info() << "Read" << bytesRead << "bytes from memory";
+            fpp::static_log_info() << "Read" << bytesRead << "bytes from memory";
             return { true, bytesRead };
         }
     };
@@ -74,7 +74,7 @@ void read_and_write_to_memory() {
     /* ? */
     fpp::InputFormatContext memory_source {
           &custom_input_buffer
-        , "flv"
+        , "avi"
     };
 
     /* ? */
@@ -102,11 +102,12 @@ void read_and_write_to_memory() {
 
     while (true) {
         if (auto packet { real_source.read() }; packet.isEOF()) { break; }
+//        else fpp::static_log_info() << packet.toString();
         else { if (!memory_sink.write(packet)) { break; } }
 
         if (auto packet { memory_source.read() }; packet.isEOF()) { break; }
-        else fpp::static_log_info() << packet.toString();
-//        else { if (!real_sink.write(packet)) { break; } }
+//        else fpp::static_log_info() << packet.toString();
+        else { if (!real_sink.write(packet)) { break; } }
     }
 
     /* explicitly close contexts */
