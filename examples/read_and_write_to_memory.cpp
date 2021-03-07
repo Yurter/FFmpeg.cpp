@@ -3,6 +3,7 @@
 #include <fpp/format/OutputFormatContext.hpp>
 
 #include <fpp/core/Utils.hpp>
+#include <fpp/stream/VideoParameters.hpp>
 
 void read_and_write_to_memory() {
 
@@ -16,15 +17,16 @@ void read_and_write_to_memory() {
         return;
     }
 
-    std::uint8_t buffer[4096];
+    std::uint8_t buffer[4096 * 50];
     std::size_t buffer_size { 0 };
 
     /* create custom output buffer */
     fpp::OutputContext custom_output_buffer {
         [&](const std::uint8_t* buf, std::size_t buf_size) {
+            fpp::static_log_info() << "Buffer size:" << buffer_size;
             fpp::static_log_info() << "Write" << buf_size << "bytes to memory";
-            std::memcpy(buffer, buf, buf_size);
-            buffer_size = buf_size;
+            std::memcpy(buffer + buffer_size, buf, buf_size);
+            buffer_size += buf_size;
             return true;
         }
     };
@@ -48,9 +50,10 @@ void read_and_write_to_memory() {
     /* create custom input buffer */
     fpp::InputContext custom_input_buffer {
         [&](std::uint8_t* buf, std::size_t buf_size) -> fpp::InputContext::CbResult {
+            fpp::static_log_info() << "Buffer size:" << buffer_size;
             const auto bytesRead { std::min(buf_size, buffer_size) };
-            std::memcpy(buf, buffer, buffer_size);
-            buffer_size = 0;
+            std::memcpy(buf + buffer_size - bytesRead, buffer, bytesRead);
+            buffer_size -= bytesRead;
             fpp::static_log_info() << "Read" << bytesRead << "bytes from memory";
             return { true, bytesRead };
         }
@@ -66,6 +69,9 @@ void read_and_write_to_memory() {
     if (!memory_source.open()) {
         return;
     }
+
+    std::static_pointer_cast<fpp::VideoParameters>(memory_source.stream(0)->params)->setWidth(1280);
+    std::static_pointer_cast<fpp::VideoParameters>(memory_source.stream(0)->params)->setHeight(720);
 
     /* ? */
     fpp::OutputFormatContext real_sink {
@@ -83,18 +89,17 @@ void read_and_write_to_memory() {
     }
 
     while (true) {
-        fpp::utils::sleep_for_sec(1);
-//        if (auto packet { real_source.read() }; packet.isEOF()) { break; }
-//        else { if (!memory_sink.write(packet)) { break; } }
+        if (auto packet { real_source.read() }; packet.isEOF()) { break; }
+        else { if (!memory_sink.write(packet)) { break; } }
 
-//        if (auto packet { memory_source.read() }; packet.isEOF()) { break; }
-//        else { if (!real_sink.write(packet)) { break; } }
+        if (auto packet { memory_source.read() }; packet.isEOF()) { break; }
+        else { if (!real_sink.write(packet)) { break; } }
     }
 
-//    /* explicitly close contexts */
-//    real_sink.close();
-//    real_source.close();
-//    memory_sink.close();
-//    memory_source.close();
+    /* explicitly close contexts */
+    real_sink.close();
+    real_source.close();
+    memory_sink.close();
+    memory_source.close();
 
 }

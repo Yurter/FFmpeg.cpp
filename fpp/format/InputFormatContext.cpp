@@ -152,7 +152,7 @@ void InputFormatContext::setInputFormat(AVInputFormat* in_fmt) {
 }
 
 Packet InputFormatContext::readFromSource() {
-    Packet packet { MediaType::Unknown };
+    Packet packet;
     if (const auto ret { ::av_read_frame(raw(), packet.ptr()) }; ret < 0) {
         if (ret == AVERROR_EOF) {
             return Packet { MediaType::EndOF };
