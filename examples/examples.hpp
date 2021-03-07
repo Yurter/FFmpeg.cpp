@@ -7,6 +7,8 @@ void webcam_to_file();
 void webcam_to_udp();
 void mic_to_file();
 void record_screen_win();
+void read_from_memory();
+void write_to_memory();
 
 // YouTube stream
 void youtube_stream_copy();

@@ -14,10 +14,12 @@ auto main() -> int {
         // Common
 //        transmuxing_file();
 //        webcam_to_file();
-        webcam_to_udp();
+//        webcam_to_udp();
 //        mic_to_file();
 //        record_screen_win();
 //        transsizing();
+//        read_from_memory();
+        write_to_memory();
 
         // YouTube stream
 //        youtube_stream_copy();

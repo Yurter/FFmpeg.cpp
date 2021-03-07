@@ -25,7 +25,7 @@ public:
 //protected:
 
     virtual CbResult readPacket(std::uint8_t* buf, std::size_t buf_size);
-    virtual bool writePacket(std::uint8_t* buf, std::size_t buf_size);
+    virtual bool writePacket(const std::uint8_t* buf, std::size_t buf_size);
     virtual bool seek(std::int64_t offset, int whence);
 
 private:

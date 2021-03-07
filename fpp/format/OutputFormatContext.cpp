@@ -11,12 +11,16 @@ namespace fpp {
 OutputFormatContext::OutputFormatContext(const std::string_view mrl, const std::string_view format)
     : _output_format { findOutputFormat(format) } {
     setMediaResourceLocator(mrl);
+    createContext();
 }
 
-OutputFormatContext::OutputFormatContext(OutputContext* output_ctx) {
+OutputFormatContext::OutputFormatContext(OutputContext* output_ctx, const std::string_view format)
+    : _output_format { findOutputFormat(format) } {
+    setMediaResourceLocator("Custom output buffer");
     createContext();
     raw()->pb = output_ctx->raw();
     raw()->flags |= AVFMT_FLAG_CUSTOM_IO;
+    raw()->flags |= AVFMT_NOFILE;
 }
 
 OutputFormatContext::~OutputFormatContext() {

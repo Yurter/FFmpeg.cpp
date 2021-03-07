@@ -1,6 +1,6 @@
-TEMPLATE = lib
+#TEMPLATE = lib
 #CONFIG += staticlib
-CONFIG += dll
+#CONFIG += dll
 
 CONFIG(debug, debug|release) {
     TARGET = fppd
@@ -54,6 +54,7 @@ SOURCES += \
     examples/transsizing.cpp \
     examples/webcam_to_file.cpp \
     examples/webcam_to_udp.cpp \
+    examples/write_to_memory.cpp \
     examples/youtube_stream_copy.cpp \
     examples/youtube_stream_copy_with_silence.cpp \
     examples/youtube_stream_transcode.cpp \

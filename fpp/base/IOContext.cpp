@@ -51,7 +51,7 @@ IOContext::CbResult IOContext::readPacket(uint8_t* /*buf*/, std::size_t /*buf_si
     return {};
 }
 
-bool IOContext::writePacket(uint8_t* /*buf*/, std::size_t /*buf_size*/) {
+bool IOContext::writePacket(const uint8_t* /*buf*/, std::size_t /*buf_size*/) {
     return {};
 }
 

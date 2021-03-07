@@ -7,13 +7,13 @@ class OutputContext : public IOContext {
 
 public:
 
-    using WritedCallback = std::function<bool(std::uint8_t*,std::size_t)>;
+    using WritedCallback = std::function<bool(const std::uint8_t*,std::size_t)>;
 
     explicit OutputContext(WritedCallback callback);
 
 private:
 
-    bool writePacket(std::uint8_t* buf, std::size_t buf_size) override;
+    bool writePacket(const std::uint8_t* buf, std::size_t buf_size) override;
 
 private:
 

@@ -7,7 +7,7 @@ OutputContext::OutputContext(OutputContext::WritedCallback callback)
     , _writeCallback { std::move(callback) }
 {}
 
-bool OutputContext::writePacket(uint8_t* buf, std::size_t buf_size) {
+bool OutputContext::writePacket(const uint8_t* buf, std::size_t buf_size) {
     return _writeCallback(buf, buf_size);
 }
 
