@@ -1,6 +1,6 @@
-#TEMPLATE = lib
+TEMPLATE = lib
 #CONFIG += staticlib
-#CONFIG += dll
+CONFIG += dll
 
 CONFIG(debug, debug|release) {
     TARGET = fppd

@@ -10,6 +10,8 @@ static_assert (LIBAVCODEC_VERSION_INT >= ffmpeg_4_1, "Use libavcodec 4.1 version
 
 namespace fpp {
 
+    using bytes = std::vector<std::uint8_t>;
+
     constexpr auto NOPTS_VALUE      { AV_NOPTS_VALUE };
     constexpr auto DEFAULT_RATIONAL { AVRational { 0, 1 } };
     constexpr auto DEFAULT_INT      { 0 };
@@ -69,6 +71,8 @@ namespace fpp {
 
         static std::string  merge_sdp_files(const std::string& sdp_one, const std::string& sdp_two);
 
+        static bytes serializeAVPacket(const AVPacket& packet);
+        static AVPacket deserializeAVPacket(const bytes& data);
     };
 
     inline bool operator==(const AVRational& lhs, const AVRational& rhs) {

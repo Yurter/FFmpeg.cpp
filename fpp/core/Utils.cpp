@@ -11,6 +11,7 @@
 extern "C" {
     #include <libavutil/imgutils.h>
     #include <libavdevice/avdevice.h>
+    #include <libavcodec/avcodec.h>
 }
 
 namespace fpp {
@@ -350,6 +351,113 @@ namespace fpp {
         }
 
         return result;
+    }
+
+    int av_copy_packet_side_data(AVPacket *pkt, const AVPacket *src)
+    {
+        if (src->side_data_elems) {
+            int i;
+            DUP_DATA(pkt->side_data, src->side_data,
+                    src->side_data_elems * sizeof(*src->side_data), 0, ALLOC_MALLOC);
+            if (src != pkt) {
+                memset(pkt->side_data, 0,
+                       src->side_data_elems * sizeof(*src->side_data));
+            }
+            for (i = 0; i < src->side_data_elems; i++) {
+                DUP_DATA(pkt->side_data[i].data, src->side_data[i].data,
+                        src->side_data[i].size, 1, ALLOC_MALLOC);
+                pkt->side_data[i].size = src->side_data[i].size;
+                pkt->side_data[i].type = src->side_data[i].type;
+            }
+        }
+        pkt->side_data_elems = src->side_data_elems;
+        return 0;
+
+    failed_alloc:
+        av_packet_unref(pkt);
+        return AVERROR(ENOMEM);
+    }
+
+    bytes utils::serializeAVPacket(const AVPacket& packet) {
+        bytes result;
+
+        const auto dataToBytes {
+            [](const std::uint8_t* data, std::size_t size) {
+                bytes result;
+                result.reserve(size);
+                std::memcpy(result.data(), data, size);
+                return result;
+            }
+        };
+        const auto numberToBytes {
+            [](auto number) {
+                bytes result;
+                constexpr auto size { sizeof (number) };
+                result.resize(size);
+                std::memcpy(result.data(), static_cast<void*>(&number), size);
+                return result;
+            }
+        };
+        const auto append {
+            [&result](const bytes& data) {
+                result.insert(end(result), begin(data), end(data));
+            }
+        };
+
+        append(numberToBytes(packet.dts));
+        append(numberToBytes(packet.pts));
+        append(numberToBytes(packet.size));
+        append(numberToBytes(packet.stream_index));
+        append(numberToBytes(packet.flags));
+        append(numberToBytes(packet.side_data_elems));
+        append(numberToBytes(packet.duration));
+        append(numberToBytes(packet.pos));
+        append(dataToBytes(packet.data, static_cast<std::size_t>(packet.size)));
+
+//        for (auto i { 0 }; i < packet.side_data_elems; ++i) {
+//            const auto sideData { packet.side_data };
+//            append(dataToBytes(sideData->data, static_cast<std::size_t>(sideData->size)));
+//        }
+
+        return result;
+    }
+
+    AVPacket utils::deserializeAVPacket(const bytes& data) {
+        AVPacket packet;
+        ::av_init_packet(&packet);
+
+        auto it { data.begin() };
+
+        const auto parseNumber {
+            [&](auto& number) {
+                constexpr auto size { sizeof (number) };
+                std::memcpy(static_cast<void*>(&number), &(*it), size);
+                it += size;
+            }
+        };
+        const auto parseData {
+            [](std::uint8_t* data, std::size_t size) {
+                //
+            }
+        };
+
+        parseNumber(packet.dts);
+        parseNumber(packet.pts);
+        parseNumber(packet.size);
+        parseNumber(packet.stream_index);
+        parseNumber(packet.flags);
+        parseNumber(packet.side_data_elems);
+        parseNumber(packet.duration);
+        parseNumber(packet.pos);
+
+        parseData(packet.data, static_cast<std::size_t>(packet.size));
+
+        {
+            // parse side data
+            packet.side_data_elems = 0; // tmp
+        }
+
+        return packet;
     }
 
     SpParameters utils::make_params(MediaType type) {
