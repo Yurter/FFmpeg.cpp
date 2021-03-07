@@ -7,14 +7,14 @@ struct AVBSFContext;
 
 namespace fpp {
 
-    class BitStreamFilterContext : public SharedFFmpegObject<AVBSFContext> {
+class BitStreamFilterContext : public SharedFFmpegObject<AVBSFContext> {
 
-    public:
+public:
 
-        BitStreamFilterContext(const fpp::SpParameters param, const std::string_view filter_name);
+    BitStreamFilterContext(const fpp::SpParameters param, const std::string_view filter_name);
 
-        Packet              filter(Packet packet);
+    Packet              filter(Packet packet);
 
-    };
+};
 
 } // namespace fpp
