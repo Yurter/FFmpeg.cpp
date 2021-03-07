@@ -1,9 +1,21 @@
 #include "examples.hpp"
 #include <fpp/format/InputFormatContext.hpp>
 #include <fpp/format/OutputFormatContext.hpp>
+#include <array>
 
+#include <iostream>
 #include <fpp/core/Utils.hpp>
 #include <fpp/stream/VideoParameters.hpp>
+
+constexpr auto BUFFER_SIZE { 1024 * 90 };
+using Buffer = std::array<std::uint8_t,BUFFER_SIZE>;
+
+void shiftElementsToBegin(Buffer& buffer, std::size_t actual_size, std::size_t firtsElementIndex) {
+//    std::cout << __func__ << " actual_size: " << actual_size << ", firtsElementIndex: " << firtsElementIndex << std::endl;
+    for (auto i { 0ull }; i < actual_size; ++i) {
+        buffer[i] = buffer[i + firtsElementIndex];
+    }
+}
 
 void read_and_write_to_memory() {
 
@@ -17,15 +29,15 @@ void read_and_write_to_memory() {
         return;
     }
 
-    std::uint8_t buffer[4096 * 50];
+    Buffer buffer;
     std::size_t buffer_size { 0 };
 
     /* create custom output buffer */
     fpp::OutputContext custom_output_buffer {
         [&](const std::uint8_t* buf, std::size_t buf_size) {
-            fpp::static_log_info() << "Buffer size:" << buffer_size;
-            fpp::static_log_info() << "Write" << buf_size << "bytes to memory";
-            std::memcpy(buffer + buffer_size, buf, buf_size);
+//            fpp::static_log_info() << "Buffer used:" << (100.f * buffer_size / BUFFER_SIZE) << "%\n";
+//            fpp::static_log_info() << "Write" << buf_size << "bytes to memory";
+            std::memcpy(buffer.data() + buffer_size, buf, buf_size);
             buffer_size += buf_size;
             return true;
         }
@@ -50,11 +62,11 @@ void read_and_write_to_memory() {
     /* create custom input buffer */
     fpp::InputContext custom_input_buffer {
         [&](std::uint8_t* buf, std::size_t buf_size) -> fpp::InputContext::CbResult {
-            fpp::static_log_info() << "Buffer size:" << buffer_size;
             const auto bytesRead { std::min(buf_size, buffer_size) };
-            std::memcpy(buf + buffer_size - bytesRead, buffer, bytesRead);
+            std::memcpy(buf, buffer.data(), bytesRead);
             buffer_size -= bytesRead;
-            fpp::static_log_info() << "Read" << bytesRead << "bytes from memory";
+            shiftElementsToBegin(buffer, buffer_size, bytesRead);
+//            fpp::static_log_info() << "Read" << bytesRead << "bytes from memory";
             return { true, bytesRead };
         }
     };
@@ -93,7 +105,8 @@ void read_and_write_to_memory() {
         else { if (!memory_sink.write(packet)) { break; } }
 
         if (auto packet { memory_source.read() }; packet.isEOF()) { break; }
-        else { if (!real_sink.write(packet)) { break; } }
+        else fpp::static_log_info() << packet.toString();
+//        else { if (!real_sink.write(packet)) { break; } }
     }
 
     /* explicitly close contexts */
