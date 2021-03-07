@@ -18,7 +18,7 @@ public:
     void                createStream(SpParameters params);
     void                copyStream(const SharedStream other);
 
-    bool                write(Packet& packet);
+    bool                write(Packet packet);
     bool                interleavedWrite(Packet& packet);
 
     void                flush();

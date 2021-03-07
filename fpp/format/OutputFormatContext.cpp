@@ -32,7 +32,7 @@ OutputFormatContext::~OutputFormatContext() {
     }
 }
 
-bool OutputFormatContext::write(Packet& packet) {
+bool OutputFormatContext::write(Packet packet) {
     if (!processPacket(packet)) {
         return false;
     }
