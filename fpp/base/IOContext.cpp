@@ -12,7 +12,7 @@ int read(void* opaque, std::uint8_t* buf, int buf_size) {
     const auto result {
         context->readPacket(buf, static_cast<std::size_t>(buf_size))
     };
-    return result.success ? static_cast<int>(result.bytesRead) : AVERROR(ERROR_EOF);
+    return result.success ? static_cast<int>(result.bytesRead) : ERROR_EOF;
 }
 
 int write(void* opaque, std::uint8_t* buf, int buf_size) {

@@ -52,6 +52,9 @@ bool InputFormatContext::seek(int stream_index, std::int64_t timestamp, SeekPrec
 Packet InputFormatContext::read() {
     setInterruptTimeout(getTimeout(TimeoutProcess::Reading));
     auto packet { readFromSource() };
+    if (packet.isEOF()) {
+        return packet;
+    }
     if (!processPacket(packet)) {
         return Packet { MediaType::EndOF };
     }
@@ -154,8 +157,11 @@ Packet InputFormatContext::readFromSource() {
         if (ERROR_EOF == ret) {
             return Packet { MediaType::EndOF };
         }
+//        if ((ERROR_EOF == ret) || (ERROR_IO_EOF == ret)) {
+//            return Packet { MediaType::EndOF };
+//        }
         throw FFmpegException {
-            "Cannot read source: " + utils::quoted(mediaResourceLocator())
+            "Cannot read source: " + utils::quoted(mediaResourceLocator()) + std::to_string(ret)
         };
     }
     return packet;
