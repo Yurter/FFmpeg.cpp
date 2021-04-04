@@ -16,8 +16,8 @@ void write_to_memory() {
         return;
     }
 
-    constexpr auto outputFileName { "outputFile" };
-    auto file { std::fstream(outputFileName, std::ios::out | std::ios::binary) };
+    constexpr auto outputFileName { "file" };
+    std::fstream file { outputFileName, std::ios::out | std::ios::binary };
     if (!file.is_open()) {
         fpp::static_log_error() << "Failed to open output file: " << outputFileName;
         return;
@@ -38,7 +38,7 @@ void write_to_memory() {
     /* create sink */
     fpp::OutputFormatContext sink {
           &custom_buffer
-        , "flv"
+        , "avi"
     };
 
     /* copy source's streams to sink */
