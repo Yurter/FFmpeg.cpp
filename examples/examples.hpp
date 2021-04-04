@@ -11,7 +11,6 @@ void record_screen_win();
 // Memory stuff
 void write_to_memory();
 void read_from_memory();
-void read_and_write_to_memory();
 
 // YouTube stream
 void youtube_stream_copy();

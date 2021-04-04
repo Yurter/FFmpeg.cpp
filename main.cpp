@@ -18,9 +18,10 @@ auto main() -> int {
 //        mic_to_file();
 //        record_screen_win();
 //        transsizing();
-//        read_from_memory();
+
+        // Memory stuff
 //        write_to_memory();
-        read_and_write_to_memory();
+//        read_from_memory();
 
         // YouTube stream
 //        youtube_stream_copy();
