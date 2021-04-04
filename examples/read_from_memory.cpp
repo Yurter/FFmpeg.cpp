@@ -1,58 +1,76 @@
 #include "examples.hpp"
 #include <fpp/format/InputFormatContext.hpp>
 #include <fpp/format/OutputFormatContext.hpp>
+#include <fpp/stream/VideoParameters.hpp> // TODO: rm
+#include <fpp/core/Logger.hpp>
+#include <fstream>
 
 void read_from_memory() {
 
-//    /* create source */
-//    fpp::InputFormatContext source {
-//        "rtsp://205.120.142.79/live/ch00_0"
-//    };
+    constexpr auto inputFileName { "file" };
+    std::ifstream file { inputFileName, std::ios::out | std::ios::binary };
+    if (!file.is_open()) {
+        fpp::static_log_error() << "Failed to open input file: " << inputFileName;
+        return;
+    }
 
-//    /* open source */
-//    if (!source.open()) {
-//        return;
-//    }
+    /* create custom input buffer */
+    fpp::InputContext custom_input_buffer {
+        [&file](std::uint8_t* buf, std::size_t buf_size) -> fpp::InputContext::CbResult {
+            if (!file.read(reinterpret_cast<char*>(buf), static_cast<std::streamsize>(buf_size))) {
+                return {};
+            }
+            const auto bytesRead { file.gcount() };
+            fpp::static_log_info() << "Read" << bytesRead << "bytes from memory";
+            return { true, static_cast<std::size_t>(bytesRead) };
+        }
+    };
 
-//    /* create custom output buffer */
-//    fpp::OutputContext custom_buffer {
-//        [](const std::uint8_t* /*buf*/, std::size_t buf_size) {
-//            fpp::static_log_info() << "Write" << buf_size << "bytes";
-//            return true;
-//        }
-//    };
+    /* create open source */
+    fpp::InputFormatContext source {
+          &custom_input_buffer
+        , "avi"
+    };
 
-//    /* create sink */
-//    fpp::OutputFormatContext sink {
-//          &custom_buffer
-//        , "flv"
-//    };
+    /* open source */
+    if (!source.open()) {
+        return;
+    }
 
-//    /* copy source's streams to sink */
-//    for (const auto& input_stream : source.streams()) {
-//        sink.copyStream(input_stream);
-//    }
+    std::static_pointer_cast<fpp::VideoParameters>(source.stream(0)->params)->setWidth(1280); // TODO: rm
+    std::static_pointer_cast<fpp::VideoParameters>(source.stream(0)->params)->setHeight(720); // TODO: rm
 
-//    /* open sink */
-//    if (!sink.open()) {
-//        return;
-//    }
+    /* create sink */
+    fpp::OutputFormatContext sink {
+        "output.flv"
+    };
 
-//    fpp::Packet packet;
-//    const auto read_packet {
-//        [&packet,&source]() {
-//            packet = source.read();
-//            return !packet.isEOF();
-//        }
-//    };
+    /* copy source's streams to sink */
+    for (const auto& input_stream : source.streams()) {
+        sink.copyStream(input_stream);
+    }
 
-//    /* read and write packets */
-//    while (read_packet()) {
-//        sink.write(packet);
-//    }
+    /* open sink */
+    if (!sink.open()) {
+        return;
+    }
 
-//    /* explicitly close contexts */
-//    source.close();
-//    sink.close();
+    fpp::Packet packet;
+    const auto read_packet {
+        [&packet,&source]() {
+            packet = source.read();
+            fpp::static_log_info() << "Read" << packet.toString();
+            return !packet.isEOF();
+        }
+    };
+
+    /* read and write packets */
+    while (read_packet()) {
+        sink.write(packet);
+    }
+
+    /* explicitly close contexts */
+    source.close();
+    sink.close();
 
 }
