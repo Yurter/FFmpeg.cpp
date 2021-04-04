@@ -47,11 +47,11 @@ IOContext::IOContext(Type type, std::size_t buffer_size)
     );
 }
 
-IOContext::CbResult IOContext::readPacket(uint8_t* /*buf*/, std::size_t /*buf_size*/) {
+IOContext::CbResult IOContext::readPacket(std::uint8_t* /*buf*/, std::size_t /*buf_size*/) {
     return {};
 }
 
-bool IOContext::writePacket(const uint8_t* /*buf*/, std::size_t /*buf_size*/) {
+bool IOContext::writePacket(const std::uint8_t* /*buf*/, std::size_t /*buf_size*/) {
     return {};
 }
 
