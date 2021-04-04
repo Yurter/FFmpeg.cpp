@@ -151,12 +151,11 @@ void InputFormatContext::setInputFormat(AVInputFormat* in_fmt) {
 Packet InputFormatContext::readFromSource() {
     Packet packet;
     if (const auto ret { ::av_read_frame(raw(), packet.ptr()) }; ret < 0) {
-        if (ret == AVERROR_EOF) {
+        if (ERROR_EOF == ret) {
             return Packet { MediaType::EndOF };
         }
         throw FFmpegException {
-            "Cannot read source: "
-                + utils::quoted(mediaResourceLocator())
+            "Cannot read source: " + utils::quoted(mediaResourceLocator())
         };
     }
     return packet;
