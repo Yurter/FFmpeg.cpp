@@ -1,6 +1,8 @@
 #include "examples.hpp"
 #include <fpp/format/InputFormatContext.hpp>
 #include <fpp/format/OutputFormatContext.hpp>
+#include <fpp/core/Logger.hpp>
+#include <fstream>
 
 void write_to_memory() {
 
@@ -14,10 +16,21 @@ void write_to_memory() {
         return;
     }
 
+    constexpr auto outputFileName { "outputFile" };
+    auto file { std::fstream(outputFileName, std::ios::out | std::ios::binary) };
+    if (!file.is_open()) {
+        fpp::static_log_error() << "Failed to open output file: " << outputFileName;
+        return;
+    }
+
     /* create custom output buffer */
     fpp::OutputContext custom_buffer {
-        [](const std::uint8_t* /*buf*/, std::size_t buf_size) {
+        [&file](const std::uint8_t* buf, std::size_t buf_size) {
             fpp::static_log_info() << "Write" << buf_size << "bytes";
+            file.write(
+                  reinterpret_cast<const char*>(buf)
+                , static_cast<std::streamsize>(buf_size)
+            );
             return true;
         }
     };
@@ -46,6 +59,10 @@ void write_to_memory() {
         }
     };
 
+    /* set timeout (because of endless rtsp stream) */
+    constexpr auto thirty_seconds { 30 * 1000 };
+    source.stream(0)->setEndTimePoint(thirty_seconds);
+
     /* read and write packets */
     while (read_packet()) {
         sink.write(packet);
@@ -54,5 +71,8 @@ void write_to_memory() {
     /* explicitly close contexts */
     source.close();
     sink.close();
+
+    /* explicitly close output file */
+    file.close();
 
 }
