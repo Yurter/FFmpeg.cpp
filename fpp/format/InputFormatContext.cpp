@@ -80,16 +80,13 @@ bool InputFormatContext::openContext(const Options& options) {
 
     Dictionary dictionary { options };
     auto fmt_ctx { raw() };
-    if (const auto ret {
-            ::avformat_open_input(
-                  &fmt_ctx
-                , mediaResourceLocator().data()
-                , inputFormat()
-                , dictionary.get()
-            )
-        }; ret < 0) {
-        return false;
-    }
+
+    ffmpeg_api(avformat_open_input
+        , &fmt_ctx
+        , mediaResourceLocator().data()
+        , inputFormat()
+        , dictionary.get()
+    );
 
     setInputFormat(raw()->iformat);
     retrieveStreams();
