@@ -129,6 +129,7 @@ namespace fpp {
         _start_time_point = msec;
     }
 
+    // TODO: use setEndTimePoint for context. do not specify "source.stream(0)->setEndTimePoint(one_minute);"
     void Stream::setEndTimePoint(std::int64_t msec) { // TODO (18.05)
         if (_end_time_point == msec) {
             return;
