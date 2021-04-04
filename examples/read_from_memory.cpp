@@ -1,7 +1,6 @@
 #include "examples.hpp"
 #include <fpp/format/InputFormatContext.hpp>
 #include <fpp/format/OutputFormatContext.hpp>
-#include <fpp/stream/VideoParameters.hpp> // TODO: rm
 #include <fpp/core/Logger.hpp>
 #include <fstream>
 
@@ -36,9 +35,6 @@ void read_from_memory() {
     if (!source.open()) {
         return;
     }
-
-    std::static_pointer_cast<fpp::VideoParameters>(source.stream(0)->params)->setWidth(1280); // TODO: rm
-    std::static_pointer_cast<fpp::VideoParameters>(source.stream(0)->params)->setHeight(720); // TODO: rm
 
     /* create sink */
     fpp::OutputFormatContext sink {
