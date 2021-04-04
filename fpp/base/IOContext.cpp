@@ -27,15 +27,11 @@ std::int64_t seek2(void* /*opaque*/, std::int64_t /*offset*/, int /*whence*/) {
     return -1;
 }
 
-IOContext::IOContext(Type type, std::size_t buffer_size)
-    : _buffer {
-          static_cast<std::uint8_t*>(::av_malloc(buffer_size))
-        , [](auto* buffer) { ::av_free(buffer); }
-    } {
-
+IOContext::IOContext(Type type, std::size_t buffer_size) {
+    _buffer.resize(buffer_size);
     reset(
         ::avio_alloc_context(
-              _buffer.get()
+              _buffer.data()
             , static_cast<int>(buffer_size)
             , static_cast<int>(type)
             , this /* opaque */
