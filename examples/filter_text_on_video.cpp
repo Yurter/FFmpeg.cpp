@@ -47,7 +47,7 @@ void text_on_video() {
         sink.stream(fpp::MediaType::Video)->params, video_options
     };
 
-    const auto drow_text {
+    const auto draw_text {
         fpp::VideoFilter::DrawText::make(
             fpp::VideoFilter::DrawText::Text {
                 "Hello World"   /* text      */
@@ -68,7 +68,7 @@ void text_on_video() {
     /* create filter */
     fpp::LinearFilterGraph filter_graph {
         source.stream(fpp::MediaType::Video)->params
-        , { drow_text }
+        , { draw_text }
     };
 
     /* open sink */
