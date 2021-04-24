@@ -157,9 +157,6 @@ Packet InputFormatContext::readFromSource() {
         if (ERROR_EOF == ret) {
             return Packet { MediaType::EndOF };
         }
-//        if ((ERROR_EOF == ret) || (ERROR_IO_EOF == ret)) {
-//            return Packet { MediaType::EndOF };
-//        }
         throw FFmpegException {
             "Cannot read source: " + utils::quoted(mediaResourceLocator()) + std::to_string(ret)
         };
