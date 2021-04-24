@@ -54,7 +54,7 @@ namespace fpp {
         struct Interrupter {
 
             Chronometer     chronometer;
-            std::int64_t    timeout_ms { 0 };
+            std::int64_t    timeout_ms { 0 }; // TODO: use chrono
 
             bool isTimeout() const {
                 return chronometer.elapsed_milliseconds() > timeout_ms;
