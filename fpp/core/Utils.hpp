@@ -71,9 +71,6 @@ namespace fpp {
         static SpParameters make_youtube_audio_params();
 
         static std::string  merge_sdp_files(const std::string& sdp_one, const std::string& sdp_two);
-
-        static bytes serializeAVPacket(const AVPacket& packet);
-        static AVPacket deserializeAVPacket(const bytes& data);
     };
 
     inline bool operator==(const AVRational& lhs, const AVRational& rhs) {
