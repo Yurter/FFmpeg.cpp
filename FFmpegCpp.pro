@@ -1,4 +1,15 @@
-TEMPLATE = app
+#TEMPLATE = lib
+#CONFIG += staticlib
+#CONFIG += dll
+
+# TODO: build both lib and dll at once
+
+CONFIG(debug, debug|release) {
+    TARGET = fppd
+} else {
+    TARGET = fpp
+}
+
 CONFIG += console c++17
 CONFIG -= app_bundle
 CONFIG -= qt
@@ -12,11 +23,14 @@ CONFIG -= qt
 #INCLUDEPATH += D:\dev\00_ffmpeg\ffmpeg-4.1.3-win64-dev\include
 #LIBS += -LD:\dev\00_ffmpeg\ffmpeg-4.1.3-win64-dev\lib
 
-INCLUDEPATH += /usr/include/x86_64-linux-gnu/
+#INCLUDEPATH += /usr/include/x86_64-linux-gnu/
 #LIBS += -L/usr/lib/x86_64-linux-gnu/
 
-INCLUDEPATH += G:\dev\00_ffmpeg\ffmpeg-4.2.2-win64-dev\include
-LIBS += -LG:\dev\00_ffmpeg\ffmpeg-4.2.2-win64-dev\lib
+#INCLUDEPATH += G:\dev\00_ffmpeg\ffmpeg-4.2.2-win64-dev\include
+#LIBS += -LG:\dev\00_ffmpeg\ffmpeg-4.2.2-win64-dev\lib
+
+INCLUDEPATH += D:\libs\ffmpeg\4.1.3\ffmpeg-4.1.3-win64-dev\include
+LIBS += -LD:\libs\ffmpeg\4.1.3\ffmpeg-4.1.3-win64-dev\lib
 
 LIBS += -lavcodec -lavdevice -lavfilter -lavformat -lavutil
 LIBS += -lpostproc -lswresample -lswscale
@@ -32,6 +46,7 @@ SOURCES += \
     examples/mic_to_file.cpp \
     examples/multiple_outputs_parallel.cpp \
     examples/multiple_outputs_sequence.cpp \
+    examples/read_from_memory.cpp \
     examples/record_screen_win.cpp \
     examples/rtp_audio_stream.cpp \
     examples/rtp_video_and_audio_stream.cpp \
@@ -41,15 +56,20 @@ SOURCES += \
     examples/transrating.cpp \
     examples/transsizing.cpp \
     examples/webcam_to_file.cpp \
+    examples/webcam_to_udp.cpp \
+    examples/write_to_memory.cpp \
     examples/youtube_stream_copy.cpp \
     examples/youtube_stream_copy_with_silence.cpp \
     examples/youtube_stream_transcode.cpp \
     examples/youtube_stream_transcode_with_silence.cpp \
     fpp/base/FilterChain.cpp \
     fpp/base/FilterGraph.cpp \
+    fpp/base/IOContext.cpp \
     fpp/filter/BitStreamFilterContext.cpp \
     fpp/filter/ComplexFilterGraph.cpp \
     fpp/filter/LinearFilterGraph.cpp \
+    fpp/format/InputContext.cpp \
+    fpp/format/OutputContext.cpp \
     fpp/resample/ResampleContext.cpp \
     fpp/refi/VideoFilters/Drawtext.cpp \
     main.cpp \
@@ -81,12 +101,15 @@ HEADERS += \
     fpp/base/FilterGraph.hpp \
     fpp/base/FormatContext.hpp \
     fpp/base/Frame.hpp \
+    fpp/base/IOContext.hpp \
     fpp/base/MediaData.hpp \
     fpp/base/Packet.hpp \
     fpp/base/Parameters.hpp \
     fpp/codec/DecoderContext.hpp \
     fpp/codec/EncoderContext.hpp \
+    fpp/format/InputContext.hpp \
     fpp/format/InputFormatContext.hpp \
+    fpp/format/OutputContext.hpp \
     fpp/format/OutputFormatContext.hpp \
     fpp/core/FFmpegException.hpp \
     fpp/core/Logger.hpp \

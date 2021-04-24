@@ -91,7 +91,7 @@ namespace fpp {
 
     void FormatContext::createContext() {
         reset(
-            ::avformat_alloc_context()
+              ::avformat_alloc_context()
             , [](auto* ctx) { ::avformat_free_context(ctx); }
         );
     }
@@ -117,9 +117,6 @@ namespace fpp {
 
     void FormatContext::setMediaResourceLocator(const std::string_view mrl) {
         _media_resource_locator = mrl;
-        if (!_media_resource_locator.empty()) {
-            createContext();
-        }
     }
 
     void FormatContext::setStreams(StreamVector stream_vector) {
@@ -128,7 +125,7 @@ namespace fpp {
 
     bool FormatContext::processPacket(Packet& packet) {
         const auto packet_stream {
-            stream(packet.streamIndex())
+            stream(static_cast<std::size_t>(packet.streamIndex()))
         };
         if (packet_stream->timeIsOver()) {
             return false;

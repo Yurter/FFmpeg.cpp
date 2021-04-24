@@ -49,12 +49,15 @@ namespace fpp {
     }
 
     std::string Logger::threadIdFormated() const {
-        //TODO: DOESNT COMPILE ON GCC (LINUX)!!!!!!!!!!!!!!!!! // use -pthread linking option
-//        const auto thread_id_max_length = 5;
-//        std::string thread_id = (std::stringstream() << std::this_thread::get_id()).str();
-//        thread_id.insert(0, thread_id_max_length - thread_id.length(), '0');
-//        return thread_id;
+#ifdef _WIN32
+        constexpr auto MAX_LENGTH { 5 };
+        std::string thread_id = (std::stringstream() << std::this_thread::get_id()).str();
+        thread_id.insert(0, MAX_LENGTH - thread_id.length(), '0');
+        return thread_id;
+#else
+        //TODO: DOESNT COMPILE ON GCC (LINUX) // use -pthread linking option
         return "0000";
+#endif
     }
 
     void Logger::log_callback(void* ptr, int level, const char* fmt, va_list vl) {
@@ -149,25 +152,25 @@ namespace fpp {
         }
 
         std::stringstream ss;
-        ss << '[' << logLevelToString(log_level) << ']'
-           << '[' << threadIdFormated()          << ']'
-           << '[' << currentTimeFormated()       << ']'
-           << '[' << caller_name                 << ']'
-           << ' ' << message;
+        ss << '[' << logLevelToString(log_level).data() << ']'
+           << '[' << threadIdFormated()                 << ']'
+           << '[' << currentTimeFormated()              << ']'
+           << '[' << caller_name.data()                 << ']'
+           << message.data();
 
         _print_func(log_level, ss.str());
     }
 
-    void Logger::print(LogLevel log_level, const std::string_view message) const {
+    void Logger::print(LogLevel log_level, const std::string_view message) const { // TODO: duplicate code (18.10)
         if (ignoreMessage(log_level)) {
             return;
         }
 
         std::stringstream ss;
-        ss << '[' << logLevelToString(log_level) << ']'
-           << '[' << threadIdFormated()          << ']'
-           << '[' << currentTimeFormated()       << ']'
-           << ' ' << message;
+        ss << '[' << logLevelToString(log_level).data() << ']'
+           << '[' << threadIdFormated()                 << ']'
+           << '[' << currentTimeFormated()              << ']'
+           << message.data();
 
         _print_func(log_level, ss.str());
     }

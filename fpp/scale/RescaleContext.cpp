@@ -16,7 +16,7 @@ namespace fpp {
     Frame RescaleContext::scale(const Frame& frame) {
         Frame rescaled_frame { createFrame() };
         ::sws_scale(
-            raw()
+              raw()
             , frame.raw().data              /* srcSlice[]  */
             , frame.raw().linesize          /* srcStride[] */
             , 0                             /* srcSliceY   */
@@ -40,7 +40,7 @@ namespace fpp {
 
         reset(
             ::sws_getContext(
-                int(in_param->width()), int(in_param->height()), in_param->pixelFormat()
+                  int(in_param->width()),  int(in_param->height()),  in_param->pixelFormat()
                 , int(out_param->width()), int(out_param->height()), out_param->pixelFormat()
                 , SWS_BICUBIC /* flags     */
                 , nullptr     /* srcFilter */

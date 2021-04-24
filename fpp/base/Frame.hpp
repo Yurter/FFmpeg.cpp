@@ -13,7 +13,7 @@ namespace fpp {
 
     public:
 
-        explicit Frame(MediaType type);
+        explicit Frame(MediaType type = MediaType::Unknown);
         Frame(const Frame& other);
         Frame(const AVFrame& frame, MediaType type, AVRational time_base, int stream_index);
         ~Frame() override;

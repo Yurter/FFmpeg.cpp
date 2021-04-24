@@ -6,11 +6,11 @@
 #include <fpp/scale/RescaleContext.hpp>
 #include <fpp/filter/LinearFilterGraph.hpp>
 
-void webcam_to_file() {
+void webcam_to_udp() {
 
     /* create source */
     fpp::InputFormatContext source {
-        "video=HP Wide Vision FHD Camera"
+        "video=HD WebCam"
     };
 
     /* change default image size (480x360) */
@@ -26,7 +26,8 @@ void webcam_to_file() {
 
     /* create sink */
     fpp::OutputFormatContext sink {
-        "webcam.flv"
+          "udp://127.0.0.1:1234"
+        , "mpegts"
     };
 
     /* encode video because of camera's rawvideo codec */
@@ -86,9 +87,6 @@ void webcam_to_file() {
             return !packet.isEOF();
         }
     };
-
-    /* because of endless webcam's video */
-    sink.stream(0)->setEndTimePoint(10 * 1000);
 
     auto stop_flag { false }; // TODO: use lambda and return instead of flag and break (12.05)
 

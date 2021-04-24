@@ -10,7 +10,10 @@ static_assert (LIBAVCODEC_VERSION_INT >= ffmpeg_4_1, "Use libavcodec 4.1 version
 
 namespace fpp {
 
+    using bytes = std::vector<std::uint8_t>;
+
     constexpr auto NOPTS_VALUE      { AV_NOPTS_VALUE };
+    constexpr auto ERROR_EOF        { AVERROR_EOF };
     constexpr auto DEFAULT_RATIONAL { AVRational { 0, 1 } };
     constexpr auto DEFAULT_INT      { 0 };
     constexpr auto not_inited_q     { [](auto x) { return ::av_cmp_q(x, DEFAULT_RATIONAL) == 0; } };
@@ -50,6 +53,7 @@ namespace fpp {
         static bool         transcoding_required(const InOutParams& params);
 
         static bool         compare_float(float a, float b);
+        static void         handle_exceptions(const Object* owner);
 
         static const std::string_view guess_format_short_name(const std::string_view media_resurs_locator);
 
@@ -67,7 +71,6 @@ namespace fpp {
         static SpParameters make_youtube_audio_params();
 
         static std::string  merge_sdp_files(const std::string& sdp_one, const std::string& sdp_two);
-
     };
 
     inline bool operator==(const AVRational& lhs, const AVRational& rhs) {

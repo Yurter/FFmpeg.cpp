@@ -13,7 +13,7 @@ namespace fpp {
 
     public:
 
-        explicit Packet(MediaType type);
+        explicit Packet(MediaType type = MediaType::Unknown);
         Packet(const Packet& other);
         Packet(const AVPacket& avpacket, AVRational time_base, MediaType type);
         ~Packet() override;
