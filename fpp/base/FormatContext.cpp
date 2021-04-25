@@ -9,7 +9,7 @@ extern "C" {
 
 namespace fpp {
 
-    constexpr auto default_opening_timeout_ms { 20'000 };
+    constexpr auto default_opening_timeout_ms { 20'000 }; // TODO: use chrono
     constexpr auto default_closing_timeout_ms { 5'000  };
     constexpr auto default_reading_timeout_ms { 5'000  };
     constexpr auto default_writing_timeout_ms { 1'000  };
