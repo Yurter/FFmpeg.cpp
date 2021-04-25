@@ -96,6 +96,14 @@ namespace fpp {
         );
     }
 
+    void FormatContext::setFlag(int flag) {
+        raw()->flags |= flag;
+    }
+
+    bool FormatContext::isFlagSet(int flag) const {
+        return raw()->flags & flag;
+    }
+
     int FormatContext::interrupt_callback(void* opaque) {
         constexpr auto OK   { 0 };
         constexpr auto FAIL { 1 };

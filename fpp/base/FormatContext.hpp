@@ -75,6 +75,9 @@ namespace fpp {
         virtual void        closeContext() = 0;
         virtual std::string formatName() const = 0;
 
+        void                setFlag(int flag);
+        bool                isFlagSet(int flag) const;
+
         void                addStream(SharedStream stream);
         void                setStreams(StreamVector stream_vector);
 
