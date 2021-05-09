@@ -117,11 +117,11 @@ bool OutputFormatContext::openContext(const Options& options) {
     if (!isFlagSet(AVFMT_NOFILE)) {
         if (const auto ret {
                 ::avio_open2(
-                      &raw()->pb                    /* AVIOContext */
-                    , mediaResourceLocator().data() /* url         */
-                    , AVIO_FLAG_WRITE               /* flags       */
-                    , nullptr                       /* int_cb      */
-                    , dictionary.get()              /* options     */
+                      &raw()->pb                    /* AVIOContext        */
+                    , mediaResourceLocator().data() /* url                */
+                    , AVIO_FLAG_WRITE               /* flags              */
+                    , nullptr                       /* interrupt callback */
+                    , dictionary.get()              /* options            */
                 )
             }; ret < 0) {
             return false;
