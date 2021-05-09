@@ -178,7 +178,7 @@ namespace fpp {
     }
 
     bool Stream::addMetadata(const std::string_view key, const std::string_view value, int flags) {
-        ffmpeg_api(av_dict_set, &raw()->metadata, key.data(), value.data(), flags);
+        ffmpeg_api_non_strict(av_dict_set, &raw()->metadata, key.data(), value.data(), flags);
         return true;
     }
 

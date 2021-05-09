@@ -172,7 +172,7 @@ namespace fpp {
                 std::to_string(rational.den);
     }
 
-    std::string utils::ffmpeg_version() { // TODO: fix it - return "N-92657-ga271025215"
+    std::string utils::ffmpeg_version() { // TODO: fix it - return "N-92657-ga271025215", ex.: AV_STRINGIFY(LIBAVUTIL_VERSION)
         return std::string { ::av_version_info() };
     }
 

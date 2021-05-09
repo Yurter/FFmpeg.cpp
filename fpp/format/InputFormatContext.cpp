@@ -44,7 +44,7 @@ bool InputFormatContext::seek(int stream_index, std::int64_t timestamp, SeekPrec
             }
         }()
     };
-    ffmpeg_api(av_seek_frame, raw(), stream_index, timestamp, flags);
+    ffmpeg_api_non_strict(av_seek_frame, raw(), stream_index, timestamp, flags);
     log_info() << "Success seek to " << utils::time_to_string(timestamp, DEFAULT_TIME_BASE);
     return true;
 }
@@ -84,7 +84,7 @@ bool InputFormatContext::openContext(const Options& options) {
     Dictionary dictionary { options };
     auto fmt_ctx { raw() };
 
-    ffmpeg_api(avformat_open_input
+    ffmpeg_api_non_strict(avformat_open_input
         , &fmt_ctx
         , mediaResourceLocator().data()
         , inputFormat()

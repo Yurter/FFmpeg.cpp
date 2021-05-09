@@ -37,7 +37,7 @@ bool OutputFormatContext::write(Packet packet) {
         return false;
     }
     setInterruptTimeout(getTimeout(TimeoutProcess::Writing));
-    ffmpeg_api(av_write_frame, raw(), packet.ptr());
+    ffmpeg_api_non_strict(av_write_frame, raw(), packet.ptr());
     return true;
 }
 
@@ -47,7 +47,7 @@ bool OutputFormatContext::interleavedWrite(Packet& packet) {
         return false;
     }
     setInterruptTimeout(getTimeout(TimeoutProcess::Writing));
-    ffmpeg_api(av_interleaved_write_frame, raw(), packet.ptr());
+    ffmpeg_api_non_strict(av_interleaved_write_frame, raw(), packet.ptr());
     return true;
 }
 
