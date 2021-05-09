@@ -5,21 +5,21 @@
 
 namespace fpp {
 
-    class DecoderContext : public CodecContext {
+class DecoderContext : public CodecContext {
 
-    public:
+public:
 
-        explicit DecoderContext(const SpParameters params, Options options = {});
+    explicit DecoderContext(const SpParameters params, Options options = {});
 
-        FrameVector         decode(const Packet& packet);
-        FrameVector         flush(AVRational time_base, int stream_index);
+    FrameVector         decode(const Packet& packet);
+    FrameVector         flush(AVRational time_base, int stream_index);
 
-    private:
+private:
 
-        void                sendPacket(const Packet& packet);
-        void                sendFlushPacket();
-        FrameVector         receiveFrames(AVRational time_base, int stream_index);
+    void                sendPacket(const Packet& packet);
+    void                sendFlushPacket();
+    FrameVector         receiveFrames(AVRational time_base, int stream_index);
 
-    };
+};
 
 } // namespace fpp
