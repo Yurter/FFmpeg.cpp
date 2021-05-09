@@ -25,16 +25,16 @@ void text_on_video() {
     };
 
     /* copy only video stream to sink */
-    sink.copyStream(source.stream(fpp::MediaType::Video));
+    sink.copyStream(source.stream(fpp::Media::Type::Video));
 
     /* create decoder */
     fpp::DecoderContext video_decoder {
-        source.stream(fpp::MediaType::Video)->params
+        source.stream(fpp::Media::Type::Video)->params
     };
 
     /* encoder's options */
     fpp::Options video_options {
-        { "threads",        "1"          }
+          { "threads",      "1"           }
         , { "thread_type",  "slice"       }
         , { "preset",       "ultrafast"   }
         , { "crf",          "30"          } // 0-51
@@ -44,7 +44,7 @@ void text_on_video() {
 
     /* create encoder */
     fpp::EncoderContext video_encoder {
-        sink.stream(fpp::MediaType::Video)->params, video_options
+        sink.stream(fpp::Media::Type::Video)->params, video_options
     };
 
     const auto draw_text {
@@ -67,7 +67,7 @@ void text_on_video() {
 
     /* create filter */
     fpp::LinearFilterGraph filter_graph {
-        source.stream(fpp::MediaType::Video)->params
+        source.stream(fpp::Media::Type::Video)->params
         , { draw_text }
     };
 
@@ -78,11 +78,9 @@ void text_on_video() {
 
     /* set timeout (because of endless rtsp stream) */
     constexpr auto one_minute { 1 * 60 * 1000 };
-    source.stream(fpp::MediaType::Video)->setEndTimePoint(one_minute);
+    source.stream(fpp::Media::Type::Video)->setEndTimePoint(one_minute);
 
-    fpp::Packet packet {
-        fpp::MediaType::Unknown
-    };
+    fpp::Packet packet;
     const auto read_packet {
         [&packet,&source]() {
             packet = source.read();

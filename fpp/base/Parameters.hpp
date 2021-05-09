@@ -15,66 +15,66 @@ struct AVCodecParams;
 
 namespace fpp {
 
-    class Parameters;
-    using SpParameters = std::shared_ptr<Parameters>;
-    using InOutParams = struct InOutParams { SpParameters in; SpParameters out; };
-    using Extradata = std::pair<std::uint8_t*,std::size_t>;
+class Parameters;
+using SpParameters = std::shared_ptr<Parameters>;
+using InOutParams = struct InOutParams { SpParameters in; SpParameters out; };
+using Extradata = std::pair<std::uint8_t*,std::size_t>;
 
-    class Parameters : public FFmpegObject<AVCodecParameters>, public MediaData {
+class Parameters : public FFmpegObject<AVCodecParameters>, public Media {
 
-    public:
+public:
 
-        explicit Parameters(MediaType type);
-        Parameters(const Parameters& other);
-        Parameters& operator=(const Parameters& other);
+    explicit Parameters(Media::Type type);
+    Parameters(const Parameters& other);
+    Parameters& operator=(const Parameters& other);
 
-        void                setDecoder(AVCodecID codec_id);
-        void                setEncoder(AVCodecID codec_id);
+    void                setDecoder(AVCodecID codec_id);
+    void                setEncoder(AVCodecID codec_id);
 
-        bool                isDecoder() const;
-        bool                isEncoder() const;
+    bool                isDecoder() const;
+    bool                isEncoder() const;
 
-        void                setBitrate(std::int64_t bitrate);
-        void                setTimeBase(AVRational time_base);
-        void                setExtradata(Extradata extradata);
-        void                setFormatFlags(int flags);
+    void                setBitrate(std::int64_t bitrate);
+    void                setTimeBase(AVRational time_base);
+    void                setExtradata(Extradata extradata);
+    void                setFormatFlags(int flags);
 
-        AVCodecID           codecId()       const;
-        std::string         codecName()     const;
-        AVCodec*            codec()         const;
-        std::int64_t        bitrate()       const;
-        AVRational          timeBase()      const;
-        Extradata           extradata()     const;
-        std::string         codecType()     const;
-        int                 formatFlags()   const;
+    AVCodecID           codecId()       const;
+    std::string         codecName()     const;
+    AVCodec*            codec()         const;
+    std::int64_t        bitrate()       const;
+    AVRational          timeBase()      const;
+    Extradata           extradata()     const;
+    std::string         codecType()     const;
+    int                 formatFlags()   const;
 
-        std::string         toString() const override;
-        virtual bool        betterThen(const SpParameters& other);
-        virtual void        completeFrom(const SpParameters other);
+    std::string         toString() const override;
+    virtual bool        betterThen(const SpParameters& other);
+    virtual void        completeFrom(const SpParameters other);
 
-        virtual void        parseStream(const AVStream* avstream);
+    virtual void        parseStream(const AVStream* avstream);
 
-        void                initCodecpar(AVCodecParameters* codecpar) const;
-        void                parseCodecpar(AVCodecParameters* codecpar);
-        virtual void        initCodecContext(AVCodecContext* codec_context) const;
-        virtual void        parseCodecContext(const AVCodecContext* codec_context);
+    void                initCodecpar(AVCodecParameters* codecpar) const;
+    void                parseCodecpar(AVCodecParameters* codecpar);
+    virtual void        initCodecContext(AVCodecContext* codec_context) const;
+    virtual void        parseCodecContext(const AVCodecContext* codec_context);
 
-        static SpParameters make_shared(MediaType media_type) {
-            return std::make_shared<Parameters>(media_type);
-        }
+    static SpParameters make_shared(Media::Type media_type) {
+        return std::make_shared<Parameters>(media_type);
+    }
 
-    private:
+private:
 
-        void                reset();
-        void                setCodec(AVCodec* codec);
-        bool                testFormatFlag(int flag) const;
+    void                reset();
+    void                setCodec(AVCodec* codec);
+    bool                testFormatFlag(int flag) const;
 
-    private:
+private:
 
-        AVCodec*            _codec;
-        AVRational          _time_base;
-        int                 _format_flags;
+    AVCodec*            _codec;
+    AVRational          _time_base;
+    int                 _format_flags;
 
-    };
+};
 
 } // namespace fpp

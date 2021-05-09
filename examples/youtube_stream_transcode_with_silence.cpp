@@ -20,7 +20,7 @@ void youtube_stream_transcode_with_silence() {
     }
 
     /* check input video stream */
-    if (!video_source.stream(fpp::MediaType::Video)) {
+    if (!video_source.stream(fpp::Media::Type::Video)) {
         fpp::static_log_error() << "Youtube require video stream";
         return;
     }
@@ -45,8 +45,8 @@ void youtube_stream_transcode_with_silence() {
     };
 
     /* create output params */
-    const auto in_video_params { video_source.stream(fpp::MediaType::Video)->params };
-    const auto in_audio_params { audio_source.stream(fpp::MediaType::Audio)->params };
+    const auto in_video_params { video_source.stream(fpp::Media::Type::Video)->params };
+    const auto in_audio_params { audio_source.stream(fpp::Media::Type::Audio)->params };
     const auto out_video_params { fpp::utils::make_youtube_video_params() };
     const auto out_audio_params { fpp::utils::make_youtube_audio_params() };
     out_video_params->completeFrom(in_video_params);
@@ -58,11 +58,11 @@ void youtube_stream_transcode_with_silence() {
 
     /* create video codec contexts and rescaler */
     fpp::DecoderContext video_decoder {
-        video_source.stream(fpp::MediaType::Video)->params
+        video_source.stream(fpp::Media::Type::Video)->params
     };
     fpp::RescaleContext rescaler {{
-        video_source.stream(fpp::MediaType::Video)->params
-        , sink.stream(fpp::MediaType::Video)->params
+        video_source.stream(fpp::Media::Type::Video)->params
+        , sink.stream(fpp::Media::Type::Video)->params
     }};
     fpp::Options video_options {
           { "threads",      "1"           }
@@ -73,24 +73,24 @@ void youtube_stream_transcode_with_silence() {
         , { "tune",         "zerolatency" }
     };
     fpp::EncoderContext video_encoder {
-        sink.stream(fpp::MediaType::Video)->params, video_options
+        sink.stream(fpp::Media::Type::Video)->params, video_options
     };
 
     /* because of pcm_u8 anullsrc's codec */
     fpp::DecoderContext audio_decoder {
-        audio_source.stream(fpp::MediaType::Audio)->params
+        audio_source.stream(fpp::Media::Type::Audio)->params
     };
     fpp::ResampleContext resample {{
-        audio_source.stream(fpp::MediaType::Audio)->params
-        , sink.stream(fpp::MediaType::Audio)->params
+          audio_source.stream(fpp::Media::Type::Audio)->params
+        , sink.stream(fpp::Media::Type::Audio)->params
     }};
     fpp::EncoderContext audio_encoder {
-        sink.stream(fpp::MediaType::Audio)->params
+        sink.stream(fpp::Media::Type::Audio)->params
     };
 
     /* because of non zero dshow start stamps
      * and zero lavfi start stamps */
-    video_source.stream(fpp::MediaType::Video)->stampFromZero(true);
+    video_source.stream(fpp::Media::Type::Video)->stampFromZero(true);
 
     /* open sink */
     if (!sink.open()) {
@@ -108,9 +108,7 @@ void youtube_stream_transcode_with_silence() {
         }
     };
 
-    fpp::Packet packet {
-        fpp::MediaType::Unknown
-    };
+    fpp::Packet packet;
     const auto read_packet {
         [&]() {
             if (last_video_dts > last_audio_dts) {

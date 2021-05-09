@@ -3,31 +3,31 @@
 
 namespace fpp {
 
-    class FilterChain : public MediaData {
+class FilterChain : public Media {
 
-    public:
+public:
 
-        explicit FilterChain(MediaType type);
+    explicit FilterChain(Media::Type type);
 
-        void                add(FilterContext ctx);
-        void                add(std::vector<FilterContext> ctx_vector);
-        void                linkFilters();
-        void                linkTo(FilterChain& other);
+    void                add(FilterContext ctx);
+    void                add(std::vector<FilterContext> ctx_vector);
+    void                linkFilters();
+    void                linkTo(FilterChain& other);
 
-        FrameVector         read();
-        void                write(const Frame& frame);
+    FrameVector         read();
+    void                write(const Frame& frame);
 
-    private:
+private:
 
-        FilterContext&      firstFilter();
-        FilterContext&      lastFilter();
+    FilterContext&      firstFilter();
+    FilterContext&      lastFilter();
 
-    private:
+private:
 
-        using Chain = std::vector<FilterContext>;
+    using Chain = std::vector<FilterContext>;
 
-        Chain               _chain;
+    Chain               _chain;
 
-    };
+};
 
 } // namespace fpp

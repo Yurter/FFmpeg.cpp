@@ -33,8 +33,9 @@ private:
     void                closeContext() override;
 
     void                guessOutputFromat();
-    AVOutputFormat*     findOutputFormat(const std::string_view short_name) const;
-    void                writeHeader();
+    AVOutputFormat*     guessFormatByName(const std::string_view short_name) const;
+    AVOutputFormat*     guessFormatByUrl(const std::string_view url) const;
+    void                writeHeader(const Options& options);
     void                writeTrailer();
     void                initStreamsCodecpar();
     void                parseStreamsTimeBase();

@@ -35,7 +35,7 @@ void webcam_to_udp() {
     out_params->setEncoder(AVCodecID::AV_CODEC_ID_H264);
     out_params->setPixelFormat(AVPixelFormat::AV_PIX_FMT_YUV420P);
     out_params->setGopSize(16);
-    const auto in_params { source.stream(fpp::MediaType::Video)->params };
+    const auto in_params { source.stream(fpp::Media::Type::Video)->params };
     out_params->completeFrom(in_params);
 
     /* create stream with predefined params */
@@ -43,7 +43,7 @@ void webcam_to_udp() {
 
     /* create decoder */
     fpp::DecoderContext video_decoder {
-        source.stream(fpp::MediaType::Video)->params
+        source.stream(fpp::Media::Type::Video)->params
     };
 
     /* create encoder's options */
@@ -58,18 +58,18 @@ void webcam_to_udp() {
 
     /* create encoders */
     fpp::EncoderContext video_encoder {
-        sink.stream(fpp::MediaType::Video)->params, video_options
+        sink.stream(fpp::Media::Type::Video)->params, video_options
     };
 
     /* create rescaler (because of pixel format mismatch) */
     fpp::RescaleContext rescaler {{
-        source.stream(fpp::MediaType::Video)->params
-        , sink.stream(fpp::MediaType::Video)->params
+        source.stream(fpp::Media::Type::Video)->params
+        , sink.stream(fpp::Media::Type::Video)->params
     }};
 
     /* create fps filter (because of bug 'vlc and h264 variable framerate') */
     fpp::LinearFilterGraph graph {
-        source.stream(fpp::MediaType::Video)->params
+        source.stream(fpp::Media::Type::Video)->params
         , { "fps=fps=25", "setpts=400000*PTS" }
     };
 
@@ -78,9 +78,7 @@ void webcam_to_udp() {
         return;
     }
 
-    fpp::Packet packet {
-        fpp::MediaType::Unknown
-    };
+    fpp::Packet packet;
     const auto read_packet {
         [&packet,&source]() {
             packet = source.read();

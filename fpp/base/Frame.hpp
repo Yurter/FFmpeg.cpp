@@ -9,43 +9,43 @@ extern "C" {
 
 namespace fpp {
 
-    class Frame : public FFmpegObject<AVFrame>, public MediaData {
+class Frame : public FFmpegObject<AVFrame>, public Media {
 
-    public:
+public:
 
-        explicit Frame(MediaType type = MediaType::Unknown);
-        Frame(const Frame& other);
-        Frame(const AVFrame& frame, MediaType type, AVRational time_base, int stream_index);
-        ~Frame() override;
+    explicit Frame(Media::Type type = Media::Type::Unknown);
+    Frame(const Frame& other);
+    Frame(const AVFrame& frame, Media::Type type, AVRational time_base, int stream_index);
+    ~Frame() override;
 
-        Frame& operator=(const Frame& other);
+    Frame& operator=(const Frame& other);
 
-        std::int64_t        pts() const;
-        void                setPts(std::int64_t pts);
-        void                setTimeBase(AVRational time_base);
-        void                setStreamIndex(int stream_index);
+    std::int64_t        pts() const;
+    void                setPts(std::int64_t pts);
+    void                setTimeBase(AVRational time_base);
+    void                setStreamIndex(int stream_index);
 
-        AVRational          timeBase()  const;
-        int                 streamIndex()  const;
-        bool                keyFrame()  const;
-        int                 nbSamples() const;
+    AVRational          timeBase()  const;
+    int                 streamIndex()  const;
+    bool                keyFrame()  const;
+    int                 nbSamples() const;
 
-        int                 size()      const;
-        std::string         toString()  const override;
+    int                 size()      const;
+    std::string         toString()  const override;
 
-    private:
+private:
 
-        void                ref(const Frame&   other);
-        void                ref(const AVFrame& other, AVRational time_base, int stream_index);
-        void                unref();
+    void                ref(const Frame&   other);
+    void                ref(const AVFrame& other, AVRational time_base, int stream_index);
+    void                unref();
 
-    private:
+private:
 
-        AVRational          _time_base;
-        int                 _stream_index;
+    AVRational          _time_base;
+    int                 _stream_index;
 
-    };
+};
 
-    using FrameVector = std::vector<Frame>;
+using FrameVector = std::vector<Frame>;
 
 } // namespace fpp

@@ -7,41 +7,41 @@ struct AVFilterGraph;
 
 namespace fpp {
 
-    class FilterGraph : public SharedFFmpegObject<AVFilterGraph> {
+class FilterGraph : public SharedFFmpegObject<AVFilterGraph> {
 
-    public:
+public:
 
-        explicit FilterGraph(const Options& options);
+    explicit FilterGraph(const Options& options);
 
-        void                init();
+    void                init();
 
-    protected:
+protected:
 
-        std::string         genUniqueId();
+    std::string         genUniqueId();
 
-        FilterContext       createBufferSource(const SpParameters par);
-        FilterContext       createBufferSink(const SpParameters par);
+    FilterContext       createBufferSource(const SpParameters par);
+    FilterContext       createBufferSink(const SpParameters par);
 
-        std::size_t         emplaceFilterChainBack(FilterChain chain);
-        FilterChain&        chain(std::size_t index);
+    std::size_t         emplaceFilterChainBack(FilterChain chain);
+    FilterChain&        chain(std::size_t index);
 
-        std::pair<const std::string, const std::string>
-        extractNameArgs(const std::string_view filter_descr) const;
+    std::pair<const std::string, const std::string>
+    extractNameArgs(const std::string_view filter_descr) const;
 
-        std::vector<FilterContext> createFilterContexts(const std::vector<std::string>& filters);
+    std::vector<FilterContext> createFilterContexts(const std::vector<std::string>& filters);
 
-    private:
+private:
 
-        std::string         createVideoArgs(const SpParameters par) const;
-        std::string         createAudioArgs(const SpParameters par) const;
+    std::string         createVideoArgs(const SpParameters par) const;
+    std::string         createAudioArgs(const SpParameters par) const;
 
-    private:
+private:
 
-        using FilterChainVector = std::vector<FilterChain>;
+    using FilterChainVector = std::vector<FilterChain>;
 
-        FilterChainVector   _filters;
-        std::size_t         _filter_uid;
+    FilterChainVector   _filters;
+    std::size_t         _filter_uid;
 
-    };
+};
 
 } // namespace fpp

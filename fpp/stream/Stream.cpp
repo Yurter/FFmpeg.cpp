@@ -9,9 +9,9 @@ extern "C" {
 namespace fpp {
 
     // base init (private constructor)
-    Stream::Stream(AVStream* avstream, MediaType type)
+    Stream::Stream(AVStream* avstream, Type type)
         : FFmpegObject(avstream)
-        , MediaData(type)
+        , Media(type)
         , _prev_dts { NOPTS_VALUE }
         , _prev_pts { NOPTS_VALUE }
         , _packet_index { 0 }
@@ -178,7 +178,7 @@ namespace fpp {
     }
 
     bool Stream::addMetadata(const std::string_view key, const std::string_view value, int flags) {
-        ffmpeg_api(av_dict_set, &raw()->metadata, key.data(), value.data(), flags);
+        ffmpeg_api_non_strict(av_dict_set, &raw()->metadata, key.data(), value.data(), flags);
         return true;
     }
 

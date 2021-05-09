@@ -3,23 +3,23 @@
 
 namespace fpp {
 
-    class Object {
+class Object {
 
-    public:
+public:
 
-        Object() = default;
-        virtual ~Object() = default;
+    Object() = default;
+    virtual ~Object() = default;
 
-        std::string         name()      const;
+    std::string         name()      const;
 
-        virtual std::string toString()  const;
+    virtual std::string toString()  const;
 
-    protected:
+protected:
 
-        MessageHandler      log_info()    const;
-        MessageHandler      log_warning() const;
-        MessageHandler      log_error()   const;
+    MessageHandler      log_info()    const;
+    MessageHandler      log_warning() const;
+    MessageHandler      log_error()   const;
 
-    };
+};
 
 } // namespace fpp

@@ -26,7 +26,7 @@ void rtp_video_stream() {
     };
 
     /* copy only video stream to sink */
-    sink.copyStream(source.stream(fpp::MediaType::Video));
+    sink.copyStream(source.stream(fpp::Media::Type::Video));
 
     /* open sink */
     if (!sink.open()) {
@@ -39,9 +39,7 @@ void rtp_video_stream() {
     sdp_file << sink.sdp();
     sdp_file.close();
 
-    fpp::Packet packet {
-        fpp::MediaType::Unknown
-    };
+    fpp::Packet packet;
     const auto read_packet {
         [&packet,&source]() {
             packet = source.read();

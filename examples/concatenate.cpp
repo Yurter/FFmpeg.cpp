@@ -30,9 +30,7 @@ void concatenate() { // TODO doesn't work 15.04
         return;
     }
 
-    fpp::Packet packet {
-        fpp::MediaType::Unknown
-    };
+    fpp::Packet packet;
     const auto read_packet {
         [&packet,&source]() {
             packet = source.read();

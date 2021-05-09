@@ -16,21 +16,21 @@ extern "C" {
 
 namespace fpp {
 
-    std::string utils::to_string(MediaType type) {
+    std::string utils::to_string(Media::Type type) {
         switch (type) {
-        case MediaType::Unknown:
+        case Media::Type::Unknown:
             return "Unknown";
-        case MediaType::Video:
+        case Media::Type::Video:
             return "Video";
-        case MediaType::Audio:
+        case Media::Type::Audio:
             return "Audio";
-        case MediaType::Subtitle:
+        case Media::Type::Subtitle:
             return "Subtitle";
-        case MediaType::Data:
+        case Media::Type::Data:
             return "Data";
-        case MediaType::Attachment:
+        case Media::Type::Attachment:
             return "Attachment";
-        case MediaType::EndOF:
+        case Media::Type::EndOF:
             return "EOF";
         }
         return "Invalid";
@@ -118,20 +118,20 @@ namespace fpp {
         return std::string { buf };
     }
 
-    MediaType utils::to_media_type(AVMediaType type) {
+    Media::Type utils::to_media_type(AVMediaType type) {
         switch (type) {
             case AVMediaType::AVMEDIA_TYPE_VIDEO:
-                return MediaType::Video;
+                return Media::Type::Video;
             case AVMediaType::AVMEDIA_TYPE_AUDIO:
-                return MediaType::Audio;
+                return Media::Type::Audio;
             case AVMediaType::AVMEDIA_TYPE_SUBTITLE:
-                return MediaType::Subtitle;
+                return Media::Type::Subtitle;
             case AVMediaType::AVMEDIA_TYPE_DATA:
-                return MediaType::Data;
+                return Media::Type::Data;
             case AVMediaType::AVMEDIA_TYPE_ATTACHMENT:
-                return MediaType::Attachment;
+                return Media::Type::Attachment;
             case AVMediaType::AVMEDIA_TYPE_UNKNOWN:
-                return MediaType::Unknown;
+                return Media::Type::Unknown;
             default: {
                 throw std::invalid_argument {
                     std::string { __FUNCTION__ } + " failed, bad type "
@@ -141,17 +141,17 @@ namespace fpp {
         }
     }
 
-    AVMediaType utils::from_media_type(MediaType type) {
+    AVMediaType utils::from_media_type(Media::Type type) {
         switch (type) {
-            case MediaType::Video:
+            case Media::Type::Video:
                 return AVMediaType::AVMEDIA_TYPE_VIDEO;
-            case MediaType::Audio:
+            case Media::Type::Audio:
                 return AVMediaType::AVMEDIA_TYPE_AUDIO;
-            case MediaType::Subtitle:
+            case Media::Type::Subtitle:
                 return AVMediaType::AVMEDIA_TYPE_SUBTITLE;
-            case MediaType::Data:
+            case Media::Type::Data:
                 return AVMediaType::AVMEDIA_TYPE_DATA;
-            case MediaType::Attachment:
+            case Media::Type::Attachment:
                 return AVMediaType::AVMEDIA_TYPE_ATTACHMENT;
             default: {
                 throw std::invalid_argument {
@@ -172,7 +172,7 @@ namespace fpp {
                 std::to_string(rational.den);
     }
 
-    std::string utils::ffmpeg_version() { // TODO: fix it - return "N-92657-ga271025215"
+    std::string utils::ffmpeg_version() { // TODO: fix it - return "N-92657-ga271025215", ex.: AV_STRINGIFY(LIBAVUTIL_VERSION)
         return std::string { ::av_version_info() };
     }
 
@@ -230,12 +230,12 @@ namespace fpp {
     }
 
     std::string utils::send_packet_error_to_string(int ret) {
-        if (AVERROR(EAGAIN) == ret) {
+        if (ERROR_AGAIN == ret) {
             return "avcodec_send_packet failed: input is not accepted "
                    "in the current state - user must read output with "
                    "avcodec_receive_frame()";
         }
-        if (AVERROR_EOF == ret) {
+        if (ERROR_EOF == ret) {
             return "avcodec_send_packet failed: the decoder has been "
                    "flushed, and no new packets can be sent to it";
         }
@@ -255,11 +255,11 @@ namespace fpp {
     }
 
     std::string utils::receive_frame_error_to_string(int ret) {
-        if (AVERROR(EAGAIN) == ret) {
+        if (ERROR_AGAIN == ret) {
             return "avcodec_receive_frame failed: output is not available "
                    "in this state - user must try to send new input";
         }
-        if (AVERROR_EOF == ret) {
+        if (ERROR_EOF == ret) {
             return "avcodec_receive_frame failed: the decoder has been fully "
                    "flushed, and there will be no more output frames";
         }
@@ -271,12 +271,12 @@ namespace fpp {
     }
 
     std::string utils::send_frame_error_to_string(int ret) {
-        if (AVERROR(EAGAIN) == ret) {
+        if (ERROR_AGAIN == ret) {
             return "avcodec_send_frame failed: input is not accepted in "
                     "the current state - user must read output "
                     "with avcodec_receive_packet()";
         }
-        if (AVERROR_EOF == ret) {
+        if (ERROR_EOF == ret) {
             return "avcodec_send_frame failed: the encoder has been flushed, "
                    "and no new frames can be sent to it";
         }
@@ -292,15 +292,15 @@ namespace fpp {
     }
 
     std::string utils::receive_packet_error_to_string(int ret) {
-        if (AVERROR(EAGAIN) == ret) {
+        if (ERROR_AGAIN == ret) {
             return "avcodec_receive_packet failed: output is not available "
                    "in the current state - user must try to send input";
         }
-        if (AVERROR_EOF == ret) {
+        if (ERROR_EOF == ret) {
             return "avcodec_receive_packet failed: the encoder has been "
                    "fully flushed, and there will be no more output packets";
         }
-        if (AVERROR(EAGAIN) == ret) {
+        if (ERROR_AGAIN == ret) {
             return "avcodec_receive_packet failed: codec not opened, "
                    "or it is an encoder";
         }
@@ -353,18 +353,18 @@ namespace fpp {
         return result;
     }
 
-    SpParameters utils::make_params(MediaType type) {
+    SpParameters utils::make_params(Media::Type type) {
         switch (type) {
-            case MediaType::Video:
+            case Media::Type::Video:
                 return VideoParameters::make_shared();
-            case MediaType::Audio:
+            case Media::Type::Audio:
                 return AudioParameters::make_shared();
-            case MediaType::Subtitle:
-                return Parameters::make_shared(MediaType::Subtitle);
-            case MediaType::Data:
-                return Parameters::make_shared(MediaType::Data);
-            case MediaType::Attachment:
-                return Parameters::make_shared(MediaType::Attachment);
+            case Media::Type::Subtitle:
+                return Parameters::make_shared(Media::Type::Subtitle);
+            case Media::Type::Data:
+                return Parameters::make_shared(Media::Type::Data);
+            case Media::Type::Attachment:
+                return Parameters::make_shared(Media::Type::Attachment);
             default:
                 throw std::invalid_argument {
                     "make_params failed: invalid media type"
@@ -379,11 +379,11 @@ namespace fpp {
             case AVMediaType::AVMEDIA_TYPE_AUDIO:
                 return AudioParameters::make_shared();
             case AVMediaType::AVMEDIA_TYPE_SUBTITLE:
-                return Parameters::make_shared(MediaType::Subtitle);
+                return Parameters::make_shared(Media::Type::Subtitle);
             case AVMediaType::AVMEDIA_TYPE_DATA:
-                return Parameters::make_shared(MediaType::Data);
+                return Parameters::make_shared(Media::Type::Data);
             case AVMediaType::AVMEDIA_TYPE_ATTACHMENT:
-                return Parameters::make_shared(MediaType::Attachment);
+                return Parameters::make_shared(Media::Type::Attachment);
             default:
                 throw std::invalid_argument {
                     "make_params failed: invalid media type"

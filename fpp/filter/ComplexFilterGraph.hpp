@@ -7,21 +7,21 @@ struct AVFilterGraph;
 
 namespace fpp {
 
-    class ComplexFilterGraph : public FilterGraph {
+class ComplexFilterGraph : public FilterGraph {
 
-    public:
+public:
 
-        explicit ComplexFilterGraph(const Options& options = {});
+    explicit ComplexFilterGraph(const Options& options = {});
 
-        std::size_t         createInputFilterChain (const SpParameters par, const std::vector<std::string>& filters);
-        std::size_t         createOutputFilterChain(const SpParameters par, const std::vector<std::string>& filters);
-        std::size_t         createFilterChain(const SpParameters par, const std::vector<std::string>& filters);
+    std::size_t         createInputFilterChain (const SpParameters par, const std::vector<std::string>& filters);
+    std::size_t         createOutputFilterChain(const SpParameters par, const std::vector<std::string>& filters);
+    std::size_t         createFilterChain(const SpParameters par, const std::vector<std::string>& filters);
 
-        void                link(const std::vector<std::size_t>& in, const std::vector<std::size_t>& out);
+    void                link(const std::vector<std::size_t>& in, const std::vector<std::size_t>& out);
 
-        void                write(const Frame& frame, std::size_t input_chain_index);
-        FrameVector         read(std::size_t output_chain_index);
+    void                write(const Frame& frame, std::size_t input_chain_index);
+    FrameVector         read(std::size_t output_chain_index);
 
-    };
+};
 
 } // namespace fpp

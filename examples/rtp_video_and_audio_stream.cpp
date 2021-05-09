@@ -33,7 +33,7 @@ void rtp_video_and_audio_stream() {
     };
 
     /* copy only video stream to 1st sink */
-    video_sink.copyStream(source.stream(fpp::MediaType::Video));
+    video_sink.copyStream(source.stream(fpp::Media::Type::Video));
 
     /* create audio sink */
     constexpr auto rtp_port_audio  { rtp_port_video + 2 };
@@ -44,10 +44,10 @@ void rtp_video_and_audio_stream() {
     };
 
     /* copy only audio stream to 2nd sink */
-    audio_sink.copyStream(source.stream(fpp::MediaType::Audio));
+    audio_sink.copyStream(source.stream(fpp::Media::Type::Audio));
     /* fix audio stream index
      * (so that the player can distinguish video and audio stream) */
-    audio_sink.stream(fpp::MediaType::Audio)->setIndex(1);
+    audio_sink.stream(fpp::Media::Type::Audio)->setIndex(1);
 
     /* open sinks */
     if (!video_sink.open()) {
@@ -69,9 +69,7 @@ void rtp_video_and_audio_stream() {
     sdp_file << sdp;
     sdp_file.close();
 
-    fpp::Packet packet {
-        fpp::MediaType::Unknown
-    };
+    fpp::Packet packet;
     const auto read_packet {
         [&packet,&source]() {
             packet = source.read();

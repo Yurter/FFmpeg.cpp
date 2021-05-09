@@ -34,13 +34,13 @@ void rtp_video_stream_transcoded() {
     out_params->setPixelFormat(AVPixelFormat::AV_PIX_FMT_YUV420P);
     out_params->setGopSize(12);
     out_params->setTimeBase(DEFAULT_TIME_BASE);
-    out_params->completeFrom(source.stream(fpp::MediaType::Video)->params);
+    out_params->completeFrom(source.stream(fpp::Media::Type::Video)->params);
 
     sink.createStream(out_params);
 
     /* create decoder */
     fpp::DecoderContext video_decoder {
-        source.stream(fpp::MediaType::Video)->params
+        source.stream(fpp::Media::Type::Video)->params
     };
 
     /* create encoder's options */
@@ -55,13 +55,13 @@ void rtp_video_stream_transcoded() {
 
     /* create encoder */
     fpp::EncoderContext video_encoder {
-        sink.stream(fpp::MediaType::Video)->params, video_options
+        sink.stream(fpp::Media::Type::Video)->params, video_options
     };
 
     /* create rescaler */
     fpp::RescaleContext rescaler {{
-        source.stream(fpp::MediaType::Video)->params
-        , sink.stream(fpp::MediaType::Video)->params
+        source.stream(fpp::Media::Type::Video)->params
+        , sink.stream(fpp::Media::Type::Video)->params
     }};
 
     /* open sink */
@@ -75,9 +75,7 @@ void rtp_video_stream_transcoded() {
     sdp_file << sink.sdp();
     sdp_file.close();
 
-    fpp::Packet packet {
-        fpp::MediaType::Unknown
-    };
+    fpp::Packet packet;
     const auto read_video_packet {
         [&packet,&source]() {
             do {

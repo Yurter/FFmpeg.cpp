@@ -25,16 +25,14 @@ void multiple_outputs_sequence() {
         sink.setMediaResourceLocator(file_name);
 
         /* copy source video stream to sink */
-        sink.copyStream(source.stream(fpp::MediaType::Video));
+        sink.copyStream(source.stream(fpp::Media::Type::Video));
 
         /* open sink */
         if (!sink.open()) {
             return;
         }
 
-        fpp::Packet packet {
-            fpp::MediaType::Unknown
-        };
+        fpp::Packet packet;
         auto read_video_packet_n { // read n packets, start from key frame
             [&packet
             ,&source

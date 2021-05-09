@@ -15,10 +15,10 @@ void youtube_stream_copy() {
     }
 
     /* check input streams */
-    if (!source.stream(fpp::MediaType::Video)) {
+    if (!source.stream(fpp::Media::Type::Video)) {
         fpp::static_log_error() << "Youtube require video stream";
     }
-    if (!source.stream(fpp::MediaType::Audio)) {
+    if (!source.stream(fpp::Media::Type::Audio)) {
         fpp::static_log_error() << "Youtube require audio stream";
     }
 
@@ -32,17 +32,15 @@ void youtube_stream_copy() {
     };
 
     /* copy source's streams to sink */
-    sink.copyStream(source.stream(fpp::MediaType::Video));
-    sink.copyStream(source.stream(fpp::MediaType::Audio));
+    sink.copyStream(source.stream(fpp::Media::Type::Video));
+    sink.copyStream(source.stream(fpp::Media::Type::Audio));
 
     /* open sink */
     if (!sink.open()) {
         return;
     }
 
-    fpp::Packet packet {
-        fpp::MediaType::Unknown
-    };
+    fpp::Packet packet;
     const auto read_packet {
         [&packet,&source]() {
             packet = source.read();

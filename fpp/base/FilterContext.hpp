@@ -8,31 +8,31 @@ struct AVFilterGraph;
 
 namespace fpp {
 
-    class FilterContext : public SharedFFmpegObject<AVFilterContext> {
+class FilterContext : public SharedFFmpegObject<AVFilterContext> {
 
-    public:
+public:
 
-        FilterContext(AVFilterGraph* graph
-                      , const std::string_view name
-                      , const std::string_view unique_id
-                      , const std::string_view args
-                      , void* opaque);
+    FilterContext(AVFilterGraph* graph
+                , const std::string_view name
+                , const std::string_view unique_id
+                , const std::string_view args
+                , void* opaque);
 
-        void                linkTo(FilterContext& other);
-        void                setAudioBufferSinkFrameSize(unsigned frame_size);
+    void                linkTo(FilterContext& other);
+    void                setAudioBufferSinkFrameSize(unsigned frame_size);
 
-        FrameVector         read();
-        void                write(const Frame& frame);
+    FrameVector         read();
+    void                write(const Frame& frame);
 
-    private:
+private:
 
-        const AVFilter*     getFilterByName(const std::string_view name) const;
+    const AVFilter*     getFilterByName(const std::string_view name) const;
 
-    private:
+private:
 
-        int                 _nb_input_pads;
-        int                 _nb_output_pads;
+    unsigned            _nb_input_pads;
+    unsigned            _nb_output_pads;
 
-    };
+};
 
 } // namespace fpp

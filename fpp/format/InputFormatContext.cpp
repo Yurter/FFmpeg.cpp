@@ -19,8 +19,8 @@ InputFormatContext::InputFormatContext(InputContext* input_ctx, const std::strin
     setMediaResourceLocator("Custom input buffer");
     createContext();
     raw()->pb = input_ctx->raw();
-//    raw()->flags |= AVFMT_FLAG_CUSTOM_IO;
-//    raw()->flags |= AVFMT_NOFILE; // ?
+    setFlag(AVFMT_FLAG_CUSTOM_IO);
+    setFlag(AVFMT_NOFILE);
 }
 
 InputFormatContext::~InputFormatContext() {
@@ -44,7 +44,7 @@ bool InputFormatContext::seek(int stream_index, std::int64_t timestamp, SeekPrec
             }
         }()
     };
-    ffmpeg_api(av_seek_frame, raw(), stream_index, timestamp, flags);
+    ffmpeg_api_non_strict(av_seek_frame, raw(), stream_index, timestamp, flags);
     log_info() << "Success seek to " << utils::time_to_string(timestamp, DEFAULT_TIME_BASE);
     return true;
 }
@@ -56,7 +56,7 @@ Packet InputFormatContext::read() {
         return packet;
     }
     if (!processPacket(packet)) {
-        return Packet { MediaType::EndOF };
+        return Packet { Media::Type::EndOF };
     }
     return packet;
 }
@@ -84,7 +84,7 @@ bool InputFormatContext::openContext(const Options& options) {
     Dictionary dictionary { options };
     auto fmt_ctx { raw() };
 
-    ffmpeg_api(avformat_open_input
+    ffmpeg_api_non_strict(avformat_open_input
         , &fmt_ctx
         , mediaResourceLocator().data()
         , inputFormat()
@@ -92,7 +92,7 @@ bool InputFormatContext::openContext(const Options& options) {
     );
 
     setInputFormat(raw()->iformat);
-    retrieveStreams();
+    retrieveStreams(options);
     return true;
 }
 
@@ -105,9 +105,10 @@ void InputFormatContext::closeContext() {
     setInputFormat(nullptr);
 }
 
-void InputFormatContext::retrieveStreams() {
+void InputFormatContext::retrieveStreams(const Options& options) {
+    Dictionary dictionary { options };
     if (const auto ret {
-            ::avformat_find_stream_info(raw(), nullptr) // TODO: use options (12.05)
+            ::avformat_find_stream_info(raw(), dictionary.get())
         }; ret < 0 ) {
         throw FFmpegException {
             "Failed to retrieve input stream information"
@@ -155,7 +156,7 @@ Packet InputFormatContext::readFromSource() {
     Packet packet;
     if (const auto ret { ::av_read_frame(raw(), packet.ptr()) }; ret < 0) {
         if (ERROR_EOF == ret) {
-            return Packet { MediaType::EndOF };
+            return Packet { Media::Type::EndOF };
         }
         throw FFmpegException {
             "Cannot read source: " + utils::quoted(mediaResourceLocator()) + std::to_string(ret)
