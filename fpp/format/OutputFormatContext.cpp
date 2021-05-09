@@ -9,13 +9,13 @@ extern "C" {
 namespace fpp {
 
 OutputFormatContext::OutputFormatContext(const std::string_view mrl, const std::string_view format)
-    : _output_format { findOutputFormat(format) } {
+    : _output_format { guessFormatByName(format) } {
     setMediaResourceLocator(mrl);
     createContext();
 }
 
 OutputFormatContext::OutputFormatContext(OutputContext* output_ctx, const std::string_view format)
-    : _output_format { findOutputFormat(format) } {
+    : _output_format { guessFormatByName(format) } {
     setMediaResourceLocator("Custom output buffer");
     createContext();
     raw()->pb = output_ctx->raw();
@@ -160,22 +160,22 @@ void OutputFormatContext::copyStream(const SharedStream other) {
 
 void OutputFormatContext::guessOutputFromat() {
     const auto out_fmt {
-        ::av_guess_format(
-              nullptr                       /* short name */
-            , mediaResourceLocator().data() /* filename   */
-            , nullptr                       /* mime type  */
-        )
+        guessFormatByUrl(mediaResourceLocator())
     };
     if (!out_fmt) {
         throw FFmpegException {
-            "av_guess_format failed"
+            "guessFormatByUrl failed"
         };
     }
     setOutputFormat(out_fmt);
 }
 
-AVOutputFormat* OutputFormatContext::findOutputFormat(const std::string_view short_name) const {
+AVOutputFormat* OutputFormatContext::guessFormatByName(const std::string_view short_name) const {
     return ::av_guess_format(short_name.data(), nullptr, nullptr);
+}
+
+AVOutputFormat* OutputFormatContext::guessFormatByUrl(const std::string_view url) const {
+    return ::av_guess_format(nullptr, url.data(), nullptr);
 }
 
 void OutputFormatContext::writeHeader(const Options& options) {
