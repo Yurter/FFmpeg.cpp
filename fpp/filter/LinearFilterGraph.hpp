@@ -7,14 +7,14 @@ struct AVFilterGraph;
 
 namespace fpp {
 
-    class LinearFilterGraph : public FilterGraph {
+class LinearFilterGraph : public FilterGraph {
 
-    public:
+public:
 
-        LinearFilterGraph(const SpParameters par, const std::vector<std::string>& filters, const Options& options = {});
+    LinearFilterGraph(const SpParameters par, const std::vector<std::string>& filters, const Options& options = {});
 
-        FrameVector         filter(const Frame& frame);
+    FrameVector         filter(const Frame& frame);
 
-    };
+};
 
 } // namespace fpp

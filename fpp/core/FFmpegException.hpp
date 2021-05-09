@@ -4,19 +4,19 @@
 
 namespace fpp {
 
-    class FFmpegException : public std::exception {
+class FFmpegException : public std::exception {
 
-    public:
+public:
 
-        explicit FFmpegException(const std::string& error_message);
+    explicit FFmpegException(const std::string& error_message);
 
-        const char*         what()  const noexcept override;
+    const char*         what()  const noexcept override;
 
-    protected:
+protected:
 
-        const std::string   _error_message;
+    const std::string   _error_message;
 
-    };
+};
 
 } // namespace fpp
 

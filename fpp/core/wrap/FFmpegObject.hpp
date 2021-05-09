@@ -3,26 +3,26 @@
 
 namespace fpp {
 
-    template<typename T>
-    class FFmpegObject : public Object {
+template<typename T>
+class FFmpegObject : public Object {
 
-    public:
+public:
 
-        FFmpegObject(T data = T {})
-            : _object(data) {
-        }
+    FFmpegObject(T data = T {})
+        : _object(data) {
+    }
 
-        void                setRaw(T data) { _object = data; }
+    void                setRaw(T data) { _object = data; }
 
-        T&                  raw()       { return  _object;  }
-        const T&            raw() const { return  _object;  }
-        T*                  ptr()       { return &_object;  }
-        const T*            ptr() const { return &_object;  }
+    T&                  raw()       { return  _object;  }
+    const T&            raw() const { return  _object;  }
+    T*                  ptr()       { return &_object;  }
+    const T*            ptr() const { return &_object;  }
 
-    private:
+private:
 
-        T                   _object;
+    T                   _object;
 
-    };
+};
 
 } // namespace fpp
