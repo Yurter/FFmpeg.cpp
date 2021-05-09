@@ -8,8 +8,8 @@ extern "C" {
 
 namespace fpp {
 
-    Frame::Frame(MediaType type)
-        : MediaData(type)
+    Frame::Frame(Type type)
+        : Media(type)
         , _time_base { DEFAULT_RATIONAL }
         , _stream_index { -1 } {
     }
@@ -19,7 +19,7 @@ namespace fpp {
         ref(other);
     }
 
-    Frame::Frame(const AVFrame& frame, MediaType type, AVRational time_base, int stream_index)
+    Frame::Frame(const AVFrame& frame, Media::Type type, AVRational time_base, int stream_index)
         : Frame(type) {
         ref(frame, time_base, stream_index);
     }

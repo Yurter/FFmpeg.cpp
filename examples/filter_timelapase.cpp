@@ -23,7 +23,7 @@ void timelapase() {
         "timelapse.flv"
     };
 
-    const auto in_params  { source.stream(fpp::MediaType::Video)->params };
+    const auto in_params  { source.stream(fpp::Media::Type::Video)->params };
     const auto out_params { fpp::VideoParameters::make_shared() };
     out_params->setEncoder(AVCodecID::AV_CODEC_ID_H264);
     out_params->setPixelFormat(AVPixelFormat::AV_PIX_FMT_YUV420P);
@@ -35,7 +35,7 @@ void timelapase() {
 
     /* create decoder */
     fpp::DecoderContext video_decoder {
-        source.stream(fpp::MediaType::Video)->params
+        source.stream(fpp::Media::Type::Video)->params
     };
 
     /* create encoder's options */
@@ -50,7 +50,7 @@ void timelapase() {
 
     /* create encoders */
     fpp::EncoderContext video_encoder {
-        sink.stream(fpp::MediaType::Video)->params, video_options
+        sink.stream(fpp::Media::Type::Video)->params, video_options
     };
 
     /* create filter */
@@ -60,14 +60,14 @@ void timelapase() {
         , "setpts=" + std::to_string(1.0 / accel) + "*PTS"
     };
     fpp::LinearFilterGraph filter_graph {
-        source.stream(fpp::MediaType::Video)->params
+        source.stream(fpp::Media::Type::Video)->params
         , filters
     };
 
     /* create rescaler */
     fpp::RescaleContext rescaler {{
-        source.stream(fpp::MediaType::Video)->params
-        , sink.stream(fpp::MediaType::Video)->params
+        source.stream(fpp::Media::Type::Video)->params
+        , sink.stream(fpp::Media::Type::Video)->params
     }};
 
     /* open sink */
@@ -77,11 +77,9 @@ void timelapase() {
 
     /* set read timeout if endless source stream */
     constexpr auto one_minute { 60'000 };
-    source.stream(fpp::MediaType::Video)->setEndTimePoint(one_minute);
+    source.stream(fpp::Media::Type::Video)->setEndTimePoint(one_minute);
 
-    fpp::Packet packet {
-        fpp::MediaType::Unknown
-    };
+    fpp::Packet packet;
     const auto read_video_packet {
         [&]() {
             do {

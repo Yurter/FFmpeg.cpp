@@ -3,23 +3,23 @@
 #include <fpp/core/Utils.hpp>
 
 extern "C" {
-    #include <libavformat/avformat.h>
+#include <libavformat/avformat.h>
 }
 
 constexpr auto not_inited_codec_id { [](auto x) { return x == AVCodecID::AV_CODEC_ID_NONE; } };
 
 namespace fpp {
 
-    Parameters::Parameters(MediaType type)
-        : MediaData(type)
+    Parameters::Parameters(Media::Type type)
+        : Media(type)
         , _codec { nullptr }
         , _time_base { DEFAULT_RATIONAL }
         , _format_flags { 0 } {
         reset();
     }
 
-    Parameters::Parameters(const Parameters& other) :
-        MediaData(other.type()) {
+    Parameters::Parameters(const Parameters& other)
+        : Media(other.type()) {
         ffmpeg_api_strict(avcodec_parameters_copy, ptr(), other.ptr());
         _codec = other.codec();
         _time_base = other.timeBase();

@@ -28,7 +28,7 @@ void rtp_audio_stream() {
     };
 
     /* copy only audio stream to sink */
-    sink.copyStream(source.stream(fpp::MediaType::Audio));
+    sink.copyStream(source.stream(fpp::Media::Type::Audio));
 
     /* open sink */
     if (!sink.open()) {
@@ -41,9 +41,7 @@ void rtp_audio_stream() {
     sdp_file << sink.sdp();
     sdp_file.close();
 
-    fpp::Packet packet {
-        fpp::MediaType::Unknown
-    };
+    fpp::Packet packet;
     const auto read_packet {
         [&packet,&source]() {
             packet = source.read();

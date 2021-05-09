@@ -12,9 +12,9 @@ namespace fpp {
     using SharedStream = std::shared_ptr<Stream>;
     using StreamVector = std::vector<SharedStream>;
 
-    class Stream : public FFmpegObject<AVStream*>, public MediaData {
+    class Stream : public FFmpegObject<AVStream*>, public Media {
 
-        Stream(AVStream* avstream, MediaType type);
+        Stream(AVStream* avstream, Media::Type type);
 
     public:
 

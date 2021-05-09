@@ -26,7 +26,7 @@ void complex() {
 
     /* create output params based on 1st source's params */
     const auto inpar {
-        sources[0].stream(fpp::MediaType::Audio)->params
+        sources[0].stream(fpp::Media::Type::Audio)->params
     };
     const auto outpar {
         fpp::AudioParameters::make_shared()
@@ -35,9 +35,9 @@ void complex() {
 
     /* create codecs */
     std::array<fpp::DecoderContext,N> decoders {
-          fpp::DecoderContext { sources[0].stream(fpp::MediaType::Audio)->params }
-        , fpp::DecoderContext { sources[1].stream(fpp::MediaType::Audio)->params }
-        , fpp::DecoderContext { sources[2].stream(fpp::MediaType::Audio)->params }
+          fpp::DecoderContext { sources[0].stream(fpp::Media::Type::Audio)->params }
+        , fpp::DecoderContext { sources[1].stream(fpp::Media::Type::Audio)->params }
+        , fpp::DecoderContext { sources[2].stream(fpp::Media::Type::Audio)->params }
     };
     fpp::EncoderContext encoder { outpar };
 
@@ -47,9 +47,9 @@ void complex() {
     };
     fpp::ComplexFilterGraph graph { graph_opt };
     const std::array<std::size_t, N> input_chain_index {
-          graph.createInputFilterChain(sources[0].stream(fpp::MediaType::Audio)->params, { "adelay=1000" })
-        , graph.createInputFilterChain(sources[1].stream(fpp::MediaType::Audio)->params, { "adelay=2000", "volume=1" })
-        , graph.createInputFilterChain(sources[2].stream(fpp::MediaType::Audio)->params, { "volume=3" })
+          graph.createInputFilterChain(sources[0].stream(fpp::Media::Type::Audio)->params, { "adelay=1000" })
+        , graph.createInputFilterChain(sources[1].stream(fpp::Media::Type::Audio)->params, { "adelay=2000", "volume=1" })
+        , graph.createInputFilterChain(sources[2].stream(fpp::Media::Type::Audio)->params, { "volume=3" })
     };
     const auto output_chain_index {
         graph.createOutputFilterChain(outpar, { "amix=inputs=3:dropout_transition=0" })

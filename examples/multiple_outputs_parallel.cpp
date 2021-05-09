@@ -22,15 +22,13 @@ void multiple_outputs_parallel() {
     for (std::size_t i { 0 }; i < N; ++i) {
         const auto file_name { std::to_string(i).append(".flv") }; // 0.flv, 1.flv...
         sinks[i].setMediaResourceLocator(file_name);
-        sinks[i].copyStream(source.stream(fpp::MediaType::Video));
+        sinks[i].copyStream(source.stream(fpp::Media::Type::Video));
         if (!sinks[i].open()) {
             return;
         }
     }
 
-    fpp::Packet packet {
-        fpp::MediaType::Unknown
-    };
+    fpp::Packet packet;
     const auto read_packet {
         [&packet,&source]() {
             packet = source.read();

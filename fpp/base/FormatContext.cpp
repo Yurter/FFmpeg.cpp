@@ -173,7 +173,7 @@ SharedStream FormatContext::stream(std::size_t index) {
     return _streams.at(index);
 }
 
-SharedStream FormatContext::stream(MediaType stream_type) {
+SharedStream FormatContext::stream(Media::Type stream_type) {
     for (const auto& stream : _streams) {
         if (stream->params->typeIs(stream_type)) {
             return stream;

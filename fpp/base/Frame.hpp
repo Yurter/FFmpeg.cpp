@@ -9,13 +9,13 @@ extern "C" {
 
 namespace fpp {
 
-    class Frame : public FFmpegObject<AVFrame>, public MediaData {
+    class Frame : public FFmpegObject<AVFrame>, public Media {
 
     public:
 
-        explicit Frame(MediaType type = MediaType::Unknown);
+        explicit Frame(Media::Type type = Media::Type::Unknown);
         Frame(const Frame& other);
-        Frame(const AVFrame& frame, MediaType type, AVRational time_base, int stream_index);
+        Frame(const AVFrame& frame, Media::Type type, AVRational time_base, int stream_index);
         ~Frame() override;
 
         Frame& operator=(const Frame& other);

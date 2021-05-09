@@ -19,7 +19,7 @@ void youtube_stream_copy_with_silence() {
     }
 
     /* check input video stream */
-    if (!video_source.stream(fpp::MediaType::Video)) {
+    if (!video_source.stream(fpp::Media::Type::Video)) {
         fpp::static_log_error() << "Youtube require video stream";
         return;
     }
@@ -44,11 +44,11 @@ void youtube_stream_copy_with_silence() {
     };
 
     /* copy source's video stream to sink */
-    sink.copyStream(video_source.stream(fpp::MediaType::Video));
+    sink.copyStream(video_source.stream(fpp::Media::Type::Video));
 
     /* create output audio params from anullsrc's */
     const auto in_audio_params {
-        audio_source.stream(fpp::MediaType::Audio)->params
+        audio_source.stream(fpp::Media::Type::Audio)->params
     };
     const auto out_audio_params {
         fpp::utils::make_youtube_audio_params()
@@ -60,14 +60,14 @@ void youtube_stream_copy_with_silence() {
 
     /* because of pcm_u8 anullsrc's codec */
     fpp::DecoderContext audio_decoder {
-        audio_source.stream(fpp::MediaType::Audio)->params
+        audio_source.stream(fpp::Media::Type::Audio)->params
     };
     fpp::ResampleContext resample {{
-        audio_source.stream(fpp::MediaType::Audio)->params
-        , sink.stream(fpp::MediaType::Audio)->params
+          audio_source.stream(fpp::Media::Type::Audio)->params
+        , sink.stream(fpp::Media::Type::Audio)->params
     }};
     fpp::EncoderContext audio_encoder {
-        sink.stream(fpp::MediaType::Audio)->params
+        sink.stream(fpp::Media::Type::Audio)->params
     };
 
     /* open sink */
@@ -86,9 +86,7 @@ void youtube_stream_copy_with_silence() {
         }
     };
 
-    fpp::Packet packet {
-        fpp::MediaType::Unknown
-    };
+    fpp::Packet packet;
     const auto read_packet {
         [&]() {
             if (last_video_dts > last_audio_dts) {

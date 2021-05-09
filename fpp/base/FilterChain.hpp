@@ -3,11 +3,11 @@
 
 namespace fpp {
 
-    class FilterChain : public MediaData {
+    class FilterChain : public Media {
 
     public:
 
-        explicit FilterChain(MediaType type);
+        explicit FilterChain(Media::Type type);
 
         void                add(FilterContext ctx);
         void                add(std::vector<FilterContext> ctx_vector);

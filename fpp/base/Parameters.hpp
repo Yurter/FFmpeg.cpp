@@ -20,11 +20,11 @@ namespace fpp {
     using InOutParams = struct InOutParams { SpParameters in; SpParameters out; };
     using Extradata = std::pair<std::uint8_t*,std::size_t>;
 
-    class Parameters : public FFmpegObject<AVCodecParameters>, public MediaData {
+    class Parameters : public FFmpegObject<AVCodecParameters>, public Media {
 
     public:
 
-        explicit Parameters(MediaType type);
+        explicit Parameters(Media::Type type);
         Parameters(const Parameters& other);
         Parameters& operator=(const Parameters& other);
 
@@ -59,7 +59,7 @@ namespace fpp {
         virtual void        initCodecContext(AVCodecContext* codec_context) const;
         virtual void        parseCodecContext(const AVCodecContext* codec_context);
 
-        static SpParameters make_shared(MediaType media_type) {
+        static SpParameters make_shared(Media::Type media_type) {
             return std::make_shared<Parameters>(media_type);
         }
 

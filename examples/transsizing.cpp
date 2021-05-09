@@ -22,7 +22,7 @@ void transsizing() {
         "transsized.flv"
     };
 
-    const auto in_params  { source.stream(fpp::MediaType::Video)->params };
+    const auto in_params  { source.stream(fpp::Media::Type::Video)->params };
     const auto out_params { fpp::VideoParameters::make_shared()          };
 
     /* resizing to 426x240 */
@@ -35,7 +35,7 @@ void transsizing() {
 
     /* create decoder */
     fpp::DecoderContext video_decoder {
-        source.stream(fpp::MediaType::Video)->params
+        source.stream(fpp::Media::Type::Video)->params
     };
 
     /* create encoder's options */
@@ -50,13 +50,13 @@ void transsizing() {
 
     /* create encoders */
     fpp::EncoderContext video_encoder {
-        sink.stream(fpp::MediaType::Video)->params, video_options
+        sink.stream(fpp::Media::Type::Video)->params, video_options
     };
 
     /* create rescaler (because of pixel format mismatch) */
     fpp::RescaleContext rescaler {{
-        source.stream(fpp::MediaType::Video)->params
-        , sink.stream(fpp::MediaType::Video)->params
+        source.stream(fpp::Media::Type::Video)->params
+        , sink.stream(fpp::Media::Type::Video)->params
     }};
 
     /* open sink */
@@ -64,9 +64,7 @@ void transsizing() {
         return;
     }
 
-    fpp::Packet packet {
-        fpp::MediaType::Unknown
-    };
+    fpp::Packet packet;
     const auto read_packet {
         [&packet,&source]() {
             packet = source.read();

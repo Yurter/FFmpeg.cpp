@@ -2,8 +2,8 @@
 
 namespace fpp {
 
-    FilterChain::FilterChain(fpp::MediaType type)
-        : MediaData(type) {
+    FilterChain::FilterChain(Type type)
+        : Media(type) {
     }
 
     void FilterChain::add(FilterContext ctx) {

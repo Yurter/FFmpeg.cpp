@@ -36,7 +36,7 @@ public:
     StreamVector        streams();
     const StreamVector  streams() const;
     SharedStream        stream(std::size_t index);
-    SharedStream        stream(MediaType stream_type);
+    SharedStream        stream(Media::Type stream_type);
 
     void                setTimeout(TimeoutProcess process, Timeout timout);
     Timeout             getTimeout(TimeoutProcess process) const;

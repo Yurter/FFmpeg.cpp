@@ -56,7 +56,7 @@ Packet InputFormatContext::read() {
         return packet;
     }
     if (!processPacket(packet)) {
-        return Packet { MediaType::EndOF };
+        return Packet { Media::Type::EndOF };
     }
     return packet;
 }
@@ -156,7 +156,7 @@ Packet InputFormatContext::readFromSource() {
     Packet packet;
     if (const auto ret { ::av_read_frame(raw(), packet.ptr()) }; ret < 0) {
         if (ERROR_EOF == ret) {
-            return Packet { MediaType::EndOF };
+            return Packet { Media::Type::EndOF };
         }
         throw FFmpegException {
             "Cannot read source: " + utils::quoted(mediaResourceLocator()) + std::to_string(ret)

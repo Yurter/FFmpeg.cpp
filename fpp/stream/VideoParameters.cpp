@@ -11,7 +11,7 @@ constexpr auto not_inited_pix_fmt   { [](auto x) { return x == DEFAULT_PIXEL_FOR
 namespace fpp {
 
     VideoParameters::VideoParameters()
-        : Parameters(MediaType::Video)
+        : Parameters(Media::Type::Video)
         , _gop_size { 0 }
         , _frame_rate { DEFAULT_RATIONAL } {
     }

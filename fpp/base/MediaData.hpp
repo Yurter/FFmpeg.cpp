@@ -3,37 +3,37 @@
 
 namespace fpp {
 
-    enum class MediaType : std::uint8_t {
-        Unknown,
-        Video,
-        Audio,
-        Data,       ///< Opaque data information usually continuous
-        Subtitle,
-        Attachment, ///< Opaque data information usually sparse
-        EndOF,
+class Media {
+
+public:
+
+    enum class Type : std::uint8_t {
+          Unknown
+        , Video
+        , Audio
+        , Data       ///< Opaque data information usually continuous
+        , Subtitle
+        , Attachment ///< Opaque data information usually sparse
+        , EndOF
     };
 
-    class MediaData { // TODO: rename class (remove 'Data' from name) (10.05)
+    explicit Media(Type type)
+        : _type { type }
+    {}
 
-    public:
+    Type                type() const { return _type; }
+    void                setType(Type type) { _type = type; }
 
-        explicit MediaData(MediaType type)
-            : _type { type } {
-        }
+    bool                isVideo() const { return typeIs(Type::Video); }
+    bool                isAudio() const { return typeIs(Type::Audio); }
+    bool                isEOF()   const { return typeIs(Type::EndOF); }
 
-        MediaType           type() const { return _type; }
-        void                setType(MediaType type) { _type = type; }
+    bool                typeIs(Type media_type) const { return _type == media_type; }
 
-        bool                isVideo() const { return _type == MediaType::Video; }
-        bool                isAudio() const { return _type == MediaType::Audio; }
-        bool                isEOF()   const { return _type == MediaType::EndOF; }
+private:
 
-        bool                typeIs(MediaType media_type) const { return _type == media_type; }
+    Type                _type;
 
-    private:
-
-        MediaType           _type;
-
-    };
+};
 
 } // namespace fpp

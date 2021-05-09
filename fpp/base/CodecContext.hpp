@@ -7,7 +7,7 @@ struct AVCodecContext;
 
 namespace fpp {
 
-    class CodecContext : public SharedFFmpegObject<AVCodecContext>, public MediaData {
+    class CodecContext : public SharedFFmpegObject<AVCodecContext>, public Media {
 
     public:
 

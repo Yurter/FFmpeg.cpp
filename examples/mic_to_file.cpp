@@ -23,7 +23,7 @@ void mic_to_file() {
     };
 
     /* create stream with predefined params */
-    const auto in_params  { source.stream(fpp::MediaType::Audio)->params };
+    const auto in_params  { source.stream(fpp::Media::Type::Audio)->params };
     const auto out_params { fpp::AudioParameters::make_shared() };
     out_params->setEncoder(AVCodecID::AV_CODEC_ID_AAC);
     out_params->setSampleFormat(AV_SAMPLE_FMT_FLTP);
@@ -38,18 +38,18 @@ void mic_to_file() {
 
     /* create decoder */
     fpp::DecoderContext audio_decoder {
-        source.stream(fpp::MediaType::Audio)->params
+        source.stream(fpp::Media::Type::Audio)->params
     };
 
     /* create encoder */
     fpp::EncoderContext audio_encoder {
-        sink.stream(fpp::MediaType::Video)->params
+        sink.stream(fpp::Media::Type::Video)->params
     };
 
     /* create rescaler (because of pixel format mismatch) */
     fpp::ResampleContext resampler {{
-        source.stream(fpp::MediaType::Audio)->params
-        , sink.stream(fpp::MediaType::Audio)->params
+        source.stream(fpp::Media::Type::Audio)->params
+        , sink.stream(fpp::Media::Type::Audio)->params
     }};
 
     /* open sink */
@@ -57,9 +57,7 @@ void mic_to_file() {
         return;
     }
 
-    fpp::Packet packet {
-        fpp::MediaType::Unknown
-    };
+    fpp::Packet packet;
     const auto read_packet {
         [&packet,&source]() {
             packet = source.read();

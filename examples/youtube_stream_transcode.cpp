@@ -20,19 +20,19 @@ void youtube_stream_transcode() {
     }
 
     /* check input streams */
-    if (!source.stream(fpp::MediaType::Video)) {
+    if (!source.stream(fpp::Media::Type::Video)) {
         fpp::static_log_error() << "Youtube require video stream";
     }
-    if (!source.stream(fpp::MediaType::Audio)) {
+    if (!source.stream(fpp::Media::Type::Audio)) {
         fpp::static_log_error() << "Youtube require audio stream";
     }
 
     /* get input parameters */
     const auto in_video_params {
-        source.stream(fpp::MediaType::Video)->params
+        source.stream(fpp::Media::Type::Video)->params
     };
     const auto in_audio_params {
-        source.stream(fpp::MediaType::Audio)->params
+        source.stream(fpp::Media::Type::Audio)->params
     };
 
     /* create sink */
@@ -54,10 +54,10 @@ void youtube_stream_transcode() {
 
     /* create decoders */
     fpp::DecoderContext video_decoder {
-        source.stream(fpp::MediaType::Video)->params
+        source.stream(fpp::Media::Type::Video)->params
     };
     fpp::DecoderContext audio_decoder {
-        source.stream(fpp::MediaType::Audio)->params
+        source.stream(fpp::Media::Type::Audio)->params
     };
 
     /* create encoder's options */
@@ -72,22 +72,22 @@ void youtube_stream_transcode() {
 
     /* create encoders */
     fpp::EncoderContext video_encoder {
-        sink.stream(fpp::MediaType::Video)->params, video_options
+        sink.stream(fpp::Media::Type::Video)->params, video_options
     };
     fpp::EncoderContext audio_encoder {
-        sink.stream(fpp::MediaType::Audio)->params
+        sink.stream(fpp::Media::Type::Audio)->params
     };
 
     /* create rescaler */
     fpp::RescaleContext rescaler {{
-        source.stream(fpp::MediaType::Video)->params
-        , sink.stream(fpp::MediaType::Video)->params
+        source.stream(fpp::Media::Type::Video)->params
+        , sink.stream(fpp::Media::Type::Video)->params
     }};
 
     /* create resampler */
     fpp::ResampleContext resample {{
-        source.stream(fpp::MediaType::Audio)->params
-        , sink.stream(fpp::MediaType::Audio)->params
+        source.stream(fpp::Media::Type::Audio)->params
+        , sink.stream(fpp::Media::Type::Audio)->params
     }};
 
     /* open sink */
@@ -95,9 +95,7 @@ void youtube_stream_transcode() {
         return;
     }
 
-    fpp::Packet packet {
-        fpp::MediaType::Unknown
-    };
+    fpp::Packet packet;
     const auto read_packet {
         [&packet,&source]() {
             packet = source.read();

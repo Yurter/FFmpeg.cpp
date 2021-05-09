@@ -9,13 +9,13 @@ extern "C" {
 
 namespace fpp {
 
-    class Packet : public FFmpegObject<AVPacket>, public MediaData {
+    class Packet : public FFmpegObject<AVPacket>, public Media {
 
     public:
 
-        explicit Packet(MediaType type = MediaType::Unknown);
+        explicit Packet(Media::Type type = Media::Type::Unknown);
         Packet(const Packet& other);
-        Packet(const AVPacket& avpacket, AVRational time_base, MediaType type);
+        Packet(const AVPacket& avpacket, AVRational time_base, Type type);
         ~Packet() override;
 
         Packet& operator=(const Packet& other);

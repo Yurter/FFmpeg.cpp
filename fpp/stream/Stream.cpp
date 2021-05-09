@@ -9,9 +9,9 @@ extern "C" {
 namespace fpp {
 
     // base init (private constructor)
-    Stream::Stream(AVStream* avstream, MediaType type)
+    Stream::Stream(AVStream* avstream, Type type)
         : FFmpegObject(avstream)
-        , MediaData(type)
+        , Media(type)
         , _prev_dts { NOPTS_VALUE }
         , _prev_pts { NOPTS_VALUE }
         , _packet_index { 0 }

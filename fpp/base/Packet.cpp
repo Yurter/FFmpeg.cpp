@@ -4,8 +4,8 @@
 
 namespace fpp {
 
-    Packet::Packet(MediaType type)
-        : MediaData(type)
+    Packet::Packet(Type type)
+        : Media(type)
         , _time_base { DEFAULT_RATIONAL } {
     }
 
@@ -14,7 +14,7 @@ namespace fpp {
         ref(other);
     }
 
-    Packet::Packet(const AVPacket& avpacket, AVRational time_base, MediaType type)
+    Packet::Packet(const AVPacket& avpacket, AVRational time_base, Media::Type type)
         : Packet(type) {
         ref(avpacket, time_base);
     }

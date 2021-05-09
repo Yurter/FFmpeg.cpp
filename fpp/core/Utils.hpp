@@ -32,13 +32,13 @@ namespace fpp {
         static std::string  to_string(AVSampleFormat value);
         static std::string  to_string(AVPixelFormat pxl_fmt);
         static std::string  to_string(bool value);
-        static std::string  to_string(MediaType type);
+        static std::string  to_string(Media::Type type);
         static std::string  pts_to_string(std::int64_t pts);
         static std::string  time_to_string(std::int64_t time_stamp, AVRational time_base);
         static std::string  channel_layout_to_string(int nb_channels, std::uint64_t channel_layout);
 
-        static MediaType    to_media_type(AVMediaType type);
-        static AVMediaType  from_media_type(MediaType type);
+        static Media::Type    to_media_type(AVMediaType type);
+        static AVMediaType  from_media_type(Media::Type type);
 
         static std::string  quoted(const std::string_view str, char delim = '"');
 
@@ -64,7 +64,7 @@ namespace fpp {
         static std::string  receive_packet_error_to_string(int ret);
         static std::string  swr_convert_frame_error_to_string(int ret);
 
-        static SpParameters make_params(MediaType type);
+        static SpParameters make_params(Media::Type type);
         static SpParameters make_params(AVMediaType type);
         static SpParameters make_youtube_video_params();
         static SpParameters make_youtube_audio_params();
@@ -100,7 +100,7 @@ namespace fpp {
         return os;
     }
 
-    inline std::ostream& operator<<(std::ostream& os, const MediaType type) {
+    inline std::ostream& operator<<(std::ostream& os, const Media::Type type) {
         os << utils::to_string(type);
         return os;
     }

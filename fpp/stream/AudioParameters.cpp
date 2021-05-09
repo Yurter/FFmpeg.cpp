@@ -13,8 +13,8 @@ constexpr auto not_inited_ch_layout  { [](auto x) { return x == DEFAULT_CHANEL_L
 namespace fpp {
 
     AudioParameters::AudioParameters()
-        : Parameters(MediaType::Audio) {
-    }
+        : Parameters(Media::Type::Audio)
+    {}
 
     void AudioParameters::setSampleRate(int sample_rate) {
         raw().sample_rate = sample_rate;
