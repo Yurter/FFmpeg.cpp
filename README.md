@@ -15,35 +15,35 @@ FFmpeg.cpp is a C++ wrapper for FFmpeg libraries
     fpp::OutputFormatContext sink {
         "filename.flv"
     };
-    sink.copyStream(source.stream(fpp::MediaType::Video));
+    sink.copyStream(source.stream(fpp::Media::Type::Video));
     if (!sink.open()) {
         return;
     }
     sink.write(packet);
 #### Decoding
     fpp::DecoderContext video_decoder {
-        source.stream(fpp::MediaType::Video)->params
+        source.stream(fpp::Media::Type::Video)->params
     };
     for (const auto& frame : video_decoder.decode(packet)) {
         ...
     }
 #### Encoding
     fpp::EncoderContext video_encoder {
-        sink.stream(fpp::MediaType::Video)->params
+        sink.stream(fpp::Media::Type::Video)->params
     };
     for (const auto& packet : video_encoder.encode(frame)) {
         ...
     }
 #### Rescaling
     fpp::RescaleContext rescaler {{
-        source.stream(fpp::MediaType::Video)->params
-        , sink.stream(fpp::MediaType::Video)->params
+        source.stream(fpp::Media::Type::Video)->params
+        , sink.stream(fpp::Media::Type::Video)->params
     }};
     const auto r_frame { rescaler.scale(frame) };
 #### Resampling
     fpp::ResampleContext resample {{
-        source.stream(fpp::MediaType::Audio)->params
-        , sink.stream(fpp::MediaType::Audio)->params
+        source.stream(fpp::Media::Type::Audio)->params
+        , sink.stream(fpp::Media::Type::Audio)->params
     }};
     for (const auto& r_frame : resample.resample(frame)) {
         ...
@@ -51,11 +51,11 @@ FFmpeg.cpp is a C++ wrapper for FFmpeg libraries
 #### Linear filter
     // Timelapse filter (speed x3):
     const std::vector<std::string> filters {
-        "select='not(mod(n,3))'"
+          "select='not(mod(n,3))'"
         , "setpts=0.333*PTS"
     };
     fpp::LinearFilterGraph filter_graph {
-        source.stream(fpp::MediaType::Video)->params
+          source.stream(fpp::Media::Type::Video)->params
         , filters
     };
     for (const auto& f_frame : filter_graph.filter(v_frame)) {
