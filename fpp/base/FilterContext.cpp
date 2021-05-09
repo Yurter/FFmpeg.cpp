@@ -1,5 +1,6 @@
 #include "FilterContext.hpp"
 #include <fpp/core/FFmpegException.hpp>
+#include <fpp/core/Utils.hpp>
 
 extern "C" {
     #include <libavfilter/buffersink.h>
@@ -51,8 +52,8 @@ namespace fpp {
         while (ret == 0) {
             Frame output_frame { MediaType::Unknown };
             ret = ::av_buffersink_get_frame(raw(), output_frame.ptr());
-            if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
-                break;
+            if ((ERROR_AGAIN == ret) || (ERROR_EOF == ret)) {
+                break; /* not an error - just an exit code */
             }
             if (ret < 0) {
                 throw FFmpegException { "av_buffersink_get_frame failed" };

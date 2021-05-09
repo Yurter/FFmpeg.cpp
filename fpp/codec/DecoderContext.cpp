@@ -45,9 +45,9 @@ namespace fpp {
         while (ret == 0) {
             Frame output_frame { params->type() };
             ret = ::avcodec_receive_frame(raw(), output_frame.ptr());
-            if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF)
-                /* Не ошибка */
-                break;
+            if ((ERROR_AGAIN == ret) || (ERROR_EOF == ret)) {
+                break; /* not an error - just an exit code */
+            }
             if (ret < 0) {
                 throw FFmpegException {
                     utils::receive_frame_error_to_string(ret)

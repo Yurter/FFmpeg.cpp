@@ -47,8 +47,8 @@ namespace fpp {
         while (0 == ret) {
             Packet packet { params->type() };
             ret = ::avcodec_receive_packet(raw(), packet.ptr());
-            if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
-                break;
+            if ((ERROR_AGAIN == ret) || (ERROR_EOF == ret)) {
+                break; /* not an error - just an exit code */
             }
             if (ret < 0) {
                 throw FFmpegException {

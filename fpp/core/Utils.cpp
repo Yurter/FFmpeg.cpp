@@ -230,12 +230,12 @@ namespace fpp {
     }
 
     std::string utils::send_packet_error_to_string(int ret) {
-        if (AVERROR(EAGAIN) == ret) {
+        if (ERROR_AGAIN == ret) {
             return "avcodec_send_packet failed: input is not accepted "
                    "in the current state - user must read output with "
                    "avcodec_receive_frame()";
         }
-        if (AVERROR_EOF == ret) {
+        if (ERROR_EOF == ret) {
             return "avcodec_send_packet failed: the decoder has been "
                    "flushed, and no new packets can be sent to it";
         }
@@ -255,11 +255,11 @@ namespace fpp {
     }
 
     std::string utils::receive_frame_error_to_string(int ret) {
-        if (AVERROR(EAGAIN) == ret) {
+        if (ERROR_AGAIN == ret) {
             return "avcodec_receive_frame failed: output is not available "
                    "in this state - user must try to send new input";
         }
-        if (AVERROR_EOF == ret) {
+        if (ERROR_EOF == ret) {
             return "avcodec_receive_frame failed: the decoder has been fully "
                    "flushed, and there will be no more output frames";
         }
@@ -271,12 +271,12 @@ namespace fpp {
     }
 
     std::string utils::send_frame_error_to_string(int ret) {
-        if (AVERROR(EAGAIN) == ret) {
+        if (ERROR_AGAIN == ret) {
             return "avcodec_send_frame failed: input is not accepted in "
                     "the current state - user must read output "
                     "with avcodec_receive_packet()";
         }
-        if (AVERROR_EOF == ret) {
+        if (ERROR_EOF == ret) {
             return "avcodec_send_frame failed: the encoder has been flushed, "
                    "and no new frames can be sent to it";
         }
@@ -292,15 +292,15 @@ namespace fpp {
     }
 
     std::string utils::receive_packet_error_to_string(int ret) {
-        if (AVERROR(EAGAIN) == ret) {
+        if (ERROR_AGAIN == ret) {
             return "avcodec_receive_packet failed: output is not available "
                    "in the current state - user must try to send input";
         }
-        if (AVERROR_EOF == ret) {
+        if (ERROR_EOF == ret) {
             return "avcodec_receive_packet failed: the encoder has been "
                    "fully flushed, and there will be no more output packets";
         }
-        if (AVERROR(EAGAIN) == ret) {
+        if (ERROR_AGAIN == ret) {
             return "avcodec_receive_packet failed: codec not opened, "
                    "or it is an encoder";
         }
