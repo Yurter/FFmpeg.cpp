@@ -3,8 +3,8 @@
 #include <fpp/core/Utils.hpp>
 
 extern "C" {
-    #include <libavfilter/buffersink.h>
-    #include <libavfilter/buffersrc.h>
+#include <libavfilter/buffersrc.h>
+#include <libavfilter/buffersink.h>
 }
 
 namespace fpp {
@@ -50,7 +50,7 @@ FrameVector FilterContext::read() {
     FrameVector filtered_frames;
     auto ret { 0 };
     while (ret == 0) {
-        Frame output_frame { MediaType::Unknown };
+        Frame output_frame;
         ret = ::av_buffersink_get_frame(raw(), output_frame.ptr());
         if ((ERROR_AGAIN == ret) || (ERROR_EOF == ret)) {
             break; /* not an error - just an exit code */

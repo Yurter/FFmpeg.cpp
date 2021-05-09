@@ -30,8 +30,8 @@ private:
 
 private:
 
-    int                 _nb_input_pads;
-    int                 _nb_output_pads;
+    unsigned            _nb_input_pads;
+    unsigned            _nb_output_pads;
 
 };
 
