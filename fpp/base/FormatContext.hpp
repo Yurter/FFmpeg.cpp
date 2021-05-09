@@ -4,6 +4,7 @@
 #include <fpp/base/Dictionary.hpp>
 #include <fpp/stream/Stream.hpp>
 #include <array>
+#include <chrono>
 
 struct AVFormatContext;
 struct AVOutputFormat;
@@ -12,17 +13,19 @@ struct AVStream;
 
 namespace fpp {
 
-    enum class TimeoutProcess {
-          Opening
-        , Closing
-        , Reading
-        , Writing
-        , EnumSize
-    };
-
     class FormatContext : public SharedFFmpegObject<AVFormatContext> {
 
     public:
+
+        using Timeout = std::chrono::milliseconds;
+
+        enum class TimeoutProcess {
+              Opening
+            , Closing
+            , Reading
+            , Writing
+            , EnumSize
+        };
 
         FormatContext();
 
@@ -35,8 +38,8 @@ namespace fpp {
         SharedStream        stream(std::size_t index);
         SharedStream        stream(MediaType stream_type);
 
-        void                setTimeout(TimeoutProcess process, std::int64_t ms);
-        std::int64_t        getTimeout(TimeoutProcess process) const;
+        void                setTimeout(TimeoutProcess process, Timeout timout);
+        Timeout             getTimeout(TimeoutProcess process) const;
 
         bool                open(const Options& options = {});
         bool                open(const std::string_view mrl, Options options = {});
@@ -51,24 +54,30 @@ namespace fpp {
 
     protected:
 
-        struct Interrupter {
+        class Interrupter {
 
-            Chronometer     chronometer;
-            std::int64_t    timeout_ms { 0 }; // TODO: use chrono
+            Chronometer     _chronometer;
+            Timeout         _timeout;
+
+        public:
 
             bool isTimeout() const {
-                return chronometer.elapsed_milliseconds() > timeout_ms;
+                return _chronometer.elapsed_milliseconds() > _timeout;
             }
 
-            void set(std::int64_t timeout) {
-                timeout_ms = timeout;
-                chronometer.reset();
+            Timeout timeout() const {
+                return _timeout;
+            }
+
+            void reset(const Timeout& timeout) {
+                _timeout = timeout;
+                _chronometer.reset();
             }
 
         };
 
         void                setInterruptCallback(AVFormatContext* ctx);
-        void                setInterruptTimeout(std::int64_t timeout_ms);
+        void                setInterruptTimeout(std::chrono::milliseconds timeout);
 
         virtual void        createContext();
         virtual bool        openContext(const Options& options) = 0;
@@ -94,7 +103,7 @@ namespace fpp {
         bool                _opened;
         StreamVector        _streams;
 
-        using TimeoutsArray = std::array<std::int64_t,std::size_t(TimeoutProcess::EnumSize)>;
+        using TimeoutsArray = std::array<Timeout,std::size_t(TimeoutProcess::EnumSize)>;
         TimeoutsArray       _timeouts;
         Interrupter         _interrupter;
 

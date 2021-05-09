@@ -9,20 +9,20 @@ extern "C" {
 
 namespace fpp {
 
-    constexpr auto default_opening_timeout_ms { 20'000 }; // TODO: use chrono
-    constexpr auto default_closing_timeout_ms { 5'000  };
-    constexpr auto default_reading_timeout_ms { 5'000  };
-    constexpr auto default_writing_timeout_ms { 1'000  };
+    constexpr FormatContext::Timeout default_opening_timeout { 20'000 };
+    constexpr FormatContext::Timeout default_closing_timeout { 5'000  };
+    constexpr FormatContext::Timeout default_reading_timeout { 5'000  };
+    constexpr FormatContext::Timeout default_writing_timeout { 1'000  };
 
     FormatContext::FormatContext()
         : _opened { false }
         , _timeouts {
-              default_opening_timeout_ms
-            , default_closing_timeout_ms
-            , default_reading_timeout_ms
-            , default_writing_timeout_ms
-        } {
-    }
+              default_opening_timeout
+            , default_closing_timeout
+            , default_reading_timeout
+            , default_writing_timeout
+        }
+    {}
 
     void FormatContext::close() {
         if (closed()) {
@@ -85,8 +85,8 @@ namespace fpp {
         ctx->interrupt_callback.opaque   = &_interrupter;
     }
 
-    void FormatContext::setInterruptTimeout(std::int64_t timeout_ms) {
-        _interrupter.set(timeout_ms);
+    void FormatContext::setInterruptTimeout(Timeout timeout) {
+        _interrupter.reset(timeout);
     }
 
     void FormatContext::createContext() {
@@ -113,7 +113,7 @@ namespace fpp {
         if (interrupter->isTimeout()) {
             static_log_error()
                 << "interrupt_callback: "
-                << "Timed out: " << interrupter->timeout_ms;
+                << "Timed out: " << interrupter->timeout().count() << " ms";
             return FAIL;
         }
         return OK;
@@ -155,11 +155,11 @@ namespace fpp {
         return _streams;
     }
 
-    void FormatContext::setTimeout(TimeoutProcess process, std::int64_t ms) {
-        _timeouts[std::size_t(process)] = ms;
+    void FormatContext::setTimeout(TimeoutProcess process, Timeout timout) {
+        _timeouts[std::size_t(process)] = timout;
     }
 
-    std::int64_t FormatContext::getTimeout(TimeoutProcess process) const {
+    FormatContext::Timeout FormatContext::getTimeout(TimeoutProcess process) const {
         return _timeouts[std::size_t(process)];
     }
 
