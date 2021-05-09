@@ -19,7 +19,7 @@ InputFormatContext::InputFormatContext(InputContext* input_ctx, const std::strin
     setMediaResourceLocator("Custom input buffer");
     createContext();
     raw()->pb = input_ctx->raw();
-//    raw()->flags |= AVFMT_FLAG_CUSTOM_IO;
+//    raw()->flags |= AVFMT_FLAG_CUSTOM_IO; // TODO
 //    raw()->flags |= AVFMT_NOFILE; // ?
 }
 
