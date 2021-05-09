@@ -22,9 +22,6 @@ namespace fpp {
 
 #define CODE_POS std::string { __FUNCTION__ } + "():" + std::to_string(__LINE__) + " "
 
-//#define ffmpeg_api(foo,...)                                 \
-//    foo(__VA_ARGS__)                                        \
-
 #define ffmpeg_api_non_strict(foo,...)                      \
     do {                                                    \
         if (const auto ret { foo(__VA_ARGS__) }; ret < 0) { \
