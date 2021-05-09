@@ -127,7 +127,7 @@ bool OutputFormatContext::openContext(const Options& options) {
             return false;
         }
     }
-    writeHeader();
+    writeHeader(options);
     parseStreamsTimeBase();
     setOutputFormat(raw()->oformat);
     return true;
@@ -161,9 +161,9 @@ void OutputFormatContext::copyStream(const SharedStream other) {
 void OutputFormatContext::guessOutputFromat() {
     const auto out_fmt {
         ::av_guess_format(
-              nullptr                       /* short_name */
+              nullptr                       /* short name */
             , mediaResourceLocator().data() /* filename   */
-            , nullptr                       /* mime_type  */
+            , nullptr                       /* mime type  */
         )
     };
     if (!out_fmt) {
@@ -178,10 +178,11 @@ AVOutputFormat* OutputFormatContext::findOutputFormat(const std::string_view sho
     return ::av_guess_format(short_name.data(), nullptr, nullptr);
 }
 
-void OutputFormatContext::writeHeader() { // TODO use options 09.04
+void OutputFormatContext::writeHeader(const Options& options) {
+    Dictionary dictionary { options };
     ::avformat_write_header(
-          raw()
-        , nullptr /* options */
+          raw()            /* AVFormatContext */
+        , dictionary.get() /* options         */
     );
 }
 

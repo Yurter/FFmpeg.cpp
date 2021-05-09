@@ -34,7 +34,7 @@ private:
 
     void                guessOutputFromat();
     AVOutputFormat*     findOutputFormat(const std::string_view short_name) const;
-    void                writeHeader();
+    void                writeHeader(const Options& options);
     void                writeTrailer();
     void                initStreamsCodecpar();
     void                parseStreamsTimeBase();
