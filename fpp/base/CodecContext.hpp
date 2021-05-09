@@ -7,27 +7,27 @@ struct AVCodecContext;
 
 namespace fpp {
 
-    class CodecContext : public SharedFFmpegObject<AVCodecContext>, public Media {
+class CodecContext : public SharedFFmpegObject<AVCodecContext>, public Media {
 
-    public:
+public:
 
-        explicit CodecContext(const SpParameters params);
+    explicit CodecContext(const SpParameters params);
 
-        std::string         toString() const override final;
+    std::string         toString() const override final;
 
-        const AVCodec*      codec()  const;
-        bool                opened();
+    const AVCodec*      codec()  const;
+    bool                opened();
 
-        const SpParameters  params;
+    const SpParameters  params;
 
-    protected:
+protected:
 
-        void                init(Options options);
+    void                init(Options options);
 
-    private:
+private:
 
-        void                open(Options options);
+    void                open(Options options);
 
-    };
+};
 
 } // namespace fpp
