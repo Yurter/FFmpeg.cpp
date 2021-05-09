@@ -9,7 +9,7 @@ extern "C" {
 
 namespace fpp {
 
-    constexpr auto default_opening_timeout_ms { 20'000 };
+    constexpr auto default_opening_timeout_ms { 20'000 }; // TODO: use chrono
     constexpr auto default_closing_timeout_ms { 5'000  };
     constexpr auto default_reading_timeout_ms { 5'000  };
     constexpr auto default_writing_timeout_ms { 1'000  };
@@ -94,6 +94,14 @@ namespace fpp {
               ::avformat_alloc_context()
             , [](auto* ctx) { ::avformat_free_context(ctx); }
         );
+    }
+
+    void FormatContext::setFlag(int flag) {
+        raw()->flags |= flag;
+    }
+
+    bool FormatContext::isFlagSet(int flag) const {
+        return raw()->flags & flag;
     }
 
     int FormatContext::interrupt_callback(void* opaque) {

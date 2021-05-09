@@ -54,7 +54,7 @@ namespace fpp {
         struct Interrupter {
 
             Chronometer     chronometer;
-            std::int64_t    timeout_ms { 0 };
+            std::int64_t    timeout_ms { 0 }; // TODO: use chrono
 
             bool isTimeout() const {
                 return chronometer.elapsed_milliseconds() > timeout_ms;
@@ -74,6 +74,9 @@ namespace fpp {
         virtual bool        openContext(const Options& options) = 0;
         virtual void        closeContext() = 0;
         virtual std::string formatName() const = 0;
+
+        void                setFlag(int flag);
+        bool                isFlagSet(int flag) const;
 
         void                addStream(SharedStream stream);
         void                setStreams(StreamVector stream_vector);

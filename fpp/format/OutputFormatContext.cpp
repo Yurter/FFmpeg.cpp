@@ -19,8 +19,8 @@ OutputFormatContext::OutputFormatContext(OutputContext* output_ctx, const std::s
     setMediaResourceLocator("Custom output buffer");
     createContext();
     raw()->pb = output_ctx->raw();
-    raw()->flags |= AVFMT_FLAG_CUSTOM_IO;
-    raw()->flags |= AVFMT_NOFILE;
+    setFlag(AVFMT_FLAG_CUSTOM_IO);
+    setFlag(AVFMT_NOFILE);
 }
 
 OutputFormatContext::~OutputFormatContext() {
@@ -114,7 +114,7 @@ bool OutputFormatContext::openContext(const Options& options) {
     }
     initStreamsCodecpar();
     Dictionary dictionary { options };
-    if (!(raw()->flags & AVFMT_NOFILE)) {
+    if (!isFlagSet(AVFMT_NOFILE)) {
         if (const auto ret {
                 ::avio_open2(
                       &raw()->pb                    /* AVIOContext */
@@ -139,7 +139,7 @@ std::string OutputFormatContext::formatName() const {
 
 void OutputFormatContext::closeContext() {
     writeTrailer();
-    if (!(raw()->flags & AVFMT_NOFILE)) { // TODO: fix crush
+    if (!isFlagSet(AVFMT_NOFILE)) {
         ffmpeg_api_strict(avio_close, raw()->pb);
     }
     setOutputFormat(nullptr);
