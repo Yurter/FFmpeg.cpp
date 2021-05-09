@@ -121,7 +121,7 @@ bool OutputFormatContext::openContext(const Options& options) {
                     , mediaResourceLocator().data() /* url         */
                     , AVIO_FLAG_WRITE               /* flags       */
                     , nullptr                       /* int_cb      */
-                    , dictionary.get()
+                    , dictionary.get()              /* options     */
                 )
             }; ret < 0) {
             return false;
