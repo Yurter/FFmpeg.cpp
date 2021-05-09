@@ -92,7 +92,7 @@ bool InputFormatContext::openContext(const Options& options) {
     );
 
     setInputFormat(raw()->iformat);
-    retrieveStreams();
+    retrieveStreams(options);
     return true;
 }
 
@@ -105,9 +105,10 @@ void InputFormatContext::closeContext() {
     setInputFormat(nullptr);
 }
 
-void InputFormatContext::retrieveStreams() {
+void InputFormatContext::retrieveStreams(const Options& options) {
+    Dictionary dictionary { options };
     if (const auto ret {
-            ::avformat_find_stream_info(raw(), nullptr) // TODO: use options (12.05)
+            ::avformat_find_stream_info(raw(), dictionary.get())
         }; ret < 0 ) {
         throw FFmpegException {
             "Failed to retrieve input stream information"

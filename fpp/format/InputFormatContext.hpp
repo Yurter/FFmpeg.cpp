@@ -31,7 +31,7 @@ private:
     std::string         formatName() const override;
     void                closeContext() override;
 
-    void                retrieveStreams();
+    void                retrieveStreams(const Options& options);
 
     void                guessInputFromat();
     AVInputFormat*      findInputFormat(const std::string_view short_name) const;
