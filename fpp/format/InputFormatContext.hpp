@@ -4,15 +4,15 @@
 
 namespace fpp {
 
-enum class SeekPrecision : std::uint8_t {
-    Forward,
-    Backward,
-    Any,
-};
-
 class InputFormatContext : public FormatContext {
 
 public:
+
+    enum class SeekPrecision : std::uint8_t {
+        Forward,
+        Backward,
+        Any,
+    };
 
     explicit InputFormatContext(const std::string_view mrl = {}, const std::string_view format = {});
     InputFormatContext(InputContext* input_ctx, const std::string_view format);
